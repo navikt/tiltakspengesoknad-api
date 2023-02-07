@@ -1,4 +1,4 @@
-package no.nav.tiltakspenger
+package no.nav.tiltakspengesoknad.api
 
 import mu.KotlinLogging
 
