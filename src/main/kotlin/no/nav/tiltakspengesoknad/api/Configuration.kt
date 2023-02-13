@@ -1,8 +1,16 @@
 package no.nav.tiltakspengesoknad.api
 
-import io.ktor.server.config.*
+import com.natpryce.konfig.*
 
 
-data class Configuration(val config : ApplicationConfig) {
-  //TODO
+object Configuration {
+  private val devProperties = mapOf(
+    "application.httpPort" to 8080.toString()
+  )
+
+  private val defaultProperties = ConfigurationMap(devProperties)
+
+  private fun config() = ConfigurationProperties.systemProperties() overriding EnvironmentVariables overriding defaultProperties
+
+  fun applicationPort(): Int = config()[Key("application.httpPort", intType)]
 }

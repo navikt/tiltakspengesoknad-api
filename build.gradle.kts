@@ -39,9 +39,12 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server:$ktorVersion")
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
     // Jackson
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    // Configuration
+    implementation("com.natpryce:konfig:1.6.10.0")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -70,6 +73,14 @@ detekt {
     config = files("$projectDir/config/detekt.yml")
 }
 
+apply(plugin = "com.diffplug.spotless")
+
+spotless {
+    kotlin {
+        ktlint("0.48.2")
+    }
+}
+
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = javaVersion.toString()
@@ -91,13 +102,5 @@ tasks {
     analyzeTestClassesDependencies {
         warnUsedUndeclared = true
         warnUnusedDeclared = true
-    }
-}
-
-apply(plugin = "com.diffplug.spotless")
-
-spotless {
-    kotlin {
-        ktlint("0.48.2")
     }
 }
