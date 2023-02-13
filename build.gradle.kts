@@ -8,6 +8,7 @@ plugins {
     kotlin("jvm") version "1.8.10"
     id("io.gitlab.arturbosch.detekt") version "1.22.0"
     id("ca.cutterslade.analyze") version "1.9.0"
+    id("com.diffplug.spotless") version "6.15.0"
 }
 
 repositories {
@@ -90,5 +91,13 @@ tasks {
     analyzeTestClassesDependencies {
         warnUsedUndeclared = true
         warnUnusedDeclared = true
+    }
+}
+
+apply(plugin = "com.diffplug.spotless")
+
+spotless {
+    kotlin {
+        ktlint("0.48.2")
     }
 }

@@ -1,3 +1,5 @@
 kafka:
   pool: nav-dev
 cluster: dev-gcp
+ingresses:
+  - https://tiltakspengesoknad-api.dev.nav.no
