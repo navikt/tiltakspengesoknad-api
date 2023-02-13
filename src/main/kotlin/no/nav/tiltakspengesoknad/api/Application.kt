@@ -1,11 +1,10 @@
 package no.nav.tiltakspengesoknad.api
 
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.server.routing.routing
 import mu.KotlinLogging
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.server.routing.*
 import no.nav.tiltakspengesoknad.api.soknad.soknadRoutes
-
 
 fun main() {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
@@ -25,8 +24,10 @@ fun main() {
         }
     }.start(wait = true)
 
-    Runtime.getRuntime().addShutdownHook(Thread {
-        log.info { "Stopper server" }
-        server.stop(gracePeriodMillis = 3000, timeoutMillis = 3000)
-    })
+    Runtime.getRuntime().addShutdownHook(
+        Thread {
+            log.info { "Stopper server" }
+            server.stop(gracePeriodMillis = 3000, timeoutMillis = 3000)
+        },
+    )
 }
