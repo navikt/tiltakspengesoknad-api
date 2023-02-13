@@ -18,7 +18,7 @@ fun Route.soknadRoutes() {
             call.respondText(
                 text = "Dette er en test!",
                 contentType = ContentType.Text.Plain,
-                status = HttpStatusCode.OK
+                status = HttpStatusCode.OK,
             )
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }

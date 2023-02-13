@@ -16,7 +16,7 @@ object Configuration {
 
     private fun config() = ConfigurationProperties.systemProperties() overriding
         EnvironmentVariables overriding
-            defaultProperties
+        defaultProperties
 
     fun applicationPort(): Int = config()[Key("application.httpPort", intType)]
 }
