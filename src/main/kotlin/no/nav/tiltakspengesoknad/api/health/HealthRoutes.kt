@@ -17,9 +17,17 @@ fun Route.healthRoutes(healthChecks: List<HealthCheck>) {
             val failedHealthChecks = healthChecks.filter { it.status() == HealthStatus.UNHEALTHY }
             if (failedHealthChecks.isNotEmpty()) {
                 LOG.warn { "Failed health checks: $failedHealthChecks" }
-                call.respondText(text = "DEAD", contentType = ContentType.Text.Plain, status = HttpStatusCode.ServiceUnavailable)
+                call.respondText(
+                    text = "DEAD",
+                    contentType = ContentType.Text.Plain,
+                    status = HttpStatusCode.ServiceUnavailable,
+                )
             } else {
-                call.respondText(text = "ALIVE", contentType = ContentType.Text.Plain, status = HttpStatusCode.OK)
+                call.respondText(
+                    text = "ALIVE",
+                    contentType = ContentType.Text.Plain,
+                    status = HttpStatusCode.OK,
+                )
             }
         }
     }.also { LOG.info { "satt opp endepunkt /isalive" } }
