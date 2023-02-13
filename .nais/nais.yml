@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ name }}
+  name: tiltakspengesoknad-api
   namespace: tpts
   labels:
     team: tpts
@@ -28,3 +28,11 @@ spec:
     pool: {{ kafka.pool }}
   secureLogs:
     enabled: true
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: tiltakspengesoknad
+          namespace: tpts
+          cluster: {{ cluster }}

@@ -1,6 +1,10 @@
 package no.nav.tiltakspengesoknad.api
 
 import mu.KotlinLogging
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.routing.*
+import no.nav.tiltakspengesoknad.api.soknad.soknadRoutes
 
 fun main() {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
@@ -12,6 +16,16 @@ fun main() {
         log.error { "Uncaught exception logget i securelog" }
         securelog.error(e) { e.message }
     }
-
     log.info { "starting server" }
+
+    val server = embeddedServer(Netty, 8081) {
+        routing {
+            soknadRoutes()
+        }
+    }.start(wait = true)
+
+    Runtime.getRuntime().addShutdownHook(Thread {
+        log.info { "Stopper server" }
+        server.stop(gracePeriodMillis = 3000, timeoutMillis = 3000)
+    })
 }
