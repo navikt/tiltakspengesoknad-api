@@ -4,6 +4,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
+import no.nav.tiltakspengesoknad.api.health.healthRoutes
 import no.nav.tiltakspengesoknad.api.soknad.soknadRoutes
 
 fun main() {
@@ -21,6 +22,7 @@ fun main() {
     val server = embeddedServer(Netty, Configuration.applicationPort()) {
         routing {
             soknadRoutes()
+            healthRoutes(emptyList()) // TODO: Relevante helsesjekker
         }
     }.start(wait = true)
 
