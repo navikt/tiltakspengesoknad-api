@@ -1,5 +1,5 @@
 kafka:
   pool: nav-prod
 cluster: prod-gcp
-ingresses:
-  - https://tiltakspengesoknad-api.nav.no
+ingress:
+  url: https://tiltakspengesoknad-api.nav.no
