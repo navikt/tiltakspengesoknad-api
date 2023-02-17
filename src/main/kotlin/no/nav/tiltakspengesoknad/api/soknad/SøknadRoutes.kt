@@ -24,7 +24,7 @@ fun Route.søknadRoutes() {
                 call.receive<Søknad>()
                 call.response.status(HttpStatusCode.NoContent)
             } catch (exception: Exception) {
-                when(exception) {
+                when (exception) {
                     is CannotTransformContentToTypeException, is BadRequestException -> {
                         LOG.error("Ugyldig søknad", exception)
                         call.respondText(

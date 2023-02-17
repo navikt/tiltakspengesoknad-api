@@ -1,15 +1,15 @@
 package no.nav.tiltakspengesoknad.api.soknad
 
-import io.ktor.server.testing.testApplication
-import no.nav.tiltakspengesoknad.api.installJacksonFeature
-import no.nav.tiltakspengesoknad.api.setupRouting
-import org.junit.jupiter.api.Test
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.server.testing.testApplication
+import no.nav.tiltakspengesoknad.api.installJacksonFeature
+import no.nav.tiltakspengesoknad.api.setupRouting
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class SøknadRoutesTest {
     val ugyldigSøknad = """{}"""
