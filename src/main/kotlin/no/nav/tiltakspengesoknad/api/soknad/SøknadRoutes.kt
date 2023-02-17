@@ -1,0 +1,42 @@
+package no.nav.tiltakspengesoknad.api.soknad
+
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.plugins.CannotTransformContentToTypeException
+import io.ktor.server.request.receive
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import mu.KotlinLogging
+import no.nav.tiltakspengesoknad.api.SØKNAD_PATH
+import no.nav.tiltakspengesoknad.api.domain.Søknad
+import java.lang.Exception
+
+val LOG = KotlinLogging.logger { }
+
+fun Route.søknadRoutes() {
+    route(SØKNAD_PATH) {
+        post {
+            try {
+                call.receive<Søknad>()
+                call.response.status(HttpStatusCode.NoContent)
+            } catch (e: CannotTransformContentToTypeException) {
+                LOG.error("Ugyldig søknad", e)
+                call.respondText(
+                    text = "Bad Request",
+                    contentType = ContentType.Text.Plain,
+                    status = HttpStatusCode.BadRequest,
+                )
+            } catch (e: Exception) {
+                LOG.error("Noe gikk galt ved post av søknad", e)
+                call.respondText(
+                    text = "Internal server error",
+                    contentType = ContentType.Text.Plain,
+                    status = HttpStatusCode.InternalServerError,
+                )
+            }
+        }
+    }.also { LOG.info { "satt opp endepunkt /soknad" } }
+}

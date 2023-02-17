@@ -1,11 +1,18 @@
 package no.nav.tiltakspengesoknad.api
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import io.ktor.serialization.jackson.jackson
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
 import no.nav.tiltakspengesoknad.api.health.healthRoutes
-import no.nav.tiltakspengesoknad.api.soknad.soknadRoutes
+import no.nav.tiltakspengesoknad.api.soknad.søknadRoutes
 
 fun main() {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
@@ -19,12 +26,7 @@ fun main() {
     }
     log.info { "starting server" }
 
-    val server = embeddedServer(Netty, Configuration.applicationPort()) {
-        routing {
-            soknadRoutes()
-            healthRoutes(emptyList()) // TODO: Relevante helsesjekker
-        }
-    }.start(wait = true)
+    val server = embeddedServer(Netty, Configuration.applicationPort(), module = Application::søknadModule).start(wait = true)
 
     Runtime.getRuntime().addShutdownHook(
         Thread {
@@ -32,4 +34,18 @@ fun main() {
             server.stop(gracePeriodMillis = 3000, timeoutMillis = 3000)
         },
     )
+}
+
+fun Application.søknadModule() {
+    routing {
+        søknadRoutes()
+        healthRoutes(emptyList()) // TODO: Relevante helsesjekker
+    }
+    install(ContentNegotiation) {
+        jackson {
+            configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            registerModule(JavaTimeModule())
+            registerModule(KotlinModule.Builder().build())
+        }
+    }
 }

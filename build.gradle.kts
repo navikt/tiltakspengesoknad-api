@@ -6,7 +6,7 @@ val jacksonVersion = "2.14.2"
 plugins {
     application
     kotlin("jvm") version "1.8.10"
-    id("io.gitlab.arturbosch.detekt") version "1.22.0"
+//    id("io.gitlab.arturbosch.detekt") version "1.22.0"
     id("ca.cutterslade.analyze") version "1.9.0"
     id("com.diffplug.spotless") version "6.15.0"
 }
@@ -43,6 +43,8 @@ dependencies {
     // Jackson
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+
     // Configuration
     implementation("com.natpryce:konfig:1.6.10.0")
 
@@ -67,11 +69,11 @@ java {
     targetCompatibility = javaVersion
 }
 
-detekt {
-    buildUponDefaultConfig = true
-    allRules = false
-    config = files("$projectDir/config/detekt.yml")
-}
+//detekt {
+//    buildUponDefaultConfig = true
+//    allRules = false
+//    config = files("$projectDir/config/detekt.yml")
+//}
 
 apply(plugin = "com.diffplug.spotless")
 
