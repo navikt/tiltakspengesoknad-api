@@ -3,6 +3,7 @@ package no.nav.tiltakspengesoknad.api.soknad
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respondText
@@ -22,20 +23,25 @@ fun Route.søknadRoutes() {
             try {
                 call.receive<Søknad>()
                 call.response.status(HttpStatusCode.NoContent)
-            } catch (e: CannotTransformContentToTypeException) {
-                LOG.error("Ugyldig søknad", e)
-                call.respondText(
-                    text = "Bad Request",
-                    contentType = ContentType.Text.Plain,
-                    status = HttpStatusCode.BadRequest,
-                )
-            } catch (e: Exception) {
-                LOG.error("Noe gikk galt ved post av søknad", e)
-                call.respondText(
-                    text = "Internal server error",
-                    contentType = ContentType.Text.Plain,
-                    status = HttpStatusCode.InternalServerError,
-                )
+            } catch (exception: Exception) {
+                when(exception) {
+                    is CannotTransformContentToTypeException, is BadRequestException -> {
+                        LOG.error("Ugyldig søknad", exception)
+                        call.respondText(
+                            text = "Bad Request",
+                            contentType = ContentType.Text.Plain,
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    }
+                    else -> {
+                        LOG.error("Noe gikk galt ved post av søknad", exception)
+                        call.respondText(
+                            text = "Internal server error",
+                            contentType = ContentType.Text.Plain,
+                            status = HttpStatusCode.InternalServerError,
+                        )
+                    }
+                }
             }
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }

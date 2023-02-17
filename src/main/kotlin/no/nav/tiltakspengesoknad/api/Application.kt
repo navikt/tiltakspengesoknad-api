@@ -37,10 +37,18 @@ fun main() {
 }
 
 fun Application.søknadModule() {
+    setupRouting()
+    installJacksonFeature()
+}
+
+internal fun Application.setupRouting() {
     routing {
         søknadRoutes()
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
     }
+}
+
+internal fun Application.installJacksonFeature() {
     install(ContentNegotiation) {
         jackson {
             configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
