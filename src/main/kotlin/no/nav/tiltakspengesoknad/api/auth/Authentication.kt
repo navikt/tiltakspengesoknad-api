@@ -8,12 +8,11 @@ import no.nav.security.token.support.v2.RequiredClaims
 import no.nav.security.token.support.v2.tokenValidationSupport
 
 fun Application.installAuthentication(config: ApplicationConfig) {
-    val acceptedIssuer = config.property("security.issuer_name").getString()
 
     install(Authentication) {
         tokenValidationSupport(
             config = config,
-            requiredClaims = RequiredClaims(issuer = acceptedIssuer, claimMap = arrayOf("acr=Level4")),
+            requiredClaims = RequiredClaims(issuer = "tokendings", claimMap = arrayOf("acr=Level4")),
         )
     }
 }
