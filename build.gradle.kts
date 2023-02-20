@@ -2,9 +2,12 @@ val javaVersion = JavaVersion.VERSION_17
 val mockkVersion = "1.13.4"
 val ktorVersion = "2.2.3"
 val jacksonVersion = "2.14.2"
+val commonVersion = "2.2023.01.10_13.49-81ddc732df3a"
+val tokenSupportVersion = "3.0.3"
 
 plugins {
     application
+    distribution
     kotlin("jvm") version "1.8.10"
     id("ca.cutterslade.analyze") version "1.9.0"
     id("com.diffplug.spotless") version "6.15.0"
@@ -39,6 +42,10 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server:$ktorVersion")
     implementation("io.ktor:ktor-server-core:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktorVersion")
     // Jackson
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
@@ -46,6 +53,9 @@ dependencies {
 
     // Configuration
     implementation("com.natpryce:konfig:1.6.10.0")
+    // TokenX
+    implementation("no.nav.common:token-client:$commonVersion")
+    implementation("no.nav.security:token-validation-ktor-v2:$tokenSupportVersion")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
+    <property name="secure_logs_dir" value="./app/build" />
+
     <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
@@ -12,9 +15,9 @@
     </appender>
 
     <appender name="secureLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/secure-logs/secure.log</file>
+        <file>${secure_logs_dir}/secure-logs/secure.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>/Users/thoreirikellefsen/dev/tiltakspengesoknad-api/src/main/kotlin/no/nav/tiltakspengesoknad/api/secure-logs.%i</fileNamePattern>
+            <fileNamePattern>${secure_logs_dir}/secure-logs/secure.log.%i</fileNamePattern>
             <minIndex>1</minIndex>
             <maxIndex>1</maxIndex>
         </rollingPolicy>
@@ -24,7 +27,25 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
+    <appender name="audit" class="com.papertrailapp.logback.Syslog4jAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%m%n%xEx</pattern>
+        </layout>
+
+        <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
+            <host>audit.nais</host>
+            <port>6514</port>
+            <ident>tiltakspenger-vedtak</ident>
+            <maxMessageLength>128000</maxMessageLength>
+        </syslogConfig>
+    </appender>
+
+    <logger level="INFO" name="audit" additivity="false">
+        <appender-ref ref="audit"/>
+    </logger>
+
     <logger name="no.nav.helse.rapids_rivers" level="INFO"/>
+    <logger name="io.ktor.auth.jwt" level="TRACE"/>
 
     <logger name="tjenestekall" level="DEBUG" additivity="false">
         <appender-ref ref="secureLog"/>
