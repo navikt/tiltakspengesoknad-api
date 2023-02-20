@@ -5,6 +5,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.testing.testApplication
 import no.nav.tiltakspengesoknad.api.installJacksonFeature
 import no.nav.tiltakspengesoknad.api.setupRouting
@@ -36,7 +37,7 @@ class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 400 ved ugyldig søknad`() {
         testApplication {
             application {
-                setupRouting()
+                setupRouting(ApplicationConfig(""))
                 installJacksonFeature()
             }
             val response = client.post("/soknad") {
@@ -51,7 +52,7 @@ class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
         testApplication {
             application {
-                setupRouting()
+                setupRouting(ApplicationConfig(""))
                 installJacksonFeature()
             }
             val response = client.post("/soknad") {

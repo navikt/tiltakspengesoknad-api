@@ -9,11 +9,13 @@ import io.ktor.server.application.ApplicationStarted
 import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
+import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.httpMethod
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
+import no.nav.security.token.support.v2.asIssuerProps
 import no.nav.tiltakspengesoknad.api.auth.installAuthentication
 import no.nav.tiltakspengesoknad.api.health.healthRoutes
 import no.nav.tiltakspengesoknad.api.soknad.søknadRoutes
@@ -47,10 +49,9 @@ fun Application.module() {
   }*/
 
     val config = this.environment.config
-
     installAuthentication(config)
 
-    setupRouting()
+    setupRouting(config)
     installJacksonFeature()
 
     environment.monitor.subscribe(ApplicationStarted) {
@@ -61,13 +62,11 @@ fun Application.module() {
     }
 }
 
-internal fun Application.setupRouting() {
-    /*if (local()) {
-    //TODO: Mocking
-    }*/
-    // val pdlService = PdlService()
+internal fun Application.setupRouting(config: ApplicationConfig) {
+    val issuers = config.asIssuerProps().keys
+
     routing {
-        authenticate("userTest") {
+        authenticate(*issuers.toTypedArray()) {
             søknadRoutes()
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
