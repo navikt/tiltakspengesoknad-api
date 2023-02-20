@@ -1,5 +1,8 @@
 package no.nav.tiltakspengesoknad.api
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStarted
@@ -13,11 +16,13 @@ import io.ktor.server.routing.routing
 import mu.KotlinLogging
 import no.nav.tiltakspengesoknad.api.auth.installAuthentication
 import no.nav.tiltakspengesoknad.api.health.healthRoutes
-import no.nav.tiltakspengesoknad.api.soknad.soknadRoutes
+import no.nav.tiltakspengesoknad.api.soknad.søknadRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
+    System.setProperty("logback.configurationFile", "egenLogback.xml")
+
     val log = KotlinLogging.logger {}
     val securelog = KotlinLogging.logger("tjenestekall")
 
@@ -25,12 +30,7 @@ fun Application.module() {
         log.error { "Uncaught exception logget i securelog" }
         securelog.error(e) { e.message }
     }
-
-    install(ContentNegotiation) {
-        jackson {
-            // TODO: Sett opp Jackson
-        }
-    }
+    log.info { "starting server" }
 
     // Til debugging enn så lenge
     install(CallLogging) {
@@ -50,7 +50,8 @@ fun Application.module() {
 
     installAuthentication(config)
 
-    wireRoutes()
+    setupRouting()
+    installJacksonFeature()
 
     environment.monitor.subscribe(ApplicationStarted) {
         log.info { "Starter server" }
@@ -60,19 +61,25 @@ fun Application.module() {
     }
 }
 
-fun Application.wireRoutes() {
-  /*if (local()) {
-      //TODO: Mocking
-  }*/
-
+internal fun Application.setupRouting() {
+    /*if (local()) {
+    //TODO: Mocking
+    }*/
     // val pdlService = PdlService()
-
     routing {
         authenticate("userTest") {
-            // TODO pdlRoutes(pdlService)
-            soknadRoutes()
+            søknadRoutes()
         }
+        healthRoutes(emptyList()) // TODO: Relevante helsesjekker
+    }
+}
 
-        healthRoutes(emptyList())
+internal fun Application.installJacksonFeature() {
+    install(ContentNegotiation) {
+        jackson {
+            configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            registerModule(JavaTimeModule())
+            registerModule(KotlinModule.Builder().build())
+        }
     }
 }

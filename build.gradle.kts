@@ -9,7 +9,6 @@ plugins {
     application
     distribution
     kotlin("jvm") version "1.8.10"
-    id("io.gitlab.arturbosch.detekt") version "1.22.0"
     id("ca.cutterslade.analyze") version "1.9.0"
     id("com.diffplug.spotless") version "6.15.0"
 }
@@ -50,6 +49,8 @@ dependencies {
     // Jackson
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+
     // Configuration
     implementation("com.natpryce:konfig:1.6.10.0")
     // TokenX
@@ -57,6 +58,8 @@ dependencies {
     implementation("no.nav.security:token-validation-ktor-v2:$tokenSupportVersion")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.10")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.mockk:mockk-dsl-jvm:$mockkVersion")
@@ -75,12 +78,6 @@ application {
 java {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
-}
-
-detekt {
-    buildUponDefaultConfig = true
-    allRules = false
-    config = files("$projectDir/config/detekt.yml")
 }
 
 apply(plugin = "com.diffplug.spotless")
