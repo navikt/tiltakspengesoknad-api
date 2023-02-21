@@ -12,6 +12,7 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.request.httpMethod
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
@@ -19,6 +20,7 @@ import no.nav.security.token.support.v2.asIssuerProps
 import no.nav.tiltakspengesoknad.api.auth.installAuthentication
 import no.nav.tiltakspengesoknad.api.health.healthRoutes
 import no.nav.tiltakspengesoknad.api.soknad.søknadRoutes
+import no.nav.tiltakspengesoknad.api.soknad.validateSøknad
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -44,15 +46,15 @@ fun Application.module() {
         }
     }
 
-  /*install(RequestValidation) {
-      TODO: Backendvalidering av søknad
-  }*/
-
     val config = this.environment.config
     installAuthentication(config)
 
     setupRouting(config)
     installJacksonFeature()
+
+    install(RequestValidation) {
+        validateSøknad()
+    }
 
     environment.monitor.subscribe(ApplicationStarted) {
         log.info { "Starter server" }
