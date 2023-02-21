@@ -1,7 +1,6 @@
 package no.nav.tiltakspengesoknad.api.auth.oauth
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -10,10 +9,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.Parameters
 import io.ktor.http.ParametersBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.security.token.support.client.core.OAuth2GrantType
@@ -28,35 +23,19 @@ class OAuth2Client(
     private val httpClient: HttpClient,
     private val wellKnownUrl: String,
     private val clientAuthProperties: ClientAuthenticationProperties,
-    private val cacheConfig: OAuth2CacheConfig = OAuth2CacheConfig(enabled = true, maximumSize = 1000, evictSkew = 5),
 ) {
     private val wellKnown: WellKnown =
         runBlocking { httpClient.get(wellKnownUrl).body() }
-
-    private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
-    private val cache: AsyncLoadingCache<GrantRequest, OAuth2AccessTokenResponse> =
-        cacheConfig.cache(coroutineScope) {
-            httpClient.tokenRequest(
-                tokenEndpointUrl = wellKnown.tokenEndpointUrl,
-                clientAuthProperties = clientAuthProperties,
-                grantRequest = it,
-            )
-        }
 
     suspend fun tokenExchange(token: String, audience: String) =
         accessToken(GrantRequest.tokenExchange(token, audience))
 
     suspend fun accessToken(grantRequest: GrantRequest): OAuth2AccessTokenResponse =
-        if (cacheConfig.enabled) {
-            cache.get(grantRequest).await()
-        } else {
-            httpClient.tokenRequest(
-                tokenEndpointUrl = wellKnown.tokenEndpointUrl,
-                clientAuthProperties = clientAuthProperties,
-                grantRequest = grantRequest,
-            )
-        }
+        httpClient.tokenRequest(
+            tokenEndpointUrl = wellKnown.tokenEndpointUrl,
+            clientAuthProperties = clientAuthProperties,
+            grantRequest = grantRequest,
+        )
 
     data class WellKnown(
         @JsonProperty("token_endpoint")

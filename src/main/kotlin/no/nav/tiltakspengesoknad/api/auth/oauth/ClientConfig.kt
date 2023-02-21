@@ -9,14 +9,6 @@ class ClientConfig(
     applicationConfig: ApplicationConfig,
     httpClient: HttpClient,
 ) {
-    private val cacheConfig: OAuth2CacheConfig =
-        with(applicationConfig.config(CACHE_PATH)) {
-            OAuth2CacheConfig(
-                enabled = propertyToStringOrNull("cache.enabled")?.toBoolean() ?: false,
-                maximumSize = propertyToStringOrNull("cache.maximumSize")?.toLong() ?: 0,
-                evictSkew = propertyToStringOrNull("cache.evictSkew")?.toLong() ?: 0,
-            )
-        }
 
     internal val clients: Map<String, OAuth2Client> =
         applicationConfig.configList(CLIENTS_PATH)
@@ -34,14 +26,12 @@ class ClientConfig(
                     httpClient = httpClient,
                     wellKnownUrl = wellKnownUrl,
                     clientAuthProperties = clientAuth,
-                    cacheConfig = cacheConfig,
                 )
             }
 
     companion object CommonConfigurationAttributes {
         const val COMMON_PREFIX = "no.nav.security.jwt.client.registration"
         const val CLIENTS_PATH = "$COMMON_PREFIX.clients"
-        const val CACHE_PATH = "$COMMON_PREFIX.cache"
         const val CLIENT_NAME = "client_name"
     }
 }
