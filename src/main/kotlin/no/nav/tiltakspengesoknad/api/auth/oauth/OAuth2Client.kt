@@ -1,4 +1,4 @@
-package no.nav.security.token.support.ktor.oauth
+package no.nav.tiltakspengesoknad.api.auth.oauth
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
+import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.security.token.support.client.core.OAuth2GrantType
 import no.nav.security.token.support.client.core.OAuth2ParameterNames
 import no.nav.security.token.support.client.core.auth.ClientAssertion
@@ -22,13 +23,12 @@ import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenRespons
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.*
-import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 
 class OAuth2Client(
     private val httpClient: HttpClient,
     private val wellKnownUrl: String,
     private val clientAuthProperties: ClientAuthenticationProperties,
-    private val cacheConfig: OAuth2CacheConfig = OAuth2CacheConfig(enabled = true, maximumSize = 1000, evictSkew = 5)
+    private val cacheConfig: OAuth2CacheConfig = OAuth2CacheConfig(enabled = true, maximumSize = 1000, evictSkew = 5),
 ) {
     private val wellKnown: WellKnown =
         runBlocking { httpClient.get(wellKnownUrl).body() }
@@ -40,7 +40,7 @@ class OAuth2Client(
             httpClient.tokenRequest(
                 tokenEndpointUrl = wellKnown.tokenEndpointUrl,
                 clientAuthProperties = clientAuthProperties,
-                grantRequest = it
+                grantRequest = it,
             )
         }
 
@@ -54,19 +54,19 @@ class OAuth2Client(
             httpClient.tokenRequest(
                 tokenEndpointUrl = wellKnown.tokenEndpointUrl,
                 clientAuthProperties = clientAuthProperties,
-                grantRequest = grantRequest
+                grantRequest = grantRequest,
             )
         }
 
     data class WellKnown(
         @JsonProperty("token_endpoint")
-        val tokenEndpointUrl: String
+        val tokenEndpointUrl: String,
     )
 }
 
 data class GrantRequest(
     val grantType: OAuth2GrantType,
-    val params: Map<String, String> = emptyMap()
+    val params: Map<String, String> = emptyMap(),
 ) {
     companion object {
         fun tokenExchange(token: String, audience: String): GrantRequest =
@@ -75,8 +75,8 @@ data class GrantRequest(
                 params = mapOf(
                     OAuth2ParameterNames.SUBJECT_TOKEN_TYPE to "urn:ietf:params:oauth:token-type:jwt",
                     OAuth2ParameterNames.SUBJECT_TOKEN to token,
-                    OAuth2ParameterNames.AUDIENCE to audience
-                )
+                    OAuth2ParameterNames.AUDIENCE to audience,
+                ),
             )
     }
 }
@@ -84,32 +84,32 @@ data class GrantRequest(
 internal suspend fun HttpClient.tokenRequest(
     tokenEndpointUrl: String,
     clientAuthProperties: ClientAuthenticationProperties,
-    grantRequest: GrantRequest
+    grantRequest: GrantRequest,
 ): OAuth2AccessTokenResponse =
     submitForm(
         url = tokenEndpointUrl,
         formParameters = Parameters.build {
             appendClientAuthParams(
                 tokenEndpointUrl = tokenEndpointUrl,
-                clientAuthProperties = clientAuthProperties
+                clientAuthProperties = clientAuthProperties,
             )
             append(OAuth2ParameterNames.GRANT_TYPE, grantRequest.grantType.value)
             grantRequest.params.forEach {
                 append(it.key, it.value)
             }
-        }
+        },
     ) {
         if (clientAuthProperties.clientAuthMethod == ClientAuthenticationMethod.CLIENT_SECRET_BASIC) {
             header(
                 "Authorization",
-                "Basic ${basicAuth(clientAuthProperties.clientId, clientAuthProperties.clientSecret)}"
+                "Basic ${basicAuth(clientAuthProperties.clientId, clientAuthProperties.clientSecret)}",
             )
         }
     }.body()
 
 private fun ParametersBuilder.appendClientAuthParams(
     tokenEndpointUrl: String,
-    clientAuthProperties: ClientAuthenticationProperties
+    clientAuthProperties: ClientAuthenticationProperties,
 ) = apply {
     when (clientAuthProperties.clientAuthMethod) {
         ClientAuthenticationMethod.CLIENT_SECRET_POST -> {

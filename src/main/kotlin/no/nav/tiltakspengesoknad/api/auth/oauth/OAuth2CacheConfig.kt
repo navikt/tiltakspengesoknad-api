@@ -1,4 +1,4 @@
-package no.nav.security.token.support.ktor.oauth
+package no.nav.tiltakspengesoknad.api.auth.oauth
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -15,7 +15,7 @@ data class OAuth2CacheConfig(
 ) {
     fun cache(
         cacheContext: CoroutineScope,
-        loader: suspend (GrantRequest) -> OAuth2AccessTokenResponse
+        loader: suspend (GrantRequest) -> OAuth2AccessTokenResponse,
     ): AsyncLoadingCache<GrantRequest, OAuth2AccessTokenResponse> =
         Caffeine.newBuilder()
             .expireAfter(evictOnResponseExpiresIn(evictSkew))
@@ -30,23 +30,32 @@ data class OAuth2CacheConfig(
         return object : Expiry<GrantRequest, OAuth2AccessTokenResponse> {
 
             override fun expireAfterCreate(
-                key: GrantRequest, response: OAuth2AccessTokenResponse,
-                currentTime: Long
+                key: GrantRequest,
+                response: OAuth2AccessTokenResponse,
+                currentTime: Long,
             ): Long {
                 val seconds =
-                    if (response.expiresIn > skewInSeconds) response.expiresIn - skewInSeconds else response.expiresIn
-                        .toLong()
+                    if (response.expiresIn > skewInSeconds) {
+                        response.expiresIn - skewInSeconds
+                    } else {
+                        response.expiresIn
+                            .toLong()
+                    }
                 return TimeUnit.SECONDS.toNanos(seconds)
             }
 
             override fun expireAfterUpdate(
-                key: GrantRequest, response: OAuth2AccessTokenResponse,
-                currentTime: Long, currentDuration: Long
+                key: GrantRequest,
+                response: OAuth2AccessTokenResponse,
+                currentTime: Long,
+                currentDuration: Long,
             ): Long = currentDuration
 
-
             override fun expireAfterRead(
-                key: GrantRequest, response: OAuth2AccessTokenResponse, currentTime: Long, currentDuration: Long
+                key: GrantRequest,
+                response: OAuth2AccessTokenResponse,
+                currentTime: Long,
+                currentDuration: Long,
             ): Long = currentDuration
         }
     }
