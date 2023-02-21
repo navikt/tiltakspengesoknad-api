@@ -15,7 +15,11 @@ fun Application.installAuthentication(config: ApplicationConfig) {
             tokenValidationSupport(
                 name = issuer,
                 config = config,
-                requiredClaims = RequiredClaims(issuer = issuer, claimMap = arrayOf("acr=Level4")),
+                requiredClaims = RequiredClaims(
+                    issuer = issuer,
+                    claimMap = arrayOf("acr=Level4"),
+                    combineWithOr = false,
+                ),
             )
         }
     }

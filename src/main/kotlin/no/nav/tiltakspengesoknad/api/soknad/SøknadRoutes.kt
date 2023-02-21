@@ -22,7 +22,7 @@ fun Route.søknadRoutes() {
         post {
             try {
                 call.receive<Søknad>()
-                call.response.status(HttpStatusCode.NoContent)
+                call.respondText(status = HttpStatusCode.NoContent, text = "OK")
             } catch (exception: Exception) {
                 when (exception) {
                     is CannotTransformContentToTypeException, is BadRequestException -> {
