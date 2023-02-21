@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
-import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.security.token.support.client.core.OAuth2GrantType
 import no.nav.security.token.support.client.core.OAuth2ParameterNames
 import no.nav.security.token.support.client.core.auth.ClientAssertion
@@ -22,8 +21,9 @@ import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenRespons
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.*
+import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 
-class OAuth2Client(
+class zOAuth2Client(
     private val httpClient: HttpClient,
     private val wellKnownUrl: String,
     private val clientAuthProperties: ClientAuthenticationProperties,
