@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -23,13 +24,14 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 
-class zOAuth2Client(
+class OAuth2Client(
     private val httpClient: HttpClient,
     private val wellKnownUrl: String,
     private val clientAuthProperties: ClientAuthenticationProperties,
     private val cacheConfig: OAuth2CacheConfig = OAuth2CacheConfig(enabled = true, maximumSize = 1000, evictSkew = 5)
 ) {
-    private val wellKnown: WellKnown = runBlocking { httpClient.get(wellKnownUrl) }
+    private val wellKnown: WellKnown =
+        runBlocking { httpClient.get(wellKnownUrl).body() }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
@@ -42,14 +44,8 @@ class zOAuth2Client(
             )
         }
 
-    suspend fun onBehalfOf(token: String, scope: String) =
-        accessToken(GrantRequest.onBehalfOf(token, scope))
-
     suspend fun tokenExchange(token: String, audience: String) =
         accessToken(GrantRequest.tokenExchange(token, audience))
-
-    suspend fun clientCredentials(scope: String) =
-        accessToken(GrantRequest.clientCredentials(scope))
 
     suspend fun accessToken(grantRequest: GrantRequest): OAuth2AccessTokenResponse =
         if (cacheConfig.enabled) {
@@ -82,24 +78,6 @@ data class GrantRequest(
                     OAuth2ParameterNames.AUDIENCE to audience
                 )
             )
-
-        fun onBehalfOf(token: String, scope: String): GrantRequest =
-            GrantRequest(
-                grantType = OAuth2GrantType.JWT_BEARER,
-                params = mapOf(
-                    OAuth2ParameterNames.SCOPE to scope,
-                    OAuth2ParameterNames.REQUESTED_TOKEN_USE to "on_behalf_of",
-                    OAuth2ParameterNames.ASSERTION to token
-                )
-            )
-
-        fun clientCredentials(scope: String): GrantRequest =
-            GrantRequest(
-                grantType = OAuth2GrantType.CLIENT_CREDENTIALS,
-                params = mapOf(
-                    OAuth2ParameterNames.SCOPE to scope,
-                )
-            )
     }
 }
 
@@ -127,7 +105,7 @@ internal suspend fun HttpClient.tokenRequest(
                 "Basic ${basicAuth(clientAuthProperties.clientId, clientAuthProperties.clientSecret)}"
             )
         }
-    }
+    }.body()
 
 private fun ParametersBuilder.appendClientAuthParams(
     tokenEndpointUrl: String,
