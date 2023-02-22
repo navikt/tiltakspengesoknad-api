@@ -3,8 +3,6 @@ package no.nav.tiltakspengesoknad.api.soknad
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
-import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.auth.principal
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
 import io.ktor.server.request.receive
@@ -23,9 +21,7 @@ fun Route.søknadRoutes() {
     route(SØKNAD_PATH) {
         post {
             try {
-                val søknadDTO = call.receive<Søknad>()
-                val principal = call.principal<JWTPrincipal>()
-                val søkerId = principal!!.payload.getClaim("pid").asString()
+                call.receive<Søknad>()
                 call.respondText(status = HttpStatusCode.NoContent, text = "OK")
             } catch (exception: Exception) {
                 when (exception) {
