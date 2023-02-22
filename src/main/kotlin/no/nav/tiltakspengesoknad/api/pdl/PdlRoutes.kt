@@ -20,9 +20,11 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
     val log = KotlinLogging.logger {}
 
     get(path = BARN_PATH) {
+        val url = config.property("endpoints.pdl").getString()
+        val audience = config.property("audience.pdl").getString()
         val pid = call.getClaim("tokendings", "pid")
         val token = call.principal<TokenValidationContextPrincipal>().asTokenString()
-        val oAuth2Response = oauth2Client.tokenExchange(token, "")
+        val oAuth2Response = oauth2Client.tokenExchange(token, audience)
         call.respondText(status = HttpStatusCode.OK, text = "OK")
     }
 }
