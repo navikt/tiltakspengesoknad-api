@@ -35,3 +35,11 @@ spec:
         - application: tiltakspengesoknad
           namespace: tpts
           cluster: {{ cluster }}
+    outbound:
+      external:
+        - host: {{ endpoints.pdl }}
+  env:
+    - name: PDL_ENDPOINT_URL
+      value: {{ endpoints.pdl }}
+    - name: PDL_AUDIENCE
+      value: {{ audience.pdl }}
