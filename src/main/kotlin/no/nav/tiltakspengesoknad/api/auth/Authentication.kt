@@ -1,10 +1,13 @@
 package no.nav.tiltakspengesoknad.api.auth
 
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.authentication
 import io.ktor.server.config.ApplicationConfig
 import no.nav.security.token.support.v2.RequiredClaims
+import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 import no.nav.security.token.support.v2.asIssuerProps
 import no.nav.security.token.support.v2.tokenValidationSupport
 
@@ -24,3 +27,13 @@ fun Application.installAuthentication(config: ApplicationConfig) {
         }
     }
 }
+
+internal fun ApplicationCall.getClaim(issuer: String, name: String): String? =
+    this.authentication.principal<TokenValidationContextPrincipal>()
+        ?.context
+        ?.getClaims(issuer)
+        ?.getStringClaim(name)
+
+internal fun TokenValidationContextPrincipal?.asTokenString(): String =
+    this?.context?.firstValidToken?.map { it.tokenAsString }?.orElse(null)
+        ?: throw RuntimeException("no token found in call context")
