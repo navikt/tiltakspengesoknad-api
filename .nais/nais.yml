@@ -43,3 +43,5 @@ spec:
       value: {{ endpoints.pdl }}
     - name: PDL_AUDIENCE
       value: {{ audience.pdl }}
+    - name: PDL_SCOPE
+      value: {{ scope.pdl }}

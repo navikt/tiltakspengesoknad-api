@@ -30,6 +30,9 @@ class OAuth2Client(
     suspend fun tokenExchange(token: String, audience: String) =
         accessToken(GrantRequest.tokenExchange(token, audience))
 
+    suspend fun clientCredentials(scope: String) =
+        accessToken(GrantRequest.clientCredentials(scope))
+
     suspend fun accessToken(grantRequest: GrantRequest): OAuth2AccessTokenResponse =
         httpClient.tokenRequest(
             tokenEndpointUrl = wellKnown.tokenEndpointUrl,
@@ -55,6 +58,14 @@ data class GrantRequest(
                     OAuth2ParameterNames.SUBJECT_TOKEN_TYPE to "urn:ietf:params:oauth:token-type:jwt",
                     OAuth2ParameterNames.SUBJECT_TOKEN to token,
                     OAuth2ParameterNames.AUDIENCE to audience,
+                ),
+            )
+
+        fun clientCredentials(scope: String): GrantRequest =
+            GrantRequest(
+                grantType = OAuth2GrantType.CLIENT_CREDENTIALS,
+                params = mapOf(
+                    OAuth2ParameterNames.SCOPE to scope,
                 ),
             )
     }

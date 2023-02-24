@@ -16,7 +16,8 @@ import no.nav.tiltakspengesoknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspengesoknad.api.httpClientCIO
 
 fun Route.pdlRoutes(config: ApplicationConfig) {
-    val oauth2Client = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
+    val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
+    val oauth2ClientClientCredentials = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
     val log = KotlinLogging.logger {}
 
     get(path = BARN_PATH) {
@@ -24,7 +25,10 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
         val audience = config.property("audience.pdl").getString()
         val pid = call.getClaim("tokendings", "pid")
         val token = call.principal<TokenValidationContextPrincipal>().asTokenString()
-        val oAuth2Response = oauth2Client.tokenExchange(token, audience)
+        val tokenxResponse = oauth2ClientTokenX.tokenExchange(token, audience)
+
+        val scope = config.property("scope.pdl").getString()
+        val clientCredentialsGrant = oauth2ClientClientCredentials.clientCredentials(scope)
         call.respondText(status = HttpStatusCode.OK, text = "OK")
     }
 }
