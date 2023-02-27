@@ -62,11 +62,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.mockk:mockk-dsl-jvm:$mockkVersion")
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
-}
-
-configurations.all {
-    // exclude JUnit 4
-    exclude(group = "junit", module = "junit")
+    testImplementation("no.nav.security:mock-oauth2-server:0.5.7")
 }
 
 application {

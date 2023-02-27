@@ -19,7 +19,7 @@ class ClientConfig(
                     ClientAuthenticationMethod(
                         clientConfig.propertyToString("authentication.client_auth_method"),
                     ),
-                    clientConfig.propertyToStringOrNull("client_secret"),
+                    clientConfig.propertyToStringOrNull("authentication.client_secret"),
                     clientConfig.propertyToStringOrNull("authentication.client_jwk"),
                 )
                 clientConfig.propertyToString(CLIENT_NAME) to OAuth2Client(
