@@ -55,7 +55,7 @@ dependencies {
     implementation("com.natpryce:konfig:1.6.10.0")
     // TokenX
     implementation("no.nav.security:token-validation-ktor-v2:$tokenSupportVersion")
-    implementation("no.nav.security:token-client-core:3.0.0-SNAPSHOT")
+    implementation("no.nav.security:token-client-core:3.0.4")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
