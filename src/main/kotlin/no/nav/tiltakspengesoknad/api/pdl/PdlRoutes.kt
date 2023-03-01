@@ -9,7 +9,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import mu.KotlinLogging
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
-import no.nav.tiltakspengesoknad.api.BARN_PATH
+import no.nav.tiltakspengesoknad.api.PERSONALIA_PATH
 import no.nav.tiltakspengesoknad.api.auth.asTokenString
 import no.nav.tiltakspengesoknad.api.auth.getClaim
 import no.nav.tiltakspengesoknad.api.auth.oauth.ClientConfig
@@ -20,13 +20,12 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
     val oauth2ClientClientCredentials = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
     val log = KotlinLogging.logger {}
 
-    get(path = BARN_PATH) {
+    get(path = PERSONALIA_PATH) {
         val url = config.property("endpoints.pdl").getString()
         val audience = config.property("audience.pdl").getString()
         val pid = call.getClaim("tokendings", "pid")
         val token = call.principal<TokenValidationContextPrincipal>().asTokenString()
         val tokenxResponse = oauth2ClientTokenX.tokenExchange(token, audience)
-
         val scope = config.property("scope.pdl").getString()
         val clientCredentialsGrant = oauth2ClientClientCredentials.clientCredentials(scope)
         call.respondText(status = HttpStatusCode.OK, text = "OK")
