@@ -1,19 +1,20 @@
 package no.nav.tiltakspengesoknad.api.soknad
 
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.testing.testApplication
-import no.nav.tiltakspengesoknad.api.installJacksonFeature
-import no.nav.tiltakspengesoknad.api.setupRouting
+import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import kotlin.test.Ignore
 
-class SøknadRoutesTest {
+internal class SøknadRoutesTest {
     val ugyldigSøknad = """{}"""
     val gyldigSøknad = """
         {
@@ -34,35 +35,57 @@ class SøknadRoutesTest {
         }
     """.trimMargin()
 
-    @Ignore
+    private val mockOAuth2Server = MockOAuth2Server()
+
+    @BeforeAll
+    fun setup() = mockOAuth2Server.start(8080)
+
+    @AfterAll
+    fun after() = mockOAuth2Server.shutdown()
+
     @Test
     fun `post på soknad-endepunkt skal svare med 400 ved ugyldig søknad`() {
+        val token = mockOAuth2Server.issueToken(
+            "default",
+            "testClientId",
+            DefaultOAuth2TokenCallback(
+                audience = listOf("audience"),
+                claims = mapOf(
+                    "acr" to "Level4",
+                ),
+            ),
+        )
+
         testApplication {
-            application {
-                setupRouting(ApplicationConfig(""))
-                installJacksonFeature()
-            }
             val response = client.post("/soknad") {
                 contentType(type = ContentType.Application.Json)
+                header("Authorization", "Bearer ${token.serialize()}")
                 setBody(ugyldigSøknad)
             }
-            assertEquals(response.status, HttpStatusCode.BadRequest)
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
     }
 
-    @Ignore
     @Test
     fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
+        val token = mockOAuth2Server.issueToken(
+            "default",
+            "testClientId",
+            DefaultOAuth2TokenCallback(
+                audience = listOf("audience"),
+                claims = mapOf(
+                    "acr" to "Level4",
+                ),
+            ),
+        )
+
         testApplication {
-            application {
-                setupRouting(ApplicationConfig(""))
-                installJacksonFeature()
-            }
             val response = client.post("/soknad") {
                 contentType(type = ContentType.Application.Json)
+                header("Authorization", "Bearer ${token.serialize()}")
                 setBody(gyldigSøknad)
             }
-            assertEquals(response.status, HttpStatusCode.NoContent)
+            assertEquals(HttpStatusCode.NoContent, response.status)
         }
     }
 }

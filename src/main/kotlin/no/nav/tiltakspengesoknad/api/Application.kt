@@ -19,6 +19,7 @@ import mu.KotlinLogging
 import no.nav.security.token.support.v2.asIssuerProps
 import no.nav.tiltakspengesoknad.api.auth.installAuthentication
 import no.nav.tiltakspengesoknad.api.health.healthRoutes
+import no.nav.tiltakspengesoknad.api.pdl.pdlRoutes
 import no.nav.tiltakspengesoknad.api.soknad.søknadRoutes
 import no.nav.tiltakspengesoknad.api.soknad.validateSøknad
 
@@ -70,6 +71,7 @@ internal fun Application.setupRouting(config: ApplicationConfig) {
     routing {
         authenticate(*issuers.toTypedArray()) {
             søknadRoutes()
+            pdlRoutes(config)
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
     }

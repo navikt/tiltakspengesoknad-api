@@ -51,11 +51,9 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-    // Configuration
-    implementation("com.natpryce:konfig:1.6.10.0")
     // TokenX
     implementation("no.nav.security:token-validation-ktor-v2:$tokenSupportVersion")
-    implementation("no.nav.security:token-client-core:3.0.0-SNAPSHOT")
+    implementation("no.nav.security:token-client-core:$tokenSupportVersion")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
@@ -64,11 +62,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.mockk:mockk-dsl-jvm:$mockkVersion")
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
-}
-
-configurations.all {
-    // exclude JUnit 4
-    exclude(group = "junit", module = "junit")
+    testImplementation("no.nav.security:mock-oauth2-server:0.5.7")
 }
 
 application {

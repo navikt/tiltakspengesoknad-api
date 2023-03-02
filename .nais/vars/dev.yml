@@ -3,3 +3,9 @@ kafka:
 cluster: dev-gcp
 ingress:
   url: https://tiltakspengesoknad-api.dev.nav.no
+endpoints:
+  pdl: https://pdl-api.dev-fss-pub.nais.io/graphql
+audience:
+  pdl: dev-fss:pdl:pdl-api
+scope:
+  pdl: api://dev-fss.pdl.pdl-api/.default
