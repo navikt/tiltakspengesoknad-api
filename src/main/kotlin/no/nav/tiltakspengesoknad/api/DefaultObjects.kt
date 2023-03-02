@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -22,7 +21,6 @@ private val SECURELOG = KotlinLogging.logger("tjenestekall")
 private const val SIXTY_SECONDS = 60L
 
 fun httpClientCIO() = HttpClient(CIO).medDefaultConfig()
-fun httpClientGeneric(engine: HttpClientEngine) = HttpClient(engine).medDefaultConfig()
 
 private fun HttpClient.medDefaultConfig() = this.config {
     install(ContentNegotiation) {
@@ -50,7 +48,7 @@ private fun HttpClient.medDefaultConfig() = this.config {
                 SECURELOG.info(message)
             }
         }
-        level = LogLevel.ALL
+        level = LogLevel.INFO
     }
     expectSuccess = true
 }
