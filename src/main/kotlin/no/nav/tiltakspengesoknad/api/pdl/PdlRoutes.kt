@@ -4,6 +4,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.principal
 import io.ktor.server.config.ApplicationConfig
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -17,17 +18,27 @@ import no.nav.tiltakspengesoknad.api.httpClientCIO
 
 fun Route.pdlRoutes(config: ApplicationConfig) {
     val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
-    val oauth2ClientClientCredentials = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
+//    val oauth2ClientClientCredentials = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
+
+    val pdlUrl = config.property("endpoints.pdl").getString()
     val log = KotlinLogging.logger {}
+    val secureLog = KotlinLogging.logger("tjenestekall")
 
     get(path = PERSONALIA_PATH) {
-        val url = config.property("endpoints.pdl").getString()
         val audience = config.property("audience.pdl").getString()
         val pid = call.getClaim("tokendings", "pid")
         val token = call.principal<TokenValidationContextPrincipal>().asTokenString()
         val tokenxResponse = oauth2ClientTokenX.tokenExchange(token, audience)
-        val scope = config.property("scope.pdl").getString()
-        val clientCredentialsGrant = oauth2ClientClientCredentials.clientCredentials(scope)
+        val pdlTokenXClient = PdlClient(endpoint = pdlUrl, token = tokenxResponse.accessToken)
+        pdlTokenXClient.fetchPerson(pid!!).onSuccess {
+            val person = it.toPerson()
+            call.respond(person)
+        }.onFailure {
+            call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
+            secureLog.error { it }
+        }
+//        val scope = config.property("scope.pdl").getString()
+//        val clientCredentialsGrant = oauth2ClientClientCredentials.clientCredentials(scope)
         call.respondText(status = HttpStatusCode.OK, text = "OK")
     }
 }
