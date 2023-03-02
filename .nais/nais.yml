@@ -37,7 +37,7 @@ spec:
           cluster: {{ cluster }}
     outbound:
       external:
-        - host: {{ endpoints.pdl }}
+        - host: "pdl-api.dev-fss-pub.nais.io"
   env:
     - name: PDL_ENDPOINT_URL
       value: {{ endpoints.pdl }}
