@@ -48,7 +48,7 @@ data class HentPersonResponse(
 ) {
     private fun extractPerson(): PdlPerson? {
         if (this.errors.isNotEmpty()) {
-            throw IllegalStateException(this.errors.firstOrNull()?.message);
+            throw IllegalStateException(this.errors.firstOrNull()?.message)
         }
         return this.data?.hentPerson
     }
