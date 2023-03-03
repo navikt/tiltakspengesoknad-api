@@ -40,7 +40,7 @@ data class PdlResponseData(
     val hentPerson: PdlPerson?,
 )
 
-data class Person(val fornavn: String?)
+data class Person(val fornavn: String, val mellomnavn: String?, val etternavn: String)
 
 data class HentPersonResponse(
     val data: PdlResponseData? = null,
@@ -58,6 +58,8 @@ data class HentPersonResponse(
         val navn = avklarNavn(person.navn)
         return Person(
             fornavn = navn.fornavn,
+            mellomnavn = navn.mellomnavn,
+            etternavn = navn.etternavn
         )
     }
 }

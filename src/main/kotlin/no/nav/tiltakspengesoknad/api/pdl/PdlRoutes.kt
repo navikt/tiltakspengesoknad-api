@@ -33,7 +33,7 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
         pdlTokenXClient.fetchPerson(pid!!).onSuccess {
             try {
                 val person = it.toPerson()
-                call.respond(person)
+                call.respond(message = person, status = HttpStatusCode.OK)
             } catch (e: Exception) {
                 secureLog.error { e }
                 call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
