@@ -15,7 +15,22 @@ const val INDIVIDSTONAD = "IND"
 
 data class Navn(
     val fornavn: String,
-)
+    val mellomnavn: String? = null,
+    val etternavn: String,
+    override val metadata: EndringsMetadata,
+    override val folkeregistermetadata: FolkeregisterMetadata,
+) : Changeable
+
+fun kildeErUdokumentert(metadata: EndringsMetadata) =
+    metadata.master == Kilde.PDL && metadata.endringer.nyeste()?.kilde == Kilde.BRUKER_SELV
+
+fun avklarNavn(navn: List<Navn>): Navn {
+    if (navn.isEmpty()) throw IllegalStateException("Navn kunne ikke avklares")
+    return navn
+        .sortedByDescending { getEndringstidspunktOrNull(it) }
+        .firstOrNull { !kildeErUdokumentert(it.metadata) }
+        ?: throw IllegalStateException("Navn kunne ikke avklares")
+}
 
 data class PdlPerson(
     val navn: List<Navn>,
@@ -36,9 +51,10 @@ data class HentPersonResponse(
     }
 
     fun toPerson(): Person {
-        val person = extractPerson()
+        val person = extractPerson() ?: throw IllegalStateException("Fant ikke personen")
+        val navn = avklarNavn(person.navn)
         return Person(
-            fornavn = person?.navn?.toString(),
+            fornavn = navn.fornavn,
         )
     }
 }

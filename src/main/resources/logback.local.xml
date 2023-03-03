@@ -44,7 +44,6 @@
         <appender-ref ref="audit"/>
     </logger>
 
-    <logger name="no.nav.helse.rapids_rivers" level="INFO"/>
     <logger name="io.ktor.auth.jwt" level="TRACE"/>
 
     <logger name="tjenestekall" level="DEBUG" additivity="false">

@@ -31,8 +31,13 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
         val tokenxResponse = oauth2ClientTokenX.tokenExchange(token, audience)
         val pdlTokenXClient = PdlClient(endpoint = pdlUrl, token = tokenxResponse.accessToken)
         pdlTokenXClient.fetchPerson(pid!!).onSuccess {
-            val person = it.toPerson()
-            call.respond(person)
+            try {
+                val person = it.toPerson()
+                call.respond(person)
+            } catch (e: Exception) {
+                call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
+                secureLog.error { e }
+            }
         }.onFailure {
             call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
             secureLog.error { it }
