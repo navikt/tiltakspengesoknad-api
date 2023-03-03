@@ -20,11 +20,11 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
     val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
 //    val oauth2ClientClientCredentials = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
 
-    val pdlUrl = config.property("endpoints.pdl").getString()
     val log = KotlinLogging.logger {}
     val secureLog = KotlinLogging.logger("tjenestekall")
 
     get(path = PERSONALIA_PATH) {
+        val pdlUrl = config.property("endpoints.pdl").getString()
         val audience = config.property("audience.pdl").getString()
         val pid = call.getClaim("tokendings", "pid")
         val token = call.principal<TokenValidationContextPrincipal>().asTokenString()
