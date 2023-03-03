@@ -35,12 +35,12 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
                 val person = it.toPerson()
                 call.respond(person)
             } catch (e: Exception) {
-                call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
                 secureLog.error { e }
+                call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
             }
         }.onFailure {
-            call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
             secureLog.error { it }
+            call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
         }
 //        val scope = config.property("scope.pdl").getString()
 //        val clientCredentialsGrant = oauth2ClientClientCredentials.clientCredentials(scope)

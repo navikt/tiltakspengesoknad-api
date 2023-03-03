@@ -47,6 +47,9 @@ data class HentPersonResponse(
     val errors: List<PdlError> = emptyList(),
 ) {
     private fun extractPerson(): PdlPerson? {
+        if (this.errors.isNotEmpty()) {
+            throw IllegalStateException(this.errors.firstOrNull()?.message);
+        }
         return this.data?.hentPerson
     }
 
