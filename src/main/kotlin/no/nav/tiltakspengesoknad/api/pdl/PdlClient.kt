@@ -59,7 +59,7 @@ data class HentPersonResponse(
         return Person(
             fornavn = navn.fornavn,
             mellomnavn = navn.mellomnavn,
-            etternavn = navn.etternavn
+            etternavn = navn.etternavn,
         )
     }
 }
