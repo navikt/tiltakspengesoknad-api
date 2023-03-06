@@ -1,1 +1,1 @@
-rootProject.name = "tiltakspengesoknad-api"
+rootProject.name = "tiltakspenger-soknad-api"

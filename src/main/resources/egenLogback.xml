@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
+    <property name="secure_logs_dir" value="./app/build" />
+
     <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
@@ -12,9 +15,9 @@
     </appender>
 
     <appender name="secureLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/secure-logs/secure.log</file>
+        <file>${secure_logs_dir}/secure-logs/secure.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>/Users/thoreirikellefsen/dev/tiltakspengesoknad-api/src/main/kotlin/no/nav/tiltakspengesoknad/api/secure-logs.%i</fileNamePattern>
+            <fileNamePattern>${secure_logs_dir}/secure-logs/secure.log.%i</fileNamePattern>
             <minIndex>1</minIndex>
             <maxIndex>1</maxIndex>
         </rollingPolicy>

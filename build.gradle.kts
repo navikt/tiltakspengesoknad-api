@@ -65,7 +65,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("no.nav.tiltakspengesoknad.api.ApplicationKt")
+    mainClass.set("no.nav.tiltakspenger.soknad.api.ApplicationKt")
 }
 
 java {
