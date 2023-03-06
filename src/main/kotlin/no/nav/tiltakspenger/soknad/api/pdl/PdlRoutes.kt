@@ -33,7 +33,7 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
         pdlTokenXClient.fetchPerson(pid!!).onSuccess {
             try {
                 val person = it.toPerson()
-                call.respond(message = person, status = HttpStatusCode.OK)
+                call.respond(person)
             } catch (e: Exception) {
                 secureLog.error { e }
                 call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
@@ -44,6 +44,5 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
         }
 //        val scope = config.property("scope.pdl").getString()
 //        val clientCredentialsGrant = oauth2ClientClientCredentials.clientCredentials(scope)
-        call.respondText(status = HttpStatusCode.OK, text = "OK")
     }
 }
