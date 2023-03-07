@@ -48,11 +48,11 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
                         .mapNotNull { it }
                     call.respond(person.toPersonDTO(barn))
                 } catch (e: Exception) {
-                    secureLog.error { e }
+                    secureLog.error { e.stackTraceToString() }
                     call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
                 }
             }.onFailure {
-                secureLog.error { it }
+                secureLog.error { it.stackTraceToString() }
                 call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
             }
     }
