@@ -2,6 +2,12 @@ query($ident: ID!){
     hentPerson(ident: $ident) {
         adressebeskyttelse(historikk: false) {
             gradering
+            folkeregistermetadata {
+                ...folkeregistermetadataDetails
+            }
+            metadata {
+                ...metadataDetails
+            }
         }
         forelderBarnRelasjon {
             relatertPersonsIdent
