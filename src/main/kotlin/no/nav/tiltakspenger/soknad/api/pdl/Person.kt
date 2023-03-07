@@ -17,7 +17,12 @@ data class Person(
             etternavn = etternavn,
             barn = barn.map {
                 if (it.adressebeskyttelseGradering === AdressebeskyttelseGradering.UGRADERT) {
-                    BarnDTO(fødselsdato = it.fødselsdato!!, navn = it.fornavn)
+                    BarnDTO(
+                        fødselsdato = it.fødselsdato!!,
+                        fornavn = it.fornavn,
+                        mellomnavn = it.mellomnavn,
+                        etternavn = it.etternavn,
+                    )
                 } else {
                     BarnDTO(fødselsdato = it.fødselsdato!!)
                 }
@@ -28,7 +33,9 @@ data class Person(
 
 data class BarnDTO(
     val fødselsdato: LocalDate,
-    val navn: String? = null,
+    val fornavn: String? = null,
+    val mellomnavn: String? = null,
+    val etternavn: String? = null,
 )
 
 data class PersonDTO(
