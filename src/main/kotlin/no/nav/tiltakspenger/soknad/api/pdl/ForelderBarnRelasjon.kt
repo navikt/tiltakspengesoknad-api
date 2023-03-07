@@ -2,6 +2,9 @@ package no.nav.tiltakspenger.soknad.api.pdl
 
 enum class ForelderBarnRelasjonRolle {
     BARN,
+    FAR,
+    MOR,
+    MEDMOR,
 }
 
 data class ForelderBarnRelasjon(
