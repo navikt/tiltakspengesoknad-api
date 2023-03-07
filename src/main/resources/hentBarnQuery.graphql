@@ -3,9 +3,10 @@ query($ident: ID!){
         adressebeskyttelse(historikk: false) {
             gradering
         }
-        forelderBarnRelasjon {
-            relatertPersonsIdent
-            relatertPersonsRolle
+        navn(historikk: false) {
+            fornavn
+            mellomnavn
+            etternavn
             folkeregistermetadata {
                 ...folkeregistermetadataDetails
             }
@@ -13,10 +14,8 @@ query($ident: ID!){
                 ...metadataDetails
             }
         }
-        navn(historikk: false) {
-            fornavn
-            mellomnavn
-            etternavn
+        foedsel {
+            foedselsdato
             folkeregistermetadata {
                 ...folkeregistermetadataDetails
             }

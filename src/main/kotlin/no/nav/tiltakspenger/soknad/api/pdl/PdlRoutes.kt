@@ -18,7 +18,7 @@ import no.nav.tiltakspenger.soknad.api.httpClientCIO
 
 fun Route.pdlRoutes(config: ApplicationConfig) {
     val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
-//    val oauth2ClientClientCredentials = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
+    val oauth2ClientClientCredentials = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
 
     val log = KotlinLogging.logger {}
     val secureLog = KotlinLogging.logger("tjenestekall")
@@ -30,19 +30,30 @@ fun Route.pdlRoutes(config: ApplicationConfig) {
         val token = call.principal<TokenValidationContextPrincipal>().asTokenString()
         val tokenxResponse = oauth2ClientTokenX.tokenExchange(token, audience)
         val pdlTokenXClient = PdlClient(endpoint = pdlUrl, token = tokenxResponse.accessToken)
-        pdlTokenXClient.fetchPerson(pid!!).onSuccess {
-            try {
-                val person = it.toPerson()
-                call.respond(person)
-            } catch (e: Exception) {
-                secureLog.error { e }
+        pdlTokenXClient
+            .fetchSøker(pid!!).onSuccess {
+                try {
+                    val person = it.toPerson()
+                    val scope = config.property("scope.pdl").getString()
+                    val clientCredentialsGrant = oauth2ClientClientCredentials.clientCredentials(scope)
+                    val pdlCcrClient = PdlClient(endpoint = pdlUrl, token = clientCredentialsGrant.accessToken)
+                    val forelderBarnRelasjon = person.forelderBarnRelasjon ?: emptyList()
+                    val barn = forelderBarnRelasjon
+                        .filter { it.relatertPersonsRolle == ForelderBarnRelasjonRolle.BARN }
+                        .mapNotNull { it.relatertPersonsIdent }
+                        .distinct()
+                        .map { barnetsIdent ->
+                            pdlCcrClient.fetchBarn(ident = barnetsIdent).getOrNull()?.toPerson()
+                        }
+                        .mapNotNull { it }
+                    call.respond(person.toPersonDTO(barn))
+                } catch (e: Exception) {
+                    secureLog.error { e }
+                    call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
+                }
+            }.onFailure {
+                secureLog.error { it }
                 call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
             }
-        }.onFailure {
-            secureLog.error { it }
-            call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
-        }
-//        val scope = config.property("scope.pdl").getString()
-//        val clientCredentialsGrant = oauth2ClientClientCredentials.clientCredentials(scope)
     }
 }

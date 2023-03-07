@@ -1,0 +1,25 @@
+package no.nav.tiltakspenger.soknad.api.pdl
+
+enum class AdressebeskyttelseGradering {
+    STRENGT_FORTROLIG_UTLAND,
+    STRENGT_FORTROLIG,
+    FORTROLIG,
+    UGRADERT,
+}
+
+data class Adressebeskyttelse(
+    val gradering: AdressebeskyttelseGradering,
+    override val folkeregistermetadata: FolkeregisterMetadata? = null,
+    override val metadata: EndringsMetadata,
+) : Changeable
+
+fun avklarGradering(gradering: List<Adressebeskyttelse>): AdressebeskyttelseGradering {
+    return if (gradering.isEmpty()) {
+        AdressebeskyttelseGradering.UGRADERT
+    } else {
+        gradering
+            .sortedByDescending { getEndringstidspunktOrNull(it) }
+            .firstOrNull { !kildeErUdokumentert(it.metadata) }?.gradering
+            ?: throw IllegalStateException("Adressebeskyttelse kunne ikke avklares")
+    }
+}
