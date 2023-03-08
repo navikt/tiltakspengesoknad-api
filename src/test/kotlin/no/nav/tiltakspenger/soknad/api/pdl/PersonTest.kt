@@ -13,13 +13,13 @@ internal class PersonTest {
             relatertPersonsIdent = id,
             relatertPersonsRolle = rolle,
             metadata = mockkClass(EndringsMetadata::class),
-            folkeregistermetadata = mockkClass(FolkeregisterMetadata::class)
+            folkeregistermetadata = mockkClass(FolkeregisterMetadata::class),
         )
     }
 
     private fun mockPerson(
         gradering: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
-        forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList()
+        forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
     ): Person {
         return Person(
             fornavn = "foo",
@@ -27,7 +27,7 @@ internal class PersonTest {
             etternavn = "bar",
             adressebeskyttelseGradering = gradering,
             fødselsdato = LocalDate.MAX,
-            forelderBarnRelasjon = forelderBarnRelasjon
+            forelderBarnRelasjon = forelderBarnRelasjon,
         )
     }
 
@@ -36,15 +36,17 @@ internal class PersonTest {
     private val testpersonStrengtFortrolig = mockPerson(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG)
     private val testpersonStrengtFortroligUtland = mockPerson(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)
 
-    private val testpersonMedRelasjoner = mockPerson(forelderBarnRelasjon = listOf(
-        mockForelderBarnRelasjon(id = "1", rolle = ForelderBarnRelasjonRolle.BARN),
-        mockForelderBarnRelasjon(id = "1", rolle = ForelderBarnRelasjonRolle.BARN),
-        mockForelderBarnRelasjon(id = null, rolle = ForelderBarnRelasjonRolle.BARN),
-        mockForelderBarnRelasjon(id = "2", rolle = ForelderBarnRelasjonRolle.BARN),
-        mockForelderBarnRelasjon(id = "3", rolle = ForelderBarnRelasjonRolle.MOR),
-        mockForelderBarnRelasjon(id = "4", rolle = ForelderBarnRelasjonRolle.FAR),
-        mockForelderBarnRelasjon(id = "5", rolle = ForelderBarnRelasjonRolle.MEDMOR),
-    ))
+    private val testpersonMedRelasjoner = mockPerson(
+        forelderBarnRelasjon = listOf(
+            mockForelderBarnRelasjon(id = "1", rolle = ForelderBarnRelasjonRolle.BARN),
+            mockForelderBarnRelasjon(id = "1", rolle = ForelderBarnRelasjonRolle.BARN),
+            mockForelderBarnRelasjon(id = null, rolle = ForelderBarnRelasjonRolle.BARN),
+            mockForelderBarnRelasjon(id = "2", rolle = ForelderBarnRelasjonRolle.BARN),
+            mockForelderBarnRelasjon(id = "3", rolle = ForelderBarnRelasjonRolle.MOR),
+            mockForelderBarnRelasjon(id = "4", rolle = ForelderBarnRelasjonRolle.FAR),
+            mockForelderBarnRelasjon(id = "5", rolle = ForelderBarnRelasjonRolle.MEDMOR),
+        ),
+    )
 
     @Test
     fun `toPersonDTO skal returnere personens navn og en tom liste med barn når det ikke er noen barn`() {
