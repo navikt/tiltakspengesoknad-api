@@ -29,6 +29,13 @@ data class Person(
             },
         )
     }
+
+    fun barnsIdenter(): List<String> {
+        return (forelderBarnRelasjon ?: emptyList())
+            .filter { it.relatertPersonsRolle == ForelderBarnRelasjonRolle.BARN }
+            .mapNotNull { it.relatertPersonsIdent }
+            .distinct()
+    }
 }
 
 data class BarnDTO(

@@ -9,35 +9,30 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.server.config.ApplicationConfig
+import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
 
 const val INDIVIDSTONAD = "IND"
 
-class PdlClient(
-    private val endpoint: String,
-    private val token: String,
+class PdlClientTokenX(
+    config: ApplicationConfig,
     private val httpClient: HttpClient = httpClientCIO(),
 ) {
-    suspend fun fetchSøker(ident: String): Result<SøkerRespons> {
-        return kotlin.runCatching {
-            httpClient.post(endpoint) {
-                accept(ContentType.Application.Json)
-                header("Tema", INDIVIDSTONAD)
-                bearerAuth(token)
-                contentType(ContentType.Application.Json)
-                setBody(hentPersonQuery(ident))
-            }.body()
-        }
-    }
+    private val pdlEndpoint = config.property("endpoints.pdl").getString()
+    private val pdlAudience = config.property("audience.pdl").getString()
+    private val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
 
-    suspend fun fetchBarn(ident: String): Result<SøkersBarnRespons> {
+    suspend fun fetchSøker(fødselsnummer: String, subjectToken: String): Result<SøkerRespons> {
+        val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
+        val token = tokenResponse.accessToken
         return kotlin.runCatching {
-            httpClient.post(endpoint) {
+            httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)
                 header("Tema", INDIVIDSTONAD)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
-                setBody(hentBarnQuery(ident))
+                setBody(hentPersonQuery(fødselsnummer))
             }.body()
         }
     }
