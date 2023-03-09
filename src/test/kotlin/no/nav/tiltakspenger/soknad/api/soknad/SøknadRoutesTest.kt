@@ -9,6 +9,7 @@ import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
+import no.nav.tiltakspenger.soknad.api.configureTestApplication
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -46,7 +47,7 @@ internal class SøknadRoutesTest {
     @Test
     fun `post på soknad-endepunkt skal svare med 400 ved ugyldig søknad`() {
         val token = mockOAuth2Server.issueToken(
-            "default",
+            "tokendings",
             "testClientId",
             DefaultOAuth2TokenCallback(
                 audience = listOf("audience"),
@@ -57,6 +58,7 @@ internal class SøknadRoutesTest {
         )
 
         testApplication {
+            configureTestApplication()
             val response = client.post("/soknad") {
                 contentType(type = ContentType.Application.Json)
                 header("Authorization", "Bearer ${token.serialize()}")
@@ -69,7 +71,7 @@ internal class SøknadRoutesTest {
     @Test
     fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
         val token = mockOAuth2Server.issueToken(
-            "default",
+            "tokendings",
             "testClientId",
             DefaultOAuth2TokenCallback(
                 audience = listOf("audience"),
@@ -80,6 +82,7 @@ internal class SøknadRoutesTest {
         )
 
         testApplication {
+            configureTestApplication()
             val response = client.post("/soknad") {
                 contentType(type = ContentType.Application.Json)
                 header("Authorization", "Bearer ${token.serialize()}")

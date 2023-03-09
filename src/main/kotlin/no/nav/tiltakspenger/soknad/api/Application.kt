@@ -25,7 +25,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-fun Application.module() {
+fun Application.module(pdlService: PdlService = PdlService(environment.config)) {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
 
     val log = KotlinLogging.logger {}
@@ -48,7 +48,7 @@ fun Application.module() {
     }
 
     installAuthentication()
-    setupRouting()
+    setupRouting(pdlService = pdlService)
     installJacksonFeature()
 
     install(RequestValidation) {
@@ -63,9 +63,8 @@ fun Application.module() {
     }
 }
 
-internal fun Application.setupRouting() {
+internal fun Application.setupRouting(pdlService: PdlService) {
     val issuers = environment.config.asIssuerProps().keys
-    val pdlService = PdlService(environment.config)
     routing {
         authenticate(*issuers.toTypedArray()) {
             søknadRoutes()
