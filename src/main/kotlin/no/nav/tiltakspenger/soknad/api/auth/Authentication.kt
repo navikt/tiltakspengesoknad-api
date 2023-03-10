@@ -5,13 +5,13 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.authentication
-import io.ktor.server.config.ApplicationConfig
 import no.nav.security.token.support.v2.RequiredClaims
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 import no.nav.security.token.support.v2.asIssuerProps
 import no.nav.security.token.support.v2.tokenValidationSupport
 
-fun Application.installAuthentication(config: ApplicationConfig) {
+fun Application.installAuthentication() {
+    val config = environment.config
     install(Authentication) {
         val issuers = config.asIssuerProps().keys
         issuers.forEach { issuer: String ->

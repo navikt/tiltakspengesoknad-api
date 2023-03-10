@@ -9,7 +9,6 @@ import io.ktor.server.application.ApplicationStarted
 import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
-import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.requestvalidation.RequestValidation
@@ -19,13 +18,14 @@ import mu.KotlinLogging
 import no.nav.security.token.support.v2.asIssuerProps
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
+import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-fun Application.module() {
+fun Application.module(pdlService: PdlService = PdlService(environment.config)) {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
 
     val log = KotlinLogging.logger {}
@@ -47,10 +47,8 @@ fun Application.module() {
         }
     }
 
-    val config = this.environment.config
-    installAuthentication(config)
-
-    setupRouting(config)
+    installAuthentication()
+    setupRouting(pdlService = pdlService)
     installJacksonFeature()
 
     install(RequestValidation) {
@@ -65,13 +63,12 @@ fun Application.module() {
     }
 }
 
-internal fun Application.setupRouting(config: ApplicationConfig) {
-    val issuers = config.asIssuerProps().keys
-
+internal fun Application.setupRouting(pdlService: PdlService) {
+    val issuers = environment.config.asIssuerProps().keys
     routing {
         authenticate(*issuers.toTypedArray()) {
             søknadRoutes()
-            pdlRoutes(config)
+            pdlRoutes(pdlService = pdlService)
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
     }
