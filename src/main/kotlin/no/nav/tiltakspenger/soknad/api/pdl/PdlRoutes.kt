@@ -24,7 +24,7 @@ fun Route.pdlRoutes(pdlService: PdlService) {
             if (subjectToken == null) {
                 throw IllegalStateException("Mangler token")
             }
-            secureLog.info {"token : $subjectToken"}
+            secureLog.info { "token : $subjectToken" }
             val personDTO = pdlService.hentPersonaliaMedBarn(fødselsnummer = fødselsnummer, subjectToken = subjectToken)
             call.respond(personDTO)
         } catch (e: Exception) {
