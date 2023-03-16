@@ -38,6 +38,7 @@ spec:
     outbound:
       external:
         - host: "pdl-api.dev-fss-pub.nais.io"
+        - host: "dokarkiv.dev-fss-pub.nais.io"
   env:
     - name: PDL_ENDPOINT_URL
       value: {{ endpoints.pdl }}
@@ -45,3 +46,9 @@ spec:
       value: {{ audience.pdl }}
     - name: PDL_SCOPE
       value: {{ scope.pdl }}
+    - name: JOARK_ENDPOINT_URL
+      value: {{ endpoints.joark }}
+    - name: JOARK_AUDIENCE
+      value: {{ audience.joark }}
+    - name: JOARK_SCOPE
+      value: {{ scope.joark }}

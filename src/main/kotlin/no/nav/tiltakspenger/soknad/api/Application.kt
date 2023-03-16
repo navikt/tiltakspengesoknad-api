@@ -18,14 +18,36 @@ import mu.KotlinLogging
 import no.nav.security.token.support.v2.asIssuerProps
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
+import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
+import no.nav.tiltakspenger.soknad.api.joark.JoarkServiceImpl
+import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
+import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-fun Application.module(pdlService: PdlService = PdlService(environment.config)) {
+fun Application.module(
+    pdlService: PdlService = PdlService(environment.config),
+    søknadService: SøknadService = SøknadServiceImpl(
+        pdfService = PdfServiceImpl(
+            PdfClient(
+                config = environment.config,
+                client = httpClientCIO(),
+            ),
+        ),
+        joarkService = JoarkServiceImpl(
+            joark = JoarkClient(
+                config = environment.config,
+                client = httpClientCIO(),
+            ),
+        ),
+    ),
+) {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
 
     val log = KotlinLogging.logger {}
@@ -48,7 +70,10 @@ fun Application.module(pdlService: PdlService = PdlService(environment.config)) 
     }
 
     installAuthentication()
-    setupRouting(pdlService = pdlService)
+    setupRouting(
+        pdlService = pdlService,
+        søknadService = søknadService,
+    )
     installJacksonFeature()
 
     install(RequestValidation) {
@@ -63,12 +88,15 @@ fun Application.module(pdlService: PdlService = PdlService(environment.config)) 
     }
 }
 
-internal fun Application.setupRouting(pdlService: PdlService) {
+internal fun Application.setupRouting(
+    pdlService: PdlService,
+    søknadService: SøknadService,
+) {
     val issuers = environment.config.asIssuerProps().keys
     routing {
         authenticate(*issuers.toTypedArray()) {
-            søknadRoutes()
             pdlRoutes(pdlService = pdlService)
+            søknadRoutes(søknadService = søknadService)
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
     }

@@ -5,15 +5,22 @@ import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 
-fun ApplicationTestBuilder.configureTestApplication(pdlService: PdlService = mockk()) {
+fun ApplicationTestBuilder.configureTestApplication(
+    pdlService: PdlService = mockk(),
+    søknadService: SøknadService = mockk(),
+) {
     environment {
         config = ApplicationConfig("application.test.conf")
     }
 
     application {
         installAuthentication()
-        setupRouting(pdlService = pdlService)
+        setupRouting(
+            pdlService = pdlService,
+            søknadService = søknadService,
+        )
         installJacksonFeature()
     }
 }
