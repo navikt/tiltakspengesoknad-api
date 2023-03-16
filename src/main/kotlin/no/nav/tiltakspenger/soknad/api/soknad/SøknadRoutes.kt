@@ -15,7 +15,6 @@ import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
-import java.lang.Exception
 
 val LOG = KotlinLogging.logger { }
 
@@ -24,7 +23,7 @@ fun Route.søknadRoutes(
 ) {
     route(SØKNAD_PATH) {
         post {
-            try {
+            kotlin.runCatching {
                 val søknad = call.receive<Søknad>()
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                 runBlocking {
@@ -32,10 +31,10 @@ fun Route.søknadRoutes(
                 }
 
                 call.respondText(status = HttpStatusCode.NoContent, text = "OK")
-            } catch (exception: Exception) {
-                when (exception) {
+            }.onFailure {
+                when (it) {
                     is CannotTransformContentToTypeException, is BadRequestException -> {
-                        LOG.error("Ugyldig søknad", exception)
+                        LOG.error("Ugyldig søknad", it)
                         call.respondText(
                             text = "Bad Request",
                             contentType = ContentType.Text.Plain,
@@ -43,7 +42,7 @@ fun Route.søknadRoutes(
                         )
                     }
                     else -> {
-                        LOG.error("Noe gikk galt ved post av søknad", exception)
+                        LOG.error("Noe gikk galt ved post av søknad", it)
                         call.respondText(
                             text = "Internal server error",
                             contentType = ContentType.Text.Plain,
@@ -51,7 +50,35 @@ fun Route.søknadRoutes(
                         )
                     }
                 }
-            }
+            }.getOrThrow()
+//            try {
+//                val søknad = call.receive<Søknad>()
+//                val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
+//                runBlocking {
+//                    søknadService.lagPdfOgSendTilJoark(søknad, fødselsnummer)
+//                }
+//
+//                call.respondText(status = HttpStatusCode.NoContent, text = "OK")
+//            } catch (exception: Exception) {
+//                when (exception) {
+//                    is CannotTransformContentToTypeException, is BadRequestException -> {
+//                        LOG.error("Ugyldig søknad", exception)
+//                        call.respondText(
+//                            text = "Bad Request",
+//                            contentType = ContentType.Text.Plain,
+//                            status = HttpStatusCode.BadRequest,
+//                        )
+//                    }
+//                    else -> {
+//                        LOG.error("Noe gikk galt ved post av søknad", exception)
+//                        call.respondText(
+//                            text = "Internal server error",
+//                            contentType = ContentType.Text.Plain,
+//                            status = HttpStatusCode.InternalServerError,
+//                        )
+//                    }
+//                }
+//            }
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
 }
