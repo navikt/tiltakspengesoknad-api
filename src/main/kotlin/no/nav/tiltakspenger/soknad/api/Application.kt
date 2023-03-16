@@ -11,7 +11,6 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.request.httpMethod
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
@@ -27,7 +26,6 @@ import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
-import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -61,6 +59,9 @@ fun Application.soknadApi(
 
     // Til debugging enn så lenge
     install(CallLogging) {
+        filter { call ->
+            !call.request.headers["User-Agent"]!!.contains("kube-probe")
+        }
         format { call ->
             val status = call.response.status()
             val httpMethod = call.request.httpMethod.value
@@ -76,9 +77,9 @@ fun Application.soknadApi(
     )
     installJacksonFeature()
 
-    install(RequestValidation) {
-        validateSøknad()
-    }
+//    install(RequestValidation) {
+//        validateSøknad()
+//    }
 
     environment.monitor.subscribe(ApplicationStarted) {
         log.info { "Starter server" }

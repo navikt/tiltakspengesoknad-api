@@ -5,7 +5,7 @@ ingress:
   url: https://tiltakspenger-soknad-api.dev.nav.no
 endpoints:
   pdl: https://pdl-api.dev-fss-pub.nais.io/graphql
-  pdf: http://tiltakspenger-pdfgen.tpts.svc.nais.local
+  pdf: https://tiltakspenger-pdfgen.intern.dev.nav.no
   joark: https://dokarkiv.dev-fss-pub.nais.io
 audience:
   pdl: dev-fss:pdl:pdl-api
