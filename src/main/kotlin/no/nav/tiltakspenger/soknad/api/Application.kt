@@ -12,6 +12,7 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.httpMethod
+import io.ktor.server.request.path
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
 import no.nav.security.token.support.v2.asIssuerProps
@@ -60,13 +61,15 @@ fun Application.soknadApi(
     // Til debugging enn så lenge
     install(CallLogging) {
         filter { call ->
-            !call.request.headers["User-Agent"]!!.contains("kube-probe")
+            call.request.path().startsWith("/$SØKNAD_PATH")
+            call.request.path().startsWith("/$PERSONALIA_PATH")
         }
         format { call ->
             val status = call.response.status()
             val httpMethod = call.request.httpMethod.value
+            val req = call.request
             val userAgent = call.request.headers["User-Agent"]
-            "Status: $status, HTTP method: $httpMethod, User agent: $userAgent"
+            "Status: $status, HTTP method: $httpMethod, User agent: $userAgent req: $req"
         }
     }
 
