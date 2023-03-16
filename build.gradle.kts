@@ -1,7 +1,9 @@
 val javaVersion = JavaVersion.VERSION_17
 val mockkVersion = "1.13.4"
 val ktorVersion = "2.2.4"
+val kotestVersion = "5.5.5"
 val jacksonVersion = "2.14.2"
+val kotlinxCoroutinesVersion = "1.6.4"
 val tokenSupportVersion = "3.0.8"
 
 plugins {
@@ -62,6 +64,13 @@ dependencies {
     testImplementation("io.mockk:mockk-dsl-jvm:$mockkVersion")
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
     testImplementation("no.nav.security:mock-oauth2-server:0.5.8")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
+    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("io.mockk:mockk-dsl-jvm:$mockkVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-json:$kotestVersion")
+    testImplementation("io.kotest:kotest-extensions:$kotestVersion")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:$kotlinxCoroutinesVersion")
 }
 
 application {

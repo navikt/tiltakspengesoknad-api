@@ -7,6 +7,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
+import io.mockk.coEvery
+import io.mockk.mockk
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
@@ -36,6 +38,10 @@ internal class SøknadRoutesTest {
         }
     """.trimMargin()
 
+    private val søknadServiceMock = mockk<SøknadService>().also { mock ->
+        coEvery { mock.lagPdfOgSendTilJoark(any(), any()) } returns Unit
+    }
+
     private val mockOAuth2Server = MockOAuth2Server()
 
     @BeforeAll
@@ -53,6 +59,7 @@ internal class SøknadRoutesTest {
                 audience = listOf("audience"),
                 claims = mapOf(
                     "acr" to "Level4",
+                    "pid" to "123",
                 ),
             ),
         )
@@ -77,12 +84,13 @@ internal class SøknadRoutesTest {
                 audience = listOf("audience"),
                 claims = mapOf(
                     "acr" to "Level4",
+                    "pid" to "123",
                 ),
             ),
         )
 
         testApplication {
-            configureTestApplication()
+            configureTestApplication(søknadService = søknadServiceMock)
             val response = client.post("/soknad") {
                 contentType(type = ContentType.Application.Json)
                 header("Authorization", "Bearer ${token.serialize()}")

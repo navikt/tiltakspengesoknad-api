@@ -9,10 +9,6 @@ class PdlService(
     private val pdlClientCredentials = PdlCredentialsClient(config = applicationConfig)
 
     suspend fun hentPersonaliaMedBarn(fødselsnummer: String, subjectToken: String): PersonDTO {
-        if (fødselsnummer == null) {
-            throw IllegalStateException("Fødselsnummer er null")
-        }
-
         val result = pdlClientTokenX.fetchSøker(fødselsnummer = fødselsnummer, subjectToken = subjectToken)
         if (result.isSuccess) {
             val person = result.getOrNull()!!.toPerson()

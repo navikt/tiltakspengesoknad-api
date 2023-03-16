@@ -13,15 +13,29 @@ import io.ktor.server.routing.route
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import java.lang.Exception
+import java.util.*
 
 val LOG = KotlinLogging.logger { }
 
-fun Route.søknadRoutes() {
+data class Person(
+    val fnr: String,
+    val fornavn: String,
+    val mellomnavn: String,
+    val etternavn: String,
+)
+
+fun Route.søknadRoutes(
+    søknadService: SøknadService,
+) {
     route(SØKNAD_PATH) {
         post {
             try {
-                call.receive<Søknad>()
+                val søknad = call.receive<Søknad>()
+                val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
+                søknadService.lagPdfOgSendTilJoark(søknad, fødselsnummer)
+
                 call.respondText(status = HttpStatusCode.NoContent, text = "OK")
             } catch (exception: Exception) {
                 when (exception) {

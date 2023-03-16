@@ -3,3 +3,12 @@ kafka:
 cluster: prod-gcp
 ingress:
   url: https://tiltakspenger-soknad-api.nav.no
+endpoints:
+    pdf: http://tiltakspenger-pdfgen.tpts.svc.nais.local
+    joark: https://dokarkiv.prod-fss-pub.nais.io
+audience:
+  pdl: prod-fss:pdl:pdl-api
+  joark: prod-fss:teamdokumenthandtering:dokarkiv
+scope:
+  pdl: api://prod-fss.pdl.pdl-api/.default
+  joark: api://prod-fss.teamdokumenthandtering.dokarkiv/.default
