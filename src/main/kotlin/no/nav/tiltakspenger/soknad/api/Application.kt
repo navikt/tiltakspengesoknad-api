@@ -31,7 +31,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-fun Application.module(
+fun Application.soknadApi(
     pdlService: PdlService = PdlService(environment.config),
     søknadService: SøknadService = SøknadServiceImpl(
         pdfService = PdfServiceImpl(
