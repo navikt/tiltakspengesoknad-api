@@ -52,3 +52,5 @@ spec:
       value: {{ audience.joark }}
     - name: JOARK_SCOPE
       value: {{ scope.joark }}
+    - name: PDF_ENDPOINT_URL
+      value: {{ endpoints.pdf }}
