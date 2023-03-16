@@ -4,7 +4,7 @@ cluster: prod-gcp
 ingress:
   url: https://tiltakspenger-soknad-api.nav.no
 endpoints:
-    pdf: https://tiltakspenger-pdfgen.intern.nav.no
+    pdf: http://tiltakspenger-pdfgen
     joark: https://dokarkiv.prod-fss-pub.nais.io
 audience:
   pdl: prod-fss:pdl:pdl-api
