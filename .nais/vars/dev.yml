@@ -7,9 +7,11 @@ endpoints:
   pdl: https://pdl-api.dev-fss-pub.nais.io/graphql
   pdf: http://tiltakspenger-pdfgen.tpts.svc.nais.local
   joark: https://dokarkiv.dev-fss-pub.nais.io
+  tiltakspengerarena: https://tiltakspenger-arena.dev-fss-pub.nais.io
 audience:
   pdl: dev-fss:pdl:pdl-api
   joark: dev-fss:teamdokumenthandtering:dokarkiv
+  tiltakspengerarena: dev-fss:tpts:tiltakspenger-arena
 scope:
   pdl: api://dev-fss.pdl.pdl-api/.default
   joark: api://dev-fss.teamdokumenthandtering.dokarkiv/.default

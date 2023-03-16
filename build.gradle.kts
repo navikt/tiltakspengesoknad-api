@@ -29,6 +29,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.jetbrains:annotations:24.0.1")
     implementation("com.natpryce:konfig:1.6.10.0")
+    implementation("com.github.navikt.tiltakspenger-libs:arenatiltak-dtos:0.0.31")
     // Ktor
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
