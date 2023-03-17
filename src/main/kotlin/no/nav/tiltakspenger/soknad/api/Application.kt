@@ -20,6 +20,7 @@ import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
 import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
 import no.nav.tiltakspenger.soknad.api.joark.JoarkServiceImpl
+import no.nav.tiltakspenger.soknad.api.joark.TokenServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
 import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
@@ -43,6 +44,7 @@ fun Application.soknadApi(
             joark = JoarkClient(
                 config = environment.config,
                 client = httpClientCIO(),
+                tokenService = TokenServiceImpl(),
             ),
         ),
     ),

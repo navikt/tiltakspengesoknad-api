@@ -3,9 +3,11 @@ package no.nav.tiltakspenger.soknad.api.joark
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -17,8 +19,9 @@ import org.slf4j.LoggerFactory
 internal const val joarkPath = "rest/journalpostapi/v1"
 
 class JoarkClient(
-    config: ApplicationConfig,
+    private val config: ApplicationConfig,
     private val client: HttpClient,
+    private val tokenService: TokenService,
 ) : Joark {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -28,9 +31,11 @@ class JoarkClient(
         dokumentInnhold: Journalpost,
     ): String {
         try {
+            val token = tokenService.getToken(config = config)
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
+                bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(
                     objectMapper.writeValueAsString(

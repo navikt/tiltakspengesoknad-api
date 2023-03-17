@@ -9,6 +9,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.server.config.ApplicationConfig
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import no.nav.tiltakspenger.soknad.api.domain.Periode
@@ -33,10 +35,14 @@ internal class JoarkClientTest {
         }
 
         val client = httpClientGeneric(mock)
+        val mockTokenService = mockk<TokenService>()
+        coEvery { mockTokenService.getToken(any()) } returns "token"
         val config = ApplicationConfig("application.test.conf")
         val joarkClient = JoarkClient(
             config = config,
             client = client,
+            tokenService = mockTokenService,
+
         )
 
         runTest {
@@ -58,6 +64,9 @@ internal class JoarkClientTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
+        val mockTokenService = mockk<TokenService>()
+        coEvery { mockTokenService.getToken(any()) } returns "token"
+
         val joarkResonse = JoarkClient.JoarkResponse(
             journalpostId = journalpostId,
             journalpostferdigstilt = false,
@@ -69,6 +78,7 @@ internal class JoarkClientTest {
         val joarkClient = JoarkClient(
             config = config,
             client = client,
+            tokenService = mockTokenService,
         )
 
         runTest {
@@ -91,11 +101,15 @@ internal class JoarkClientTest {
             )
         }
 
+        val mockTokenService = mockk<TokenService>()
+        coEvery { mockTokenService.getToken(any()) } returns "token"
+
         val client = httpClientGeneric(mock)
         val config = ApplicationConfig("application.test.conf")
         val joarkClient = JoarkClient(
             config = config,
             client = client,
+            tokenService = mockTokenService,
         )
 
         runTest {
@@ -117,6 +131,10 @@ internal class JoarkClientTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
+
+        val mockTokenService = mockk<TokenService>()
+        coEvery { mockTokenService.getToken(any()) } returns "token"
+
         val joarkResonse = JoarkClient.JoarkResponse(
             journalpostId = journalpostId,
             journalpostferdigstilt = null,
@@ -128,6 +146,7 @@ internal class JoarkClientTest {
         val joarkClient = JoarkClient(
             config = config,
             client = client,
+            tokenService = mockTokenService,
         )
 
         runTest {
@@ -149,6 +168,10 @@ internal class JoarkClientTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
+
+        val mockTokenService = mockk<TokenService>()
+        coEvery { mockTokenService.getToken(any()) } returns "token"
+
         val joarkResonse = JoarkClient.JoarkResponse(
             journalpostId = null,
             journalpostferdigstilt = null,
@@ -160,6 +183,7 @@ internal class JoarkClientTest {
         val joarkClient = JoarkClient(
             config = config,
             client = client,
+            tokenService = mockTokenService,
         )
 
         runTest {
