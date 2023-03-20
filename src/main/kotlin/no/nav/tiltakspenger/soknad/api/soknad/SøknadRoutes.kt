@@ -26,11 +26,11 @@ fun Route.søknadRoutes(
             kotlin.runCatching {
                 val søknad = call.receive<Søknad>()
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
-                runBlocking {
+                val journalpostId = runBlocking {
                     søknadService.lagPdfOgSendTilJoark(søknad, fødselsnummer)
                 }
 
-                call.respondText(status = HttpStatusCode.NoContent, text = "OK")
+                call.respondText(status = HttpStatusCode.Created, text = journalpostId)
             }.onFailure {
                 when (it) {
                     is CannotTransformContentToTypeException, is BadRequestException -> {

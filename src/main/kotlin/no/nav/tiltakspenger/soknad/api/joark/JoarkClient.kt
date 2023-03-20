@@ -89,6 +89,7 @@ class JoarkClient(
                         throw IllegalStateException("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
                     }
 
+                    log.info("Vi har opprettet journalpost med id : $journalpostId")
                     return journalpostId
                 }
 

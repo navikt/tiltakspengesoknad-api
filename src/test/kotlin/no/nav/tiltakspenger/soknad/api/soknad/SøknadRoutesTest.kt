@@ -39,7 +39,7 @@ internal class SøknadRoutesTest {
     """.trimMargin()
 
     private val søknadServiceMock = mockk<SøknadService>().also { mock ->
-        coEvery { mock.lagPdfOgSendTilJoark(any(), any()) } returns Unit
+        coEvery { mock.lagPdfOgSendTilJoark(any(), any()) } returns "1"
     }
 
     private val mockOAuth2Server = MockOAuth2Server()
@@ -96,7 +96,7 @@ internal class SøknadRoutesTest {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(gyldigSøknad)
             }
-            assertEquals(HttpStatusCode.NoContent, response.status)
+            assertEquals(HttpStatusCode.Created, response.status)
         }
     }
 }
