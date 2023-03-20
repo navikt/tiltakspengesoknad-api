@@ -45,7 +45,7 @@ class JoarkClient(
                     avsenderMottaker = dokumentInnhold.avsenderMottaker,
                     bruker = dokumentInnhold.bruker,
                     sak = dokumentInnhold.sak,
-                    dokumenter = dokumentInnhold.dokumenter,
+                    dokumenter = emptyList(),
                 ),
             )
             log.info("$body")
