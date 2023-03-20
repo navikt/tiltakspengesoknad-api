@@ -74,7 +74,7 @@ class JoarkClient(
             }
 
             when (res.status) {
-                HttpStatusCode.OK -> {
+                HttpStatusCode.Created -> {
                     val response = res.call.body<JoarkResponse>()
 
                     val journalpostId = if (response.journalpostId.isNullOrEmpty()) {
