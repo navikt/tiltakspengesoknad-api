@@ -32,6 +32,7 @@ class JoarkClient(
     ): String {
         try {
             val token = tokenService.getToken(config = config)
+            log.info("$token")
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
