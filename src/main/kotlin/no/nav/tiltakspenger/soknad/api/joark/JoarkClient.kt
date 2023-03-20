@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.utils.EmptyContent.contentType
@@ -16,7 +17,7 @@ import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.pdl.INDIVIDSTONAD
 import org.slf4j.LoggerFactory
 
-internal const val joarkPath = "rest/journalpostapi/v1"
+internal const val joarkPath = "rest/journalpostapi/v1/journalpost"
 
 class JoarkClient(
     private val config: ApplicationConfig,
@@ -36,6 +37,7 @@ class JoarkClient(
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
+                parameter("forsoekFerdigstill", true)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(
