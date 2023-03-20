@@ -48,7 +48,7 @@ class JoarkClient(
                     dokumenter = dokumentInnhold.dokumenter,
                 ),
             )
-            log.info("body")
+            log.info("$body")
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
