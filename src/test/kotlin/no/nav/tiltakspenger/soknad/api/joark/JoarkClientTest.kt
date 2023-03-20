@@ -29,7 +29,7 @@ internal class JoarkClientTest {
         val mock = MockEngine {
             respond(
                 content = okSvarJoark,
-                status = HttpStatusCode.OK,
+                status = HttpStatusCode.Created,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
@@ -60,7 +60,7 @@ internal class JoarkClientTest {
         val mock = MockEngine {
             respond(
                 content = svarIkkeFerdigstiltJoark,
-                status = HttpStatusCode.OK,
+                status = HttpStatusCode.Created,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
@@ -127,7 +127,7 @@ internal class JoarkClientTest {
         val mock = MockEngine {
             respond(
                 content = svarNullIFerdigstiltJoark,
-                status = HttpStatusCode.OK,
+                status = HttpStatusCode.Created,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
@@ -164,7 +164,7 @@ internal class JoarkClientTest {
         val mock = MockEngine {
             respond(
                 content = svarUtenJournalpostId,
-                status = HttpStatusCode.OK,
+                status = HttpStatusCode.Created,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
