@@ -24,7 +24,7 @@ class TiltakspengerArenaClient(
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, tiltakspengerArenaAudience)
         val token = tokenResponse.accessToken
         return kotlin.runCatching {
-            httpClient.get(tiltakspengerArenaEndpoint) {
+            httpClient.get("$tiltakspengerArenaEndpoint/tiltak") {
                 accept(ContentType.Application.Json)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
