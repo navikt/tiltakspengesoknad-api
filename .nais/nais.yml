@@ -41,6 +41,7 @@ spec:
       external:
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "dokarkiv.dev-fss-pub.nais.io"
+        - host: "tiltakspenger-arena.dev-fss-pub.nais.io"
   env:
     - name: PDL_ENDPOINT_URL
       value: {{ endpoints.pdl }}
@@ -56,3 +57,7 @@ spec:
       value: {{ scope.joark }}
     - name: PDF_ENDPOINT_URL
       value: {{ endpoints.pdf }}
+    - name: TILTAKSPENGER_ARENA_URL
+      value: {{ endpoints.tiltakspengerarena }}
+    - name: TILTAKSPENGER_ARENA_AUDIENCE
+      value: {{ audience.tiltakspengerarena }}

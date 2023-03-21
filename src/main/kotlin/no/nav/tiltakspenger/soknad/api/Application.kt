@@ -28,6 +28,8 @@ import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
+import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
+import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -48,6 +50,7 @@ fun Application.soknadApi(
             ),
         ),
     ),
+    tiltakService: TiltakService = TiltakService(environment.config),
 ) {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
 
@@ -79,6 +82,7 @@ fun Application.soknadApi(
     setupRouting(
         pdlService = pdlService,
         søknadService = søknadService,
+        tiltakService = tiltakService,
     )
     installJacksonFeature()
 
@@ -97,12 +101,14 @@ fun Application.soknadApi(
 internal fun Application.setupRouting(
     pdlService: PdlService,
     søknadService: SøknadService,
+    tiltakService: TiltakService,
 ) {
     val issuers = environment.config.asIssuerProps().keys
     routing {
         authenticate(*issuers.toTypedArray()) {
             pdlRoutes(pdlService = pdlService)
             søknadRoutes(søknadService = søknadService)
+            tiltakRoutes(tiltakService = tiltakService)
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
     }
