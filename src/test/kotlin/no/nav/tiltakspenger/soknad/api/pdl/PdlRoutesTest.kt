@@ -11,6 +11,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -42,6 +43,8 @@ internal class PdlRoutesTest {
         coEvery { mock.hentPersonaliaMedBarn(any(), any()) } returns mockedPerson.toPersonDTO()
     }
 
+    val testFødselsnummer = "123"
+
     private fun issueTestToken(): SignedJWT {
         return mockOAuth2Server.issueToken(
             "tokendings",
@@ -50,7 +53,7 @@ internal class PdlRoutesTest {
                 audience = listOf("audience"),
                 claims = mapOf(
                     "acr" to "Level4",
-                    "pid" to "123",
+                    "pid" to testFødselsnummer,
                 ),
             ),
         )
@@ -78,6 +81,47 @@ internal class PdlRoutesTest {
                 assertEquals(mockedPerson.fornavn, body.fornavn)
                 assertEquals(mockedPerson.etternavn, body.etternavn)
                 assertEquals(mockedPerson.mellomnavn, body.mellomnavn)
+            }
+        }
+    }
+
+    @Test
+    fun `get på personalia-endepunkt skal kalle på PDLService med fødselsnummeret som ligger bakt inn i pid claim i tokenet`() {
+        val token = issueTestToken()
+
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(pdlService = mockedPdlService)
+            runBlocking {
+                client.get("/personalia") {
+                    contentType(type = ContentType.Application.Json)
+                    header("Authorization", "Bearer ${token.serialize()}")
+                }
+                coVerify { mockedPdlService.hentPersonaliaMedBarn(testFødselsnummer, any()) }
+            }
+        }
+    }
+
+    @Test
+    fun `get på personalia-endepunkt skal returnere 401 dersom token mangler`() {
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(pdlService = mockedPdlService)
+            runBlocking {
+                val response = client.get("/personalia") {
+                    contentType(type = ContentType.Application.Json)
+                }
+                assertEquals(HttpStatusCode.Unauthorized, response.status)
             }
         }
     }
