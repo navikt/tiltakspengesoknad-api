@@ -6,10 +6,12 @@ import io.mockk.mockk
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
+import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 
 fun ApplicationTestBuilder.configureTestApplication(
     pdlService: PdlService = mockk(),
     søknadService: SøknadService = mockk(),
+    tiltakService: TiltakService = mockk()
 ) {
     environment {
         config = ApplicationConfig("application.test.conf")
@@ -20,6 +22,7 @@ fun ApplicationTestBuilder.configureTestApplication(
         setupRouting(
             pdlService = pdlService,
             søknadService = søknadService,
+            tiltakService = tiltakService,
         )
         installJacksonFeature()
     }
