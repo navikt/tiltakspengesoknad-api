@@ -11,7 +11,7 @@ import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 fun ApplicationTestBuilder.configureTestApplication(
     pdlService: PdlService = mockk(),
     søknadService: SøknadService = mockk(),
-    tiltakService: TiltakService = mockk()
+    tiltakService: TiltakService = mockk(),
 ) {
     environment {
         config = ApplicationConfig("application.test.conf")
