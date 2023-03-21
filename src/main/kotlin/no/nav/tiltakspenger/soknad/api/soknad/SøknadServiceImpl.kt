@@ -8,8 +8,8 @@ class SøknadServiceImpl(
     private val pdfService: PdfService,
     private val joarkService: JoarkService,
 ) : SøknadService {
-    override suspend fun lagPdfOgSendTilJoark(søknad: Søknad, fnr: String) {
+    override suspend fun lagPdfOgSendTilJoark(søknad: Søknad, fnr: String): String {
         val pdf = pdfService.lagPdf(søknad)
-        joarkService.sendPdfTilJoark(pdf, søknad, fnr)
+        return joarkService.sendPdfTilJoark(pdf, søknad, fnr)
     }
 }

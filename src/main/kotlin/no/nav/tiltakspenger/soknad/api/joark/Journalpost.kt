@@ -101,7 +101,6 @@ sealed class Sak {
     ) : Sak()
 
     data class GenerellSak(
-        val fagsaksystem: String = "IND",
         val sakstype: String = "GENERELL_SAK",
     ) : Sak()
 }

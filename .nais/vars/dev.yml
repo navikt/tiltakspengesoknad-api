@@ -5,7 +5,7 @@ ingress:
   url: https://tiltakspenger-soknad-api.dev.nav.no
 endpoints:
   pdl: https://pdl-api.dev-fss-pub.nais.io/graphql
-  pdf: http://tiltakspenger-pdfgen.tpts.svc.nais.local
+  pdf: http://tiltakspenger-pdfgen
   joark: https://dokarkiv.dev-fss-pub.nais.io
   tiltakspengerarena: https://tiltakspenger-arena.dev-fss-pub.nais.io
 audience:
@@ -14,4 +14,4 @@ audience:
   tiltakspengerarena: dev-fss:tpts:tiltakspenger-arena
 scope:
   pdl: api://dev-fss.pdl.pdl-api/.default
-  joark: api://dev-fss.teamdokumenthandtering.dokarkiv/.default
+  joark: api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default

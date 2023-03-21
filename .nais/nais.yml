@@ -36,6 +36,8 @@ spec:
           namespace: tpts
           cluster: {{ cluster }}
     outbound:
+      rules:
+        - application: tiltakspenger-pdfgen
       external:
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "dokarkiv.dev-fss-pub.nais.io"

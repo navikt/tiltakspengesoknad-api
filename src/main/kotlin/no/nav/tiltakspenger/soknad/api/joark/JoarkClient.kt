@@ -3,9 +3,12 @@ package no.nav.tiltakspenger.soknad.api.joark
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -14,11 +17,12 @@ import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.pdl.INDIVIDSTONAD
 import org.slf4j.LoggerFactory
 
-internal const val joarkPath = "rest/journalpostapi/v1"
+internal const val joarkPath = "rest/journalpostapi/v1/journalpost"
 
 class JoarkClient(
-    config: ApplicationConfig,
+    private val config: ApplicationConfig,
     private val client: HttpClient,
+    private val tokenService: TokenService,
 ) : Joark {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -28,9 +32,28 @@ class JoarkClient(
         dokumentInnhold: Journalpost,
     ): String {
         try {
+            val token = tokenService.getToken(config = config)
+            log.info("$token")
+            val body = objectMapper.writeValueAsString(
+                JournalpostRequest(
+                    tittel = dokumentInnhold.tittel,
+                    journalpostType = dokumentInnhold.journalpostType,
+                    tema = dokumentInnhold.tema,
+                    kanal = dokumentInnhold.kanal,
+                    behandlingstema = dokumentInnhold.behandlingstema,
+                    journalfoerendeEnhet = dokumentInnhold.journalfoerendeEnhet,
+                    avsenderMottaker = dokumentInnhold.avsenderMottaker,
+                    bruker = dokumentInnhold.bruker,
+                    sak = dokumentInnhold.sak,
+                    dokumenter = emptyList(),
+                ),
+            )
+            log.info("$body")
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
+                parameter("forsoekFerdigstill", true)
+                bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(
                     objectMapper.writeValueAsString(
@@ -51,7 +74,7 @@ class JoarkClient(
             }
 
             when (res.status) {
-                HttpStatusCode.OK -> {
+                HttpStatusCode.Created -> {
                     val response = res.call.body<JoarkResponse>()
 
                     val journalpostId = if (response.journalpostId.isNullOrEmpty()) {
@@ -66,6 +89,7 @@ class JoarkClient(
                         throw IllegalStateException("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
                     }
 
+                    log.info("Vi har opprettet journalpost med id : $journalpostId")
                     return journalpostId
                 }
 
