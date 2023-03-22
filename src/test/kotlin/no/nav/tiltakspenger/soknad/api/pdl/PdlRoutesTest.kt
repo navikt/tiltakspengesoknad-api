@@ -51,7 +51,7 @@ internal class PdlRoutesTest {
         claims: Map<String, String> = mapOf(
             "acr" to "Level4",
             "pid" to testFødselsnummer,
-            ),
+        ),
     ): SignedJWT {
         return mockOAuth2Server.issueToken(
             issuer,
