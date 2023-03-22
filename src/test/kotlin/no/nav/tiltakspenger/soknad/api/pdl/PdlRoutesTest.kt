@@ -45,16 +45,20 @@ internal class PdlRoutesTest {
 
     val testFødselsnummer = "123"
 
-    private fun issueTestToken(): SignedJWT {
+    private fun issueTestToken(
+        issuer: String = "tokendings",
+        clientId: String = "testClientId",
+        claims: Map<String, String> = mapOf(
+            "acr" to "Level4",
+            "pid" to testFødselsnummer,
+            ),
+    ): SignedJWT {
         return mockOAuth2Server.issueToken(
-            "tokendings",
-            "testClientId",
+            issuer,
+            clientId,
             DefaultOAuth2TokenCallback(
                 audience = listOf("audience"),
-                claims = mapOf(
-                    "acr" to "Level4",
-                    "pid" to testFødselsnummer,
-                ),
+                claims = claims,
             ),
         )
     }
@@ -120,6 +124,50 @@ internal class PdlRoutesTest {
             runBlocking {
                 val response = client.get("/personalia") {
                     contentType(type = ContentType.Application.Json)
+                }
+                assertEquals(HttpStatusCode.Unauthorized, response.status)
+            }
+        }
+    }
+
+    @Test
+    fun `get på personalia-endepunkt skal returnere 401 dersom token kommer fra ugyldig issuer`() {
+        val tokenMedUgyldigIssuer = issueTestToken(issuer = "ugyldigIssuer")
+
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(pdlService = mockedPdlService)
+            runBlocking {
+                val response = client.get("/personalia") {
+                    contentType(type = ContentType.Application.Json)
+                    header("Authorization", "Bearer ${tokenMedUgyldigIssuer.serialize()}")
+                }
+                assertEquals(HttpStatusCode.Unauthorized, response.status)
+            }
+        }
+    }
+
+    @Test
+    fun `get på personalia-endepunkt skal returnere 401 dersom token mangler acr=Level4 claim`() {
+        val tokenMedManglendeClaim = issueTestToken(claims = mapOf("pid" to testFødselsnummer))
+
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(pdlService = mockedPdlService)
+            runBlocking {
+                val response = client.get("/personalia") {
+                    contentType(type = ContentType.Application.Json)
+                    header("Authorization", "Bearer ${tokenMedManglendeClaim.serialize()}")
                 }
                 assertEquals(HttpStatusCode.Unauthorized, response.status)
             }
