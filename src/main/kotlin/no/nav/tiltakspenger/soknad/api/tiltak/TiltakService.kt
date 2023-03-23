@@ -12,10 +12,14 @@ class TiltakService(
         if (result.isSuccess) {
             val tiltak = result.getOrNull()
             if (tiltak !== null) {
-                return ArenaTiltakResponse(
-                    tiltaksaktiviteter = tiltak.tiltaksaktiviteter,
-                    feil = tiltak.feil,
-                ).toTiltakDto()
+                return TiltakDto(
+                    tiltak = ArenaTiltakResponse(
+                        tiltaksaktiviteter = tiltak.tiltaksaktiviteter,
+                        feil = tiltak.feil,
+                    ).toTiltakDto().tiltak.filter {
+                        it.erInnenfor6Måneder()
+                    },
+                )
             }
         }
         throw IllegalStateException("Noe gikk galt under kall til tiltakspenger-arena")
