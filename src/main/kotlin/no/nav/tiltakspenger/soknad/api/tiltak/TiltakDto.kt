@@ -12,18 +12,27 @@ data class TiltaksdeltakelseDto(
     val type: ArenaTiltaksaktivitetResponsDTO.TiltakType,
     val deltakelsePeriode: Deltakelsesperiode,
     val arrangør: String,
+    val status: ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType,
 ) {
-    fun erInnenfor6Måneder(): Boolean {
+    fun erInnenforRelevantTidsrom(): Boolean {
         val datoFor6MånederSiden = LocalDate.now().minusMonths(6)
-        val dato6MånederFrem = LocalDate.now().plusMonths(6)
+        val dato2MånederFrem = LocalDate.now().plusMonths(2)
 
         return if (deltakelsePeriode.fom == null) {
             true
         } else if (deltakelsePeriode.tom == null) {
-            deltakelsePeriode.fom.isAfter(datoFor6MånederSiden)
+            deltakelsePeriode.fom.isBefore(dato2MånederFrem) && deltakelsePeriode.fom.isAfter(datoFor6MånederSiden)
         } else {
-            deltakelsePeriode.fom.isAfter(datoFor6MånederSiden) && deltakelsePeriode.tom.isBefore(dato6MånederFrem)
+            deltakelsePeriode.fom.isBefore(dato2MånederFrem) && deltakelsePeriode.tom.isAfter(datoFor6MånederSiden)
         }
+    }
+
+    fun harRelevantStatus(): Boolean {
+        return status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.AKTUELL ||
+            status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.JATAKK ||
+            status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.GJENN ||
+            status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.FULLF ||
+            status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.DELAVB
     }
 }
 
@@ -45,6 +54,7 @@ data class ArenaTiltakResponse(
                         tom = it.deltakelsePeriode?.tom,
                     ),
                     arrangør = it.arrangoer ?: "",
+                    status = it.deltakerStatusType,
                 )
             },
         )

@@ -17,7 +17,7 @@ class TiltakService(
                         tiltaksaktiviteter = tiltak.tiltaksaktiviteter,
                         feil = tiltak.feil,
                     ).toTiltakDto().tiltak.filter {
-                        it.erInnenfor6Måneder()
+                        it.erInnenforRelevantTidsrom() && it.harRelevantStatus()
                     },
                 )
             }
