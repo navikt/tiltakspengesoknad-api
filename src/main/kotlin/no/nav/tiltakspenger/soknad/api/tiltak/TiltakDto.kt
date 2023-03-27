@@ -9,6 +9,7 @@ data class Deltakelsesperiode(
 )
 
 data class TiltaksdeltakelseDto(
+    val aktivitetId: String,
     val type: ArenaTiltaksaktivitetResponsDTO.TiltakType,
     val deltakelsePeriode: Deltakelsesperiode,
     val arrangør: String,
@@ -48,6 +49,7 @@ data class ArenaTiltakResponse(
         return TiltakDto(
             tiltak = (tiltaksaktiviteter ?: emptyList()).map {
                 TiltaksdeltakelseDto(
+                    aktivitetId = it.aktivitetId,
                     type = it.tiltakType,
                     deltakelsePeriode = Deltakelsesperiode(
                         fom = it.deltakelsePeriode?.fom,

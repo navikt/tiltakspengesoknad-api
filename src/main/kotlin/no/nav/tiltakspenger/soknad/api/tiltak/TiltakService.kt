@@ -17,7 +17,7 @@ class TiltakService(
                         tiltaksaktiviteter = tiltak.tiltaksaktiviteter,
                         feil = tiltak.feil,
                     ).toTiltakDto().tiltak.filter {
-                        it.erInnenforRelevantTidsrom() && it.harRelevantStatus()
+                        it.erInnenforRelevantTidsrom() && it.harRelevantStatus() && it.type.rettPåTiltakspenger
                     },
                 )
             }
