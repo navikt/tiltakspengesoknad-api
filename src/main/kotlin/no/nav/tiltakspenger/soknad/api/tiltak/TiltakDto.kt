@@ -33,7 +33,8 @@ data class TiltaksdeltakelseDto(
             status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.JATAKK ||
             status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.GJENN ||
             status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.FULLF ||
-            status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.DELAVB
+            status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.DELAVB ||
+            status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.TILBUD
     }
 }
 
