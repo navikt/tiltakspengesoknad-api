@@ -57,7 +57,7 @@ spec:
       value: {{ scope.joark }}
     - name: PDF_ENDPOINT_URL
       value: {{ endpoints.pdf }}
-    - name: TILTAKSPENGER_ARENA_URL
+    - name: TILTAKSPENGER_ARENA_ENDPOINT_URL
       value: {{ endpoints.tiltakspengerarena }}
     - name: TILTAKSPENGER_ARENA_AUDIENCE
       value: {{ audience.tiltakspengerarena }}
