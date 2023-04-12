@@ -2,6 +2,7 @@ package no.nav.tiltakspenger.soknad.api.joark
 
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.objectMapper
+import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.util.Base64
 
 enum class Tema(val value: String) {
@@ -44,28 +45,45 @@ sealed class Journalpost {
                 fnr: String,
                 søknad: Søknad,
                 pdf: ByteArray,
-            ) = Søknadspost(
-                fnr = fnr,
-                dokumenter = lagDokumenter(
-                    pdf = pdf,
-                    søknad = søknad,
-                ),
-            )
+                vedlegg: List<Vedlegg>,
+            ) =
+                Søknadspost(
+                    fnr = fnr,
+                    dokumenter = mutableListOf(
+                        lagHoveddokument(
+                            pdf = pdf,
+                            søknad = søknad,
+                        ),
+                    ).apply {
+                        this.addAll(lagVedleggsdokumenter(vedlegg))
+                    },
+                )
 
-            private fun lagDokumenter(pdf: ByteArray, søknad: Søknad): List<JournalpostDokument> =
-                listOf(
-                    JournalpostDokument(
-                        tittel = søknadsposttittel,
-                        dokumentKategori = DokumentKategori.SOK,
-                        dokumentvarianter = listOf(
-                            DokumentVariant.ArkivPDF(fysiskDokument = Base64.getEncoder().encodeToString(pdf)),
-                            DokumentVariant.OriginalJson(
-                                fysiskDokument = Base64.getEncoder()
-                                    .encodeToString(objectMapper.writeValueAsString(søknad).toByteArray()),
-                            ),
+            private fun lagHoveddokument(pdf: ByteArray, søknad: Søknad): JournalpostDokument =
+                JournalpostDokument(
+                    tittel = søknadsposttittel,
+                    dokumentKategori = DokumentKategori.SOK,
+                    dokumentvarianter = listOf(
+                        DokumentVariant.ArkivPDF(fysiskDokument = Base64.getEncoder().encodeToString(pdf)),
+                        DokumentVariant.OriginalJson(
+                            fysiskDokument = Base64.getEncoder()
+                                .encodeToString(objectMapper.writeValueAsString(søknad).toByteArray()),
                         ),
                     ),
                 )
+
+            private fun lagVedleggsdokumenter(vedleggListe: List<Vedlegg>): List<JournalpostDokument> =
+                vedleggListe.map { vedlegg ->
+                    JournalpostDokument(
+                        tittel = vedlegg.filnavn,
+                        dokumentKategori = DokumentKategori.SOK,
+                        dokumentvarianter = listOf(
+                            DokumentVariant.ArkivPDF(
+                                fysiskDokument = Base64.getEncoder().encodeToString(vedlegg.dokument),
+                            ),
+                        ),
+                    )
+                }
         }
     }
 }

@@ -1,7 +1,8 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
 interface SøknadService {
-    suspend fun lagPdfOgSendTilJoark(søknad: Søknad, fnr: String): String
+    suspend fun opprettDokumenterOgArkiverIJoark(søknad: Søknad, fnr: String, vedlegg: List<Vedlegg>): String
 }

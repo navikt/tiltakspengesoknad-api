@@ -220,6 +220,7 @@ internal class JoarkClientTest {
             barnSøktBarnetilleggFor = listOf(),
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
+        vedlegg = emptyList(),
     )
 
     private val dokumentInfoId = "485227498"

@@ -2,10 +2,14 @@ package no.nav.tiltakspenger.soknad.api.soknad
 
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.PartData
+import io.ktor.http.content.forEachPart
+import io.ktor.http.content.streamProvider
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
 import io.ktor.server.request.receive
+import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
@@ -15,6 +19,7 @@ import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
+import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
 val LOG = KotlinLogging.logger { }
 
@@ -23,11 +28,31 @@ fun Route.søknadRoutes(
 ) {
     route(SØKNAD_PATH) {
         post {
+            val vedlegg = mutableListOf<Vedlegg>()
             kotlin.runCatching {
+                val multipartData = call.receiveMultipart()
+
+                multipartData.forEachPart { part ->
+                    when (part) {
+                        is PartData.FormItem -> {
+                            LOG.info { part.value }
+                        }
+
+                        is PartData.FileItem -> {
+                            val fileBytes = part.streamProvider().readBytes()
+                            vedlegg.add(Vedlegg(filnavn = part.originalFileName!!, dokument = fileBytes))
+                            LOG.info { part.originalFileName }
+                        }
+
+                        else -> {}
+                    }
+                    part.dispose()
+                }
+
                 val søknad = call.receive<Søknad>()
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                 val journalpostId = runBlocking {
-                    søknadService.lagPdfOgSendTilJoark(søknad, fødselsnummer)
+                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, vedlegg)
                 }
 
                 call.respondText(status = HttpStatusCode.Created, text = journalpostId)

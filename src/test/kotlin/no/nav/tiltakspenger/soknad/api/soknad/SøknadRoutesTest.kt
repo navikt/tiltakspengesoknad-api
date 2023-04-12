@@ -39,7 +39,7 @@ internal class SøknadRoutesTest {
     """.trimMargin()
 
     private val søknadServiceMock = mockk<SøknadService>().also { mock ->
-        coEvery { mock.lagPdfOgSendTilJoark(any(), any()) } returns "1"
+        coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any()) } returns "1"
     }
 
     private val mockOAuth2Server = MockOAuth2Server()
