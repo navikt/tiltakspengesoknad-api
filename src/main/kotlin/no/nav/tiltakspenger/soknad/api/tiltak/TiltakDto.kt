@@ -4,8 +4,8 @@ import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO
 import java.time.LocalDate
 
 data class Deltakelsesperiode(
-    val fom: LocalDate?,
-    val tom: LocalDate?,
+    val fra: LocalDate?,
+    val til: LocalDate?,
 )
 
 data class TiltaksdeltakelseDto(
@@ -19,12 +19,12 @@ data class TiltaksdeltakelseDto(
         val datoFor6MånederSiden = LocalDate.now().minusMonths(6)
         val dato2MånederFrem = LocalDate.now().plusMonths(2)
 
-        return if (deltakelsePeriode.fom == null) {
+        return if (deltakelsePeriode.fra == null) {
             true
-        } else if (deltakelsePeriode.tom == null) {
-            deltakelsePeriode.fom.isBefore(dato2MånederFrem) && deltakelsePeriode.fom.isAfter(datoFor6MånederSiden)
+        } else if (deltakelsePeriode.til == null) {
+            deltakelsePeriode.fra.isBefore(dato2MånederFrem) && deltakelsePeriode.fra.isAfter(datoFor6MånederSiden)
         } else {
-            deltakelsePeriode.fom.isBefore(dato2MånederFrem) && deltakelsePeriode.tom.isAfter(datoFor6MånederSiden)
+            deltakelsePeriode.fra.isBefore(dato2MånederFrem) && deltakelsePeriode.til.isAfter(datoFor6MånederSiden)
         }
     }
 
@@ -53,8 +53,8 @@ data class ArenaTiltakResponse(
                     aktivitetId = it.aktivitetId,
                     type = it.tiltakType,
                     deltakelsePeriode = Deltakelsesperiode(
-                        fom = it.deltakelsePeriode?.fom,
-                        tom = it.deltakelsePeriode?.tom,
+                        fra = it.deltakelsePeriode?.fom,
+                        til = it.deltakelsePeriode?.tom,
                     ),
                     arrangør = it.arrangoer ?: "",
                     status = it.deltakerStatusType,
