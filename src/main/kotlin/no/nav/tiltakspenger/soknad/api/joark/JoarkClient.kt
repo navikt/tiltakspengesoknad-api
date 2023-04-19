@@ -8,7 +8,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -34,25 +33,25 @@ class JoarkClient(
         try {
             val token = tokenService.getToken(config = config)
             log.info("$token")
-            val body = objectMapper.writeValueAsString(
+            val bodyUtenDokumenterFordiViSkalLoggeLitt = objectMapper.writeValueAsString(
                 JournalpostRequest(
                     tittel = dokumentInnhold.tittel,
                     journalpostType = dokumentInnhold.journalpostType,
                     tema = dokumentInnhold.tema,
                     kanal = dokumentInnhold.kanal,
                     behandlingstema = dokumentInnhold.behandlingstema,
-                    journalfoerendeEnhet = dokumentInnhold.journalfoerendeEnhet,
+                    // journalfoerendeEnhet = dokumentInnhold.journalfoerendeEnhet,
                     avsenderMottaker = dokumentInnhold.avsenderMottaker,
                     bruker = dokumentInnhold.bruker,
-                    sak = dokumentInnhold.sak,
+                    // sak = dokumentInnhold.sak,
                     dokumenter = emptyList(),
                 ),
             )
-            log.info("$body")
+            log.info("$bodyUtenDokumenterFordiViSkalLoggeLitt")
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
-                parameter("forsoekFerdigstill", true)
+                parameter("forsoekFerdigstill", false)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(
@@ -63,10 +62,10 @@ class JoarkClient(
                             tema = dokumentInnhold.tema,
                             kanal = dokumentInnhold.kanal,
                             behandlingstema = dokumentInnhold.behandlingstema,
-                            journalfoerendeEnhet = dokumentInnhold.journalfoerendeEnhet,
+                            // journalfoerendeEnhet = dokumentInnhold.journalfoerendeEnhet,
                             avsenderMottaker = dokumentInnhold.avsenderMottaker,
                             bruker = dokumentInnhold.bruker,
-                            sak = dokumentInnhold.sak,
+                            // sak = dokumentInnhold.sak,
                             dokumenter = dokumentInnhold.dokumenter,
                         ),
                     ),
@@ -84,10 +83,10 @@ class JoarkClient(
                         response.journalpostId
                     }
 
-                    if ((response.journalpostferdigstilt == null) || (response.journalpostferdigstilt == false)) {
-                        log.error("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
-                        throw IllegalStateException("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
-                    }
+                    // if ((response.journalpostferdigstilt == null) || (response.journalpostferdigstilt == false)) {
+                    //     log.error("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
+                    //     throw IllegalStateException("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
+                    // }
 
                     log.info("Vi har opprettet journalpost med id : $journalpostId")
                     return journalpostId
