@@ -82,11 +82,11 @@ internal class JoarkClientTest {
         )
 
         runTest {
-            shouldThrow<IllegalStateException> {
-                joarkClient.opprettJournalpost(
-                    dokumentInnhold = dokument,
-                )
-            }.message shouldBe "Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$joarkResonse"
+            val resp = joarkClient.opprettJournalpost(
+                dokumentInnhold = dokument,
+            )
+
+            resp shouldBe journalpostId
         }
     }
 
@@ -150,11 +150,11 @@ internal class JoarkClientTest {
         )
 
         runTest {
-            shouldThrow<IllegalStateException> {
-                joarkClient.opprettJournalpost(
-                    dokumentInnhold = dokument,
-                )
-            }.message shouldBe "Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$joarkResonse"
+            val resp = joarkClient.opprettJournalpost(
+                dokumentInnhold = dokument,
+            )
+
+            resp shouldBe journalpostId
         }
     }
 
