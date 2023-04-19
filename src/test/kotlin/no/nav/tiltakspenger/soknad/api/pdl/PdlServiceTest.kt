@@ -85,7 +85,7 @@ internal class PdlServiceTest {
             hentPerson = SøkersBarnFraPDL(
                 navn = listOf(mockNavn()),
                 adressebeskyttelse = emptyList(),
-                foedsel = listOf(mockFødsel()),
+                fødsel = listOf(mockFødsel()),
             ),
         ),
     )

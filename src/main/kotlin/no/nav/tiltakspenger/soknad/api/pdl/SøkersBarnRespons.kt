@@ -3,7 +3,8 @@ package no.nav.tiltakspenger.soknad.api.pdl
 data class SøkersBarnFraPDL(
     val navn: List<Navn>,
     val adressebeskyttelse: List<Adressebeskyttelse>,
-    val foedsel: List<Fødsel>,
+    val fødsel: List<Fødsel>,
+    val dødsfall: List<Dødsfall>,
 )
 
 data class SøkersBarnFraPDLRespons(
@@ -24,7 +25,8 @@ data class SøkersBarnRespons(
     fun toPerson(): Person {
         val person = extractPerson() ?: throw IllegalStateException("Fant ikke personen")
         val navn = avklarNavn(person.navn)
-        val fødsel = avklarFødsel(person.foedsel)
+        val fødsel = avklarFødsel(person.fødsel)
+        val dødsfall = person.dødsfall.isNotEmpty()
         val adressebeskyttelseGradering = avklarGradering(person.adressebeskyttelse)
         return Person(
             fornavn = navn.fornavn,
@@ -32,6 +34,7 @@ data class SøkersBarnRespons(
             etternavn = navn.etternavn,
             adressebeskyttelseGradering = adressebeskyttelseGradering,
             fødselsdato = fødsel.foedselsdato,
+            erDød = dødsfall,
         )
     }
 }

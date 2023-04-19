@@ -7,15 +7,17 @@ data class Person(
     val mellomnavn: String?,
     val etternavn: String,
     val fødselsdato: LocalDate? = null,
+    val erDød: Boolean,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>? = emptyList(),
     val adressebeskyttelseGradering: AdressebeskyttelseGradering,
 ) {
     fun toPersonDTO(barn: List<Person> = emptyList()): PersonDTO {
+       var levendeBarn = barn.filterNot { it.erDød }
         return PersonDTO(
             fornavn = fornavn,
             mellomnavn = mellomnavn,
             etternavn = etternavn,
-            barn = barn.map {
+            barn = levendeBarn.map {
                 if (it.adressebeskyttelseGradering === AdressebeskyttelseGradering.UGRADERT) {
                     BarnDTO(
                         fødselsdato = it.fødselsdato!!,
