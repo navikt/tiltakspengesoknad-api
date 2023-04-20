@@ -28,6 +28,7 @@ internal class PersonTest {
             adressebeskyttelseGradering = gradering,
             fødselsdato = LocalDate.MAX,
             forelderBarnRelasjon = forelderBarnRelasjon,
+            erDød = false
         )
     }
 
