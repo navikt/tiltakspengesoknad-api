@@ -8,6 +8,7 @@ import io.ktor.http.content.streamProvider
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
+import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
@@ -17,6 +18,7 @@ import java.io.File
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
+import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
@@ -29,16 +31,18 @@ fun Route.søknadRoutes(
     route(SØKNAD_PATH) {
         post {
             val vedlegg = mutableListOf<Vedlegg>()
-            var søknad: Søknad? = null
             kotlin.runCatching {
                 val multipartData = call.receiveMultipart()
+                var søknad: Søknad? = null
 
                 multipartData.forEachPart { part ->
                     when (part) {
                         is PartData.FormItem -> {
-                            LOG.info("FormItem")
-                            LOG.info { part.value }
-                            //TODO: Les inn søknad
+                            if ( part.name == "søknad") {
+                                søknad = deserialize(part.value)
+                            } else {
+                                LOG.error { "Recieved multipart form with unknown key ${part.name}" }
+                            }
                         }
 
                         is PartData.FileItem -> {
@@ -54,11 +58,15 @@ fun Route.søknadRoutes(
                     }
                     part.dispose()
                 }
-                val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
-                runBlocking {
-                    søknad?.let { søknadService.opprettDokumenterOgArkiverIJoark(it, fødselsnummer, vedlegg) }
-                }?.let {
-                    call.respondText(status = HttpStatusCode.Created, text = it)
+
+                if (søknad == null){
+                    call.respondText(status = HttpStatusCode.BadRequest, text = "Bad request")
+                } else {
+                    val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
+                    val journalpostId = runBlocking {
+                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, vedlegg)
+                    }
+                    call.respondText(status = HttpStatusCode.Created, text = journalpostId)
                 }
             }.onFailure {
                 when (it) {
