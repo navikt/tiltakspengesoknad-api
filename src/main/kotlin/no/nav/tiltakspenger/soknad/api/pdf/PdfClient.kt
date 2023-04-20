@@ -54,6 +54,7 @@ class PdfClient(
     override suspend fun konverterVedlegg(vedlegg: List<Vedlegg>): List<Vedlegg> {
         return vedlegg.map {
             LOG.info("Konverterer vedlegg: ${it.filnavn}")
+            val baseFileName = it.filnavn.split(".").first().lowercase()
             val extension = it.filnavn.split(".").last().lowercase()
             when(extension) {
                 "pdf" -> {
@@ -61,11 +62,11 @@ class PdfClient(
                 }
                 "png" -> {
                     val bilde = genererPdfFraBilde(Bilde(ContentType.Image.PNG, it.dokument))
-                    Vedlegg(it.filnavn, bilde)
+                    Vedlegg("$baseFileName.pdf", bilde)
                 }
                 "jpg", "jpeg" -> {
                     val bilde = genererPdfFraBilde(Bilde(ContentType.Image.JPEG, it.dokument))
-                    Vedlegg(it.filnavn, bilde)
+                    Vedlegg("$baseFileName.pdf", bilde)
                 }
                 else -> {
                     throw BadExtensionException("Ugyldig filformat")
