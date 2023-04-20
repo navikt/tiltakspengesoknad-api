@@ -7,6 +7,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.content.ByteArrayContent
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.soknad.api.domain.AnnenUtbetaling
@@ -19,8 +20,13 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.util.UUID
+import no.nav.tiltakspenger.soknad.api.soknad.BadExtensionException
+import no.nav.tiltakspenger.soknad.api.soknad.LOG
+import no.nav.tiltakspenger.soknad.api.util.Bilde
+import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
 internal const val pdfgenPath = "api/v1/genpdf/tpts"
+internal const val pdfgenImagePath = "api/v1/genpdf/image/tpts"
 internal const val SOKNAD_TEMPLATE = "soknad"
 
 class PdfClient(
@@ -38,6 +44,42 @@ class PdfClient(
                 header("X-Correlation-ID", UUID.randomUUID())
                 contentType(ContentType.Application.Json)
                 setBody(objectMapper.writeValueAsString(søknadDto))
+            }.body()
+        } catch (throwable: Throwable) {
+            log.error("Kallet til pdfgen feilet $throwable")
+            throw RuntimeException("Kallet til pdfgen feilet $throwable")
+        }
+    }
+
+    override suspend fun konverterVedlegg(vedlegg: List<Vedlegg>): List<Vedlegg> {
+        return vedlegg.map {
+            LOG.info("Konverterer vedlegg: ${it.filnavn}")
+            val extension = it.filnavn.split(".").last().lowercase()
+            when(extension) {
+                "pdf" -> {
+                    it
+                }
+                "png" -> {
+                    val bilde = genererPdfFraBilde(Bilde(ContentType.Image.PNG, it.dokument))
+                    Vedlegg(it.filnavn, bilde)
+                }
+                "jpg", "jpeg" -> {
+                    val bilde = genererPdfFraBilde(Bilde(ContentType.Image.JPEG, it.dokument))
+                    Vedlegg(it.filnavn, bilde)
+                }
+                else -> {
+                    throw BadExtensionException("Ugyldig filformat")
+                }
+            }
+        }
+    }
+    private suspend fun genererPdfFraBilde(bilde: Bilde): ByteArray {
+        try {
+            return client.post("$pdfEndpoint/$pdfgenImagePath") {
+                accept(ContentType.Application.Json)
+                header("X-Correlation-ID", UUID.randomUUID())
+                contentType(bilde.type)
+                setBody(ByteArrayContent(bilde.data))
             }.body()
         } catch (throwable: Throwable) {
             log.error("Kallet til pdfgen feilet $throwable")

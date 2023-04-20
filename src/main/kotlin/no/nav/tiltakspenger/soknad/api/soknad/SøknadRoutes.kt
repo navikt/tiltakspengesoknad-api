@@ -8,12 +8,12 @@ import io.ktor.http.content.streamProvider
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
-import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import java.io.File
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
@@ -29,18 +29,24 @@ fun Route.søknadRoutes(
     route(SØKNAD_PATH) {
         post {
             val vedlegg = mutableListOf<Vedlegg>()
+            var søknad: Søknad? = null
             kotlin.runCatching {
                 val multipartData = call.receiveMultipart()
 
                 multipartData.forEachPart { part ->
                     when (part) {
                         is PartData.FormItem -> {
+                            LOG.info("FormItem")
                             LOG.info { part.value }
+                            //TODO: Les inn søknad
                         }
 
                         is PartData.FileItem -> {
+                            val filnavn = part.originalFileName ?: "untitled-${part.hashCode()}"
                             val fileBytes = part.streamProvider().readBytes()
-                            vedlegg.add(Vedlegg(filnavn = part.originalFileName!!, dokument = fileBytes))
+                            LOG.info("FileItem")
+                            File(filnavn).writeBytes(fileBytes) // TODO: Fjern, lagrer vedlegg lokalt
+                            vedlegg.add(Vedlegg(filnavn = filnavn, dokument = fileBytes))
                             LOG.info { part.originalFileName }
                         }
 
@@ -48,17 +54,15 @@ fun Route.søknadRoutes(
                     }
                     part.dispose()
                 }
-
-                val søknad = call.receive<Søknad>()
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
-                val journalpostId = runBlocking {
-                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, vedlegg)
+                runBlocking {
+                    søknad?.let { søknadService.opprettDokumenterOgArkiverIJoark(it, fødselsnummer, vedlegg) }
+                }?.let {
+                    call.respondText(status = HttpStatusCode.Created, text = it)
                 }
-
-                call.respondText(status = HttpStatusCode.Created, text = journalpostId)
             }.onFailure {
                 when (it) {
-                    is CannotTransformContentToTypeException, is BadRequestException -> {
+                    is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException -> {
                         LOG.error("Ugyldig søknad", it)
                         call.respondText(
                             text = "Bad Request",
@@ -107,3 +111,5 @@ fun Route.søknadRoutes(
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
 }
+
+class BadExtensionException(message: String): RuntimeException(message)
