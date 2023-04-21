@@ -26,7 +26,7 @@ data class SøkerRespons(
         val person = extractPerson() ?: throw IllegalStateException("Fant ikke personen")
         val navn = avklarNavn(person.navn)
         if (person.dødsfall.isNotEmpty()) {
-            throw IllegalStateException("Døde personer kan ikke søke om tiltakspenger")
+            throw IllegalStateException("Søker er registrert som død i PDL")
         }
         val adressebeskyttelseGradering = avklarGradering(person.adressebeskyttelse)
         return Person(
