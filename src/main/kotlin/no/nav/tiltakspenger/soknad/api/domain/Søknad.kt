@@ -7,36 +7,67 @@ data class Periode(
     val til: LocalDate,
 )
 
-data class Tiltak(
-    val type: String,
-    val periode: Periode,
-    val antallDagerIUken: Int,
-)
-
-data class AnnenUtbetaling(
-    val utbetaler: String,
-    val periode: Periode,
-)
-
-data class Barn(
+data class ManueltRegistrertBarn(
     val fornavn: String,
+    val mellomnavn: String?,
     val etternavn: String,
-    val fdato: LocalDate,
+    val fødselsdato: LocalDate,
     val bostedsland: String,
 )
 
-data class Søknad(
-    val deltarIKvp: Boolean,
-    val periodeMedKvp: Periode?,
-    val deltarIIntroprogrammet: Boolean,
-    val periodeMedIntroprogrammet: Periode?,
+data class RegistrertBarn(
+    val fornavn: String,
+    val mellomnavn: String?,
+    val etternavn: String,
+    val fødselsdato: LocalDate,
+)
+
+data class Kvalifiseringsprogram(
+    val deltar: Boolean,
+    val periode: Periode?,
+)
+
+data class Introduksjonsprogram(
+    val deltar: Boolean,
+    val periode: Periode?,
+)
+
+data class Institusjonsopphold(
     val borPåInstitusjon: Boolean,
-    val institusjonstype: String?,
-    val tiltak: Tiltak,
-    val mottarEllerSøktPensjonsordning: Boolean,
-    val pensjon: AnnenUtbetaling?,
-    val mottarEllerSøktEtterlønn: Boolean,
-    val etterlønn: AnnenUtbetaling?,
+    val periode: Periode?,
+)
+
+data class Tiltak(
+    val aktivitetId: String,
+    val periode: Periode?,
+    val søkerHeleTiltaksperioden: Boolean,
+)
+
+data class Barnetillegg(
     val søkerOmBarnetillegg: Boolean,
-    val barnSøktBarnetilleggFor: List<Barn>?,
+    val ønskerÅSøkeBarnetilleggForAndreBarn: Boolean?,
+    val manueltRegistrerteBarnSøktBarnetilleggFor: List<ManueltRegistrertBarn>,
+    val registrerteBarnSøktBarnetilleggFor: List<RegistrertBarn>,
+)
+
+data class Pensjonsordning(
+    val mottarEllerSøktPensjonsordning: Boolean,
+    val utbetaler: String?,
+    val periode: Periode?,
+)
+
+data class Etterlønn(
+    val mottarEllerSøktEtterlønn: Boolean,
+    val utbetaler: String?,
+    val periode: Periode?,
+)
+
+data class Søknad(
+    val kvalifiseringsprogram: Kvalifiseringsprogram,
+    val introduksjonsprogram: Introduksjonsprogram,
+    val institusjonsopphold: Institusjonsopphold,
+    val tiltak: Tiltak,
+    val barnetillegg: Barnetillegg,
+    val pensjonsordning: Pensjonsordning,
+    val etterlønn: Etterlønn,
 )
