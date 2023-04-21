@@ -62,7 +62,7 @@ data class Etterlønn(
     val periode: Periode?,
 )
 
-data class Søknad(
+data class SøknadDTO(
     val kvalifiseringsprogram: Kvalifiseringsprogram,
     val introduksjonsprogram: Introduksjonsprogram,
     val institusjonsopphold: Institusjonsopphold,

@@ -1,10 +1,10 @@
 package no.nav.tiltakspenger.soknad.api.pdf
 
-import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 
 class PdfServiceImpl(
     private val pdfGenerator: PdfGenerator,
 ) : PdfService {
-    override suspend fun lagPdf(søknad: Søknad) =
-        pdfGenerator.genererPdf(søknad)
+    override suspend fun lagPdf(søknadDTO: SøknadDTO) =
+        pdfGenerator.genererPdf(søknadDTO)
 }

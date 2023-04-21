@@ -18,7 +18,7 @@ import no.nav.tiltakspenger.soknad.api.domain.Introduksjonsprogram
 import no.nav.tiltakspenger.soknad.api.domain.Kvalifiseringsprogram
 import no.nav.tiltakspenger.soknad.api.domain.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.domain.Periode
-import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.domain.Tiltak
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
 import org.junit.jupiter.api.Test
@@ -76,7 +76,7 @@ internal class PdfClientTest {
         }
     }
 
-    private fun tomSøknad() = Søknad(
+    private fun tomSøknad() = SøknadDTO(
         kvalifiseringsprogram = Kvalifiseringsprogram(
             deltar = false,
             periode = null,

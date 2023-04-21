@@ -1,7 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.pdf
 
-import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 
 interface PdfGenerator {
-    suspend fun genererPdf(søknad: Søknad): ByteArray
+    suspend fun genererPdf(søknadDTO: SøknadDTO): ByteArray
 }

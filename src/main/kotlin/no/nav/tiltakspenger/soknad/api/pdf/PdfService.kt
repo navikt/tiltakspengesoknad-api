@@ -1,7 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.pdf
 
-import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 
 interface PdfService {
-    suspend fun lagPdf(søknad: Søknad): ByteArray
+    suspend fun lagPdf(søknadDTO: SøknadDTO): ByteArray
 }

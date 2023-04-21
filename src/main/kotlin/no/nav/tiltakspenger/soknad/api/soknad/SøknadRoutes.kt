@@ -13,7 +13,7 @@ import io.ktor.server.routing.route
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
-import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 
 val LOG = KotlinLogging.logger { }
@@ -24,10 +24,10 @@ fun Route.søknadRoutes(
     route(SØKNAD_PATH) {
         post {
             kotlin.runCatching {
-                val søknad = call.receive<Søknad>()
+                val søknadDTO = call.receive<SøknadDTO>()
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                 val journalpostId = runBlocking {
-                    søknadService.lagPdfOgSendTilJoark(søknad, fødselsnummer)
+                    søknadService.lagPdfOgSendTilJoark(søknadDTO, fødselsnummer)
                 }
 
                 call.respondText(status = HttpStatusCode.Created, text = journalpostId)
