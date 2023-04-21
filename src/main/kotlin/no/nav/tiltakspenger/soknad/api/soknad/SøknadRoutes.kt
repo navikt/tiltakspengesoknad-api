@@ -8,20 +8,19 @@ import io.ktor.http.content.streamProvider
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
-import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import java.io.File
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.deserialize
-import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
+import java.io.File
 
 val LOG = KotlinLogging.logger { }
 
@@ -33,12 +32,12 @@ fun Route.søknadRoutes(
             val vedlegg = mutableListOf<Vedlegg>()
             kotlin.runCatching {
                 val multipartData = call.receiveMultipart()
-                var søknad: Søknad? = null
+                var søknad: SøknadDTO? = null
 
                 multipartData.forEachPart { part ->
                     when (part) {
                         is PartData.FormItem -> {
-                            if ( part.name == "søknad") {
+                            if (part.name == "søknad") {
                                 søknad = deserialize(part.value)
                             } else {
                                 LOG.error { "Recieved multipart form with unknown key ${part.name}" }
@@ -59,11 +58,12 @@ fun Route.søknadRoutes(
                     part.dispose()
                 }
 
-                if (søknad == null){
+                if (søknad == null) {
                     call.respondText(status = HttpStatusCode.BadRequest, text = "Bad request")
                 } else {
                     val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                     val journalpostId = runBlocking {
+                        // todo: kan vi fjerne !! herfra?
                         søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, vedlegg)
                     }
                     call.respondText(status = HttpStatusCode.Created, text = journalpostId)
@@ -120,4 +120,4 @@ fun Route.søknadRoutes(
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
 }
 
-class BadExtensionException(message: String): RuntimeException(message)
+class BadExtensionException(message: String) : RuntimeException(message)

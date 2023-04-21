@@ -63,6 +63,7 @@ internal class PdlServiceTest {
                     navn = listOf(mockNavn()),
                     adressebeskyttelse = emptyList(),
                     forelderBarnRelasjon = forelderBarnRelasjon,
+                    dødsfall = emptyList(),
                 ),
             ),
         )
@@ -85,7 +86,8 @@ internal class PdlServiceTest {
             hentPerson = SøkersBarnFraPDL(
                 navn = listOf(mockNavn()),
                 adressebeskyttelse = emptyList(),
-                foedsel = listOf(mockFødsel()),
+                fødsel = listOf(mockFødsel()),
+                dødsfall = emptyList(),
             ),
         ),
     )

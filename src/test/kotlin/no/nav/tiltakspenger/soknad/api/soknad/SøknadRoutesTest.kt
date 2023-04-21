@@ -21,20 +21,70 @@ internal class SøknadRoutesTest {
     val ugyldigSøknad = """{}"""
     val gyldigSøknad = """
         {
-            "deltarIKvp": false,
-            "deltarIIntroprogrammet": false,
-            "borPåInstitusjon": false,
-            "tiltak": {
-                "type": "foo",
-                "periode": {
-                    "fra": "2025-01-01",
-                    "til": "2025-01-02"
-                },
-                "antallDagerIUken": 5
-            },
-            "mottarEllerSøktPensjonsordning": false,
-            "mottarEllerSøktEtterlønn": false,
-            "søkerOmBarnetillegg": false
+          "tiltak": {
+            "aktivitetId": "123",
+            "søkerHeleTiltaksperioden": false,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          },
+          "barnetillegg": {
+            "manueltRegistrerteBarnSøktBarnetilleggFor": [
+              {
+                "fornavn": "Test",
+                "etternavn": "Test",
+                "fødselsdato": "2025-01-01",
+                "bostedsland": "Test"
+              }
+            ],
+            "søkerOmBarnetillegg": true,
+            "registrerteBarnSøktBarnetilleggFor": [
+              {
+                "fornavn": "Test",
+                "fødselsdato": "2025-01-01",
+                "etternavn": "Testesen"
+              }
+            ],
+            "ønskerÅSøkeBarnetilleggForAndreBarn": true
+          },
+          "etterlønn": {
+            "mottarEllerSøktEtterlønn": true,
+            "utbetaler": "Test",
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          },
+          "institusjonsopphold": {
+            "borPåInstitusjon": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          },
+          "introduksjonsprogram": {
+            "deltar": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          },
+          "kvalifiseringsprogram": {
+            "deltar": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          },
+          "pensjonsordning": {
+            "utbetaler": "Test",
+            "mottarEllerSøktPensjonsordning": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          }
         }
     """.trimMargin()
 

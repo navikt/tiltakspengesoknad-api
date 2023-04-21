@@ -4,6 +4,7 @@ data class SøkerFraPDL(
     val navn: List<Navn>,
     val adressebeskyttelse: List<Adressebeskyttelse>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
+    val dødsfall: List<Dødsfall>,
 )
 
 data class SøkerFraPDLRespons(
@@ -24,6 +25,9 @@ data class SøkerRespons(
     fun toPerson(): Person {
         val person = extractPerson() ?: throw IllegalStateException("Fant ikke personen")
         val navn = avklarNavn(person.navn)
+        if (person.dødsfall.isNotEmpty()) {
+            throw IllegalStateException("Søker er registrert som død i PDL")
+        }
         val adressebeskyttelseGradering = avklarGradering(person.adressebeskyttelse)
         return Person(
             fornavn = navn.fornavn,
@@ -31,6 +35,7 @@ data class SøkerRespons(
             etternavn = navn.etternavn,
             forelderBarnRelasjon = person.forelderBarnRelasjon,
             adressebeskyttelseGradering = adressebeskyttelseGradering,
+            erDød = false,
         )
     }
 }
