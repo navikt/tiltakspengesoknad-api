@@ -11,8 +11,14 @@ import io.ktor.http.headersOf
 import io.ktor.server.config.ApplicationConfig
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import no.nav.tiltakspenger.soknad.api.domain.Barnetillegg
+import no.nav.tiltakspenger.soknad.api.domain.Etterlønn
+import no.nav.tiltakspenger.soknad.api.domain.Institusjonsopphold
+import no.nav.tiltakspenger.soknad.api.domain.Introduksjonsprogram
+import no.nav.tiltakspenger.soknad.api.domain.Kvalifiseringsprogram
+import no.nav.tiltakspenger.soknad.api.domain.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.domain.Periode
-import no.nav.tiltakspenger.soknad.api.domain.Søknad
+import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.domain.Tiltak
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
 import org.junit.jupiter.api.Test
@@ -70,26 +76,48 @@ internal class PdfClientTest {
         }
     }
 
-    private fun tomSøknad() = Søknad(
-        deltarIKvp = false,
-        periodeMedKvp = null,
-        deltarIIntroprogrammet = false,
-        periodeMedIntroprogrammet = null,
-        borPåInstitusjon = false,
-        institusjonstype = null,
+    private fun tomSøknad() = SøknadDTO(
+        kvalifiseringsprogram = Kvalifiseringsprogram(
+            deltar = false,
+            periode = null,
+        ),
+        introduksjonsprogram = Introduksjonsprogram(
+            deltar = false,
+            periode = null,
+        ),
+        institusjonsopphold = Institusjonsopphold(
+            borPåInstitusjon = false,
+            periode = null,
+        ),
         tiltak = Tiltak(
-            type = "tiltak",
             periode = Periode(
                 fra = LocalDate.of(2023, 1, 1),
                 til = LocalDate.of(2023, 1, 31),
             ),
-            antallDagerIUken = 3,
+            aktivitetId = "123",
+            søkerHeleTiltaksperioden = false,
         ),
-        mottarEllerSøktPensjonsordning = false,
-        pensjon = null,
-        mottarEllerSøktEtterlønn = false,
-        etterlønn = null,
-        søkerOmBarnetillegg = false,
-        barnSøktBarnetilleggFor = listOf(),
+        etterlønn = Etterlønn(
+            mottarEllerSøktEtterlønn = false,
+            periode = Periode(
+                fra = LocalDate.of(2023, 1, 1),
+                til = LocalDate.of(2023, 1, 31),
+            ),
+            utbetaler = "test",
+        ),
+        pensjonsordning = Pensjonsordning(
+            mottarEllerSøktPensjonsordning = false,
+            periode = Periode(
+                fra = LocalDate.of(2023, 1, 1),
+                til = LocalDate.of(2023, 1, 31),
+            ),
+            utbetaler = "test",
+        ),
+        barnetillegg = Barnetillegg(
+            søkerOmBarnetillegg = false,
+            ønskerÅSøkeBarnetilleggForAndreBarn = null,
+            manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
+            registrerteBarnSøktBarnetilleggFor = emptyList(),
+        ),
     )
 }
