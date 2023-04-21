@@ -4,6 +4,7 @@ import io.mockk.mockkClass
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -20,21 +21,26 @@ internal class PersonTest {
     private fun mockPerson(
         gradering: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
+        erDød: Boolean = false,
+        fornavn: String = "foo",
     ): Person {
         return Person(
-            fornavn = "foo",
+            fornavn = fornavn,
             mellomnavn = "baz",
             etternavn = "bar",
             adressebeskyttelseGradering = gradering,
             fødselsdato = LocalDate.MAX,
             forelderBarnRelasjon = forelderBarnRelasjon,
+            erDød = erDød,
         )
     }
 
     private val testpersonUgradert = mockPerson(gradering = AdressebeskyttelseGradering.UGRADERT)
     private val testpersonFortrolig = mockPerson(gradering = AdressebeskyttelseGradering.FORTROLIG)
     private val testpersonStrengtFortrolig = mockPerson(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-    private val testpersonStrengtFortroligUtland = mockPerson(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)
+    private val testpersonStrengtFortroligUtland =
+        mockPerson(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)
+    private val dødTestPerson = mockPerson(erDød = true, fornavn = "Død")
 
     private val testpersonMedRelasjoner = mockPerson(
         forelderBarnRelasjon = listOf(
@@ -106,5 +112,13 @@ internal class PersonTest {
         assertTrue(barnsIdenter.filterNotNull().size == 2)
         assertEquals(barnsIdenter[0], "1")
         assertEquals(barnsIdenter[1], "2")
+    }
+
+    @Test
+    fun `barn med dødsdato skal filtreres ut`() {
+        val personDTO = testpersonUgradert.toPersonDTO(listOf(testpersonUgradert, dødTestPerson))
+        assertEquals(personDTO.barn.size, 1)
+        val barn = personDTO.barn[0]
+        assertNotEquals(barn.fornavn, "Død")
     }
 }
