@@ -5,7 +5,7 @@ data class SøkerFraPDL(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
     val dødsfall: List<Dødsfall>,
-    )
+)
 
 data class SøkerFraPDLRespons(
     val hentPerson: SøkerFraPDL?,
@@ -25,7 +25,7 @@ data class SøkerRespons(
     fun toPerson(): Person {
         val person = extractPerson() ?: throw IllegalStateException("Fant ikke personen")
         val navn = avklarNavn(person.navn)
-        if (person.dødsfall.isNotEmpty()){
+        if (person.dødsfall.isNotEmpty()) {
             throw IllegalStateException("Døde personer kan ikke søke om tiltakspenger")
         }
         val adressebeskyttelseGradering = avklarGradering(person.adressebeskyttelse)

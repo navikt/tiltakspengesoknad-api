@@ -31,14 +31,15 @@ internal class PersonTest {
             adressebeskyttelseGradering = gradering,
             fødselsdato = LocalDate.MAX,
             forelderBarnRelasjon = forelderBarnRelasjon,
-            erDød = erDød
+            erDød = erDød,
         )
     }
 
     private val testpersonUgradert = mockPerson(gradering = AdressebeskyttelseGradering.UGRADERT)
     private val testpersonFortrolig = mockPerson(gradering = AdressebeskyttelseGradering.FORTROLIG)
     private val testpersonStrengtFortrolig = mockPerson(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-    private val testpersonStrengtFortroligUtland = mockPerson(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)
+    private val testpersonStrengtFortroligUtland =
+        mockPerson(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)
     private val dødTestPerson = mockPerson(erDød = true, fornavn = "Død")
 
     private val testpersonMedRelasjoner = mockPerson(

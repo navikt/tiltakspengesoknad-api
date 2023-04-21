@@ -37,7 +37,7 @@ internal class PdlRoutesTest {
         etternavn = "bar",
         mellomnavn = "baz",
         adressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
-        erDød = false
+        erDød = false,
     )
 
     private val mockedPdlService = mockk<PdlService>().also { mock ->

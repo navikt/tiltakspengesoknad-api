@@ -12,7 +12,7 @@ data class Person(
     val adressebeskyttelseGradering: AdressebeskyttelseGradering,
 ) {
     fun toPersonDTO(barn: List<Person> = emptyList()): PersonDTO {
-       val levendeBarn = barn.filterNot { it.erDød }
+        val levendeBarn = barn.filterNot { it.erDød }
         return PersonDTO(
             fornavn = fornavn,
             mellomnavn = mellomnavn,
