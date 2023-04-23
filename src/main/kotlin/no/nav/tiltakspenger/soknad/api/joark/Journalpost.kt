@@ -116,12 +116,14 @@ sealed class DokumentVariant {
     abstract val filtype: String
     abstract val fysiskDokument: String
     abstract val variantformat: String
+    abstract val filnavn: String
 
     data class ArkivPDF(
         override val fysiskDokument: String,
     ) : DokumentVariant() {
         override val filtype: String = "PDFA"
         override val variantformat: String = "ARKIV"
+        override val filnavn: String = "tiltakspengersoknad"
     }
 
     data class OriginalJson(
@@ -129,6 +131,7 @@ sealed class DokumentVariant {
     ) : DokumentVariant() {
         override val filtype: String = "JSON"
         override val variantformat: String = "ORIGINAL"
+        override val filnavn: String = "tiltakspengersoknad"
     }
 }
 
