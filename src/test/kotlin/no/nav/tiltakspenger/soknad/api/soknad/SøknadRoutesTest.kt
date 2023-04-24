@@ -1,11 +1,12 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -117,9 +118,17 @@ internal class SøknadRoutesTest {
         testApplication {
             configureTestApplication()
             val response = client.post("/soknad") {
-                contentType(type = ContentType.Application.Json)
                 header("Authorization", "Bearer ${token.serialize()}")
-                setBody(ugyldigSøknad)
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {
+                            append("søknad", ugyldigSøknad)
+                            append("vedlegg", "")
+                        },
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary")
+                    )
+                )
             }
             assertEquals(HttpStatusCode.BadRequest, response.status)
         }
@@ -142,9 +151,17 @@ internal class SøknadRoutesTest {
         testApplication {
             configureTestApplication(søknadService = søknadServiceMock)
             val response = client.post("/soknad") {
-                contentType(type = ContentType.Application.Json)
                 header("Authorization", "Bearer ${token.serialize()}")
-                setBody(gyldigSøknad)
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {
+                            append("søknad", gyldigSøknad)
+                            append("vedlegg", "")
+                        },
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary")
+                    )
+                )
             }
             assertEquals(HttpStatusCode.Created, response.status)
         }

@@ -1,5 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -70,7 +72,7 @@ fun Route.søknadRoutes(
                 }
             }.onFailure {
                 when (it) {
-                    is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException -> {
+                    is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException, is MismatchedInputException, is MissingKotlinParameterException -> {
                         LOG.error("Ugyldig søknad", it)
                         call.respondText(
                             text = "Bad Request",
