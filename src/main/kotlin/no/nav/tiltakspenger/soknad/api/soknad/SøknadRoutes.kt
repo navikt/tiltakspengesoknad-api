@@ -20,7 +20,6 @@ import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
-import java.io.File
 
 val LOG = KotlinLogging.logger { }
 
