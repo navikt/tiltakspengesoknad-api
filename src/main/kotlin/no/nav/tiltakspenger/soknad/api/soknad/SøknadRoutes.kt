@@ -2,10 +2,13 @@ package no.nav.tiltakspenger.soknad.api.soknad
 
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.PartData
+import io.ktor.http.content.forEachPart
+import io.ktor.http.content.streamProvider
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
-import io.ktor.server.request.receive
+import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
@@ -13,8 +16,10 @@ import io.ktor.server.routing.route
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
+import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
+import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
 val LOG = KotlinLogging.logger { }
 
@@ -23,17 +28,56 @@ fun Route.søknadRoutes(
 ) {
     route(SØKNAD_PATH) {
         post {
+            val vedlegg = mutableListOf<Vedlegg>()
             kotlin.runCatching {
-                val søknadDTO = call.receive<SøknadDTO>()
-                val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
-                val journalpostId = runBlocking {
-                    søknadService.lagPdfOgSendTilJoark(søknadDTO, fødselsnummer)
+                val multipartData = call.receiveMultipart()
+                var søknad: SøknadDTO? = null
+
+                multipartData.forEachPart { part ->
+                    when (part) {
+                        is PartData.FormItem -> {
+                            if (part.name == "søknad") {
+                                try {
+                                    søknad = deserialize(part.value)
+                                } catch (e: Exception) {
+                                    LOG.error("Ugyldig søknadsformat", e)
+                                    call.respondText(
+                                        text = "Bad Request",
+                                        contentType = ContentType.Text.Plain,
+                                        status = HttpStatusCode.BadRequest,
+                                    )
+                                }
+                            } else {
+                                LOG.error { "Recieved multipart form with unknown key ${part.name}" }
+                            }
+                        }
+
+                        is PartData.FileItem -> {
+                            val filnavn = part.originalFileName ?: "untitled-${part.hashCode()}"
+                            val fileBytes = part.streamProvider().readBytes()
+                            LOG.info("FileItem")
+                            vedlegg.add(Vedlegg(filnavn = filnavn, dokument = fileBytes))
+                            LOG.info { part.originalFileName }
+                        }
+
+                        else -> {}
+                    }
+                    part.dispose()
                 }
 
-                call.respondText(status = HttpStatusCode.Created, text = journalpostId)
+                if (søknad == null) {
+                    call.respondText(status = HttpStatusCode.BadRequest, text = "Bad request")
+                } else {
+                    val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
+                    val journalpostId = runBlocking {
+                        // todo: kan vi fjerne !! herfra?
+                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, vedlegg)
+                    }
+                    call.respondText(status = HttpStatusCode.Created, text = journalpostId)
+                }
             }.onFailure {
                 when (it) {
-                    is CannotTransformContentToTypeException, is BadRequestException -> {
+                    is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException -> {
                         LOG.error("Ugyldig søknad", it)
                         call.respondText(
                             text = "Bad Request",
@@ -82,3 +126,5 @@ fun Route.søknadRoutes(
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
 }
+
+class BadExtensionException(message: String) : RuntimeException(message)

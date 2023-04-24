@@ -2,6 +2,7 @@ package no.nav.tiltakspenger.soknad.api.joark
 
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.objectMapper
+import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.util.Base64
 
 enum class Tema(val value: String) {
@@ -43,29 +44,46 @@ sealed class Journalpost {
                 fnr: String,
                 søknadDTO: SøknadDTO,
                 pdf: ByteArray,
-            ) = Søknadspost(
-                fnr = fnr,
-                dokumenter = lagDokumenter(
-                    pdf = pdf,
-                    søknadDTO = søknadDTO,
-                ),
-            )
+                vedlegg: List<Vedlegg>,
+            ) =
+                Søknadspost(
+                    fnr = fnr,
+                    dokumenter = mutableListOf(
+                        lagHoveddokument(
+                            pdf = pdf,
+                            søknadDTO = søknadDTO,
+                        ),
+                    ).apply {
+                        this.addAll(lagVedleggsdokumenter(vedlegg))
+                    },
+                )
 
-            private fun lagDokumenter(pdf: ByteArray, søknadDTO: SøknadDTO): List<JournalpostDokument> =
-                listOf(
-                    JournalpostDokument(
-                        tittel = SØKNADSPOSTTITTEL,
-                        // dokumentKategori = DokumentKategori.SOK,
-                        brevkode = BREVKODE_FOR_SØKNAD,
-                        dokumentvarianter = listOf(
-                            DokumentVariant.ArkivPDF(fysiskDokument = Base64.getEncoder().encodeToString(pdf)),
-                            DokumentVariant.OriginalJson(
-                                fysiskDokument = Base64.getEncoder()
-                                    .encodeToString(objectMapper.writeValueAsString(søknadDTO).toByteArray()),
-                            ),
+            private fun lagHoveddokument(pdf: ByteArray, søknadDTO: SøknadDTO): JournalpostDokument =
+                JournalpostDokument(
+                    tittel = SØKNADSPOSTTITTEL,
+                    // dokumentKategori = DokumentKategori.SOK,
+                    brevkode = BREVKODE_FOR_SØKNAD,
+                    dokumentvarianter = listOf(
+                        DokumentVariant.ArkivPDF(fysiskDokument = Base64.getEncoder().encodeToString(pdf)),
+                        DokumentVariant.OriginalJson(
+                            fysiskDokument = Base64.getEncoder()
+                                .encodeToString(objectMapper.writeValueAsString(søknadDTO).toByteArray()),
                         ),
                     ),
                 )
+
+            private fun lagVedleggsdokumenter(vedleggListe: List<Vedlegg>): List<JournalpostDokument> =
+                vedleggListe.map { vedlegg ->
+                    JournalpostDokument(
+                        tittel = vedlegg.filnavn,
+                        brevkode = null,
+                        dokumentvarianter = listOf(
+                            DokumentVariant.ArkivPDF(
+                                fysiskDokument = Base64.getEncoder().encodeToString(vedlegg.dokument),
+                            ),
+                        ),
+                    )
+                }
         }
     }
 }
@@ -108,7 +126,7 @@ sealed class Sak {
 data class JournalpostDokument(
     val tittel: String,
     // val dokumentKategori: DokumentKategori,
-    val brevkode: String,
+    val brevkode: String?,
     val dokumentvarianter: List<DokumentVariant>,
 )
 

@@ -248,6 +248,7 @@ internal class JoarkClientTest {
             ),
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
+        vedlegg = emptyList(),
     )
 
     private val dokumentInfoId = "485227498"
