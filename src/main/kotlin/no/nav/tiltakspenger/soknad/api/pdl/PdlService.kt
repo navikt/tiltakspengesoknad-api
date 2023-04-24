@@ -27,6 +27,6 @@ class PdlService(
             return person.toPersonDTO(barn)
         }
 
-        throw IllegalStateException("Noe gikk galt under kall til PDL")
+        throw IllegalStateException("Noe gikk galt under kall til PDL $result")
     }
 }
