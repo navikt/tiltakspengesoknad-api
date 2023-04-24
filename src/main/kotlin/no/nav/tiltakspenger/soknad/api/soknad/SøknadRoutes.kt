@@ -40,7 +40,16 @@ fun Route.søknadRoutes(
                     when (part) {
                         is PartData.FormItem -> {
                             if (part.name == "søknad") {
-                                søknad = deserialize(part.value)
+                                try {
+                                    søknad = deserialize(part.value)
+                                } catch (e: Exception) {
+                                    LOG.error("Ugyldig søknadsformat", e)
+                                    call.respondText(
+                                        text = "Bad Request",
+                                        contentType = ContentType.Text.Plain,
+                                        status = HttpStatusCode.BadRequest,
+                                    )
+                                }
                             } else {
                                 LOG.error { "Recieved multipart form with unknown key ${part.name}" }
                             }
@@ -72,7 +81,7 @@ fun Route.søknadRoutes(
                 }
             }.onFailure {
                 when (it) {
-                    is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException, is MismatchedInputException, is MissingKotlinParameterException -> {
+                    is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException -> {
                         LOG.error("Ugyldig søknad", it)
                         call.respondText(
                             text = "Bad Request",
