@@ -19,6 +19,7 @@ import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.UUID
+import no.nav.tiltakspenger.soknad.api.util.PdfTools
 
 internal const val pdfgenPath = "api/v1/genpdf/tpts"
 internal const val pdfgenImagePath = "api/v1/genpdf/image/tpts"
@@ -46,21 +47,26 @@ class PdfClient(
     }
 
     override suspend fun konverterVedlegg(vedlegg: List<Vedlegg>): List<Vedlegg> {
-        return vedlegg.map {
+        return vedlegg.map { it ->
             LOG.info("Konverterer vedlegg: ${it.filnavn}")
             val baseFileName = it.filnavn.split(".").first().lowercase()
             val extension = it.filnavn.split(".").last().lowercase()
             when (extension) {
                 "pdf" -> {
-                    it
+                    val bilder = PdfTools.konverterPdfTilBilder(it.dokument)
+                    val enkeltsider = bilder.map { bilde ->
+                        genererPdfFraBilde(Bilde(ContentType.Image.PNG, bilde.data))
+                    }
+                    val resultatPdf = PdfTools.slåSammenPdfer(enkeltsider)
+                    Vedlegg("$baseFileName.pdf", resultatPdf)
                 }
                 "png" -> {
-                    val bilde = genererPdfFraBilde(Bilde(ContentType.Image.PNG, it.dokument))
-                    Vedlegg("$baseFileName.pdf", bilde)
+                    val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.PNG, it.dokument))
+                    Vedlegg("$baseFileName.pdf", pdfFraBilde)
                 }
                 "jpg", "jpeg" -> {
-                    val bilde = genererPdfFraBilde(Bilde(ContentType.Image.JPEG, it.dokument))
-                    Vedlegg("$baseFileName.pdf", bilde)
+                    val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.JPEG, it.dokument))
+                    Vedlegg("$baseFileName.pdf", pdfFraBilde)
                 }
                 else -> {
                     throw BadExtensionException("Ugyldig filformat")
