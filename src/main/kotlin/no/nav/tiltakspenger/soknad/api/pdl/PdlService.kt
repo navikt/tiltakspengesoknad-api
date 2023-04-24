@@ -1,6 +1,9 @@
 package no.nav.tiltakspenger.soknad.api.pdl
 
 import io.ktor.server.config.ApplicationConfig
+import mu.KotlinLogging
+
+val LOG = KotlinLogging.logger { }
 
 class PdlService(
     applicationConfig: ApplicationConfig,
@@ -16,6 +19,13 @@ class PdlService(
                 pdlClientCredentials.fetchBarn(barnsIdent).getOrNull()?.toPerson()
             }.mapNotNull { it }
             return person.toPersonDTO(barn)
+        }
+
+        LOG.info {
+            """
+            |Det gikk galt.. Her er result: $result
+            |Ble alt på samme linje nå?
+            """.trimMargin()
         }
 
         throw IllegalStateException("Noe gikk galt under kall til PDL")
