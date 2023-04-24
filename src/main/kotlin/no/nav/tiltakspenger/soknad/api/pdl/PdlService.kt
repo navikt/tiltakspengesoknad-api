@@ -21,10 +21,12 @@ class PdlService(
             return person.toPersonDTO(barn)
         }
 
-        LOG.info { """
+        LOG.info {
+            """
             |Det gikk galt.. Her er result: $result
             |Ble alt på samme linje nå?
-        """.trimMargin() }
+            """.trimMargin()
+        }
 
         throw IllegalStateException("Noe gikk galt under kall til PDL")
     }
