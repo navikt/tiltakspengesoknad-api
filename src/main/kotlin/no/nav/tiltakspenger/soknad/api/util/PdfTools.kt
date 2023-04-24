@@ -1,19 +1,19 @@
 package no.nav.tiltakspenger.soknad.api.util
 
 import io.ktor.http.ContentType
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.PDFRenderer
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import javax.imageio.ImageIO
 
 // WIP
 
 class PdfTools {
     companion object {
-        fun konverterPdfTilBilder(pdfByteArray: ByteArray): List<Bilde>{
+        fun konverterPdfTilBilder(pdfByteArray: ByteArray): List<Bilde> {
             val pdfDokument = PDDocument.load(pdfByteArray)
             val renderer = PDFRenderer(pdfDokument)
             val siderSomBilder = (0 until pdfDokument.numberOfPages).map {
@@ -29,11 +29,11 @@ class PdfTools {
         fun slåSammenPdfer(pdfbaListe: List<ByteArray>): ByteArray {
             val pdfMerger = PDFMergerUtility()
             val baosUt = ByteArrayOutputStream()
-            pdfMerger.destinationStream = baosUt;
+            pdfMerger.destinationStream = baosUt
             pdfbaListe.forEach {
                 pdfMerger.addSource(ByteArrayInputStream(it))
             }
-            pdfMerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly()); //TODO: Sjekk ut memory settings
+            pdfMerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly()); // TODO: Sjekk ut memory settings
             return baosUt.toByteArray()
         }
     }

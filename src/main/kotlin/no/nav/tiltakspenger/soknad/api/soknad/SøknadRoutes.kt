@@ -1,7 +1,5 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -59,7 +57,6 @@ fun Route.søknadRoutes(
                             val filnavn = part.originalFileName ?: "untitled-${part.hashCode()}"
                             val fileBytes = part.streamProvider().readBytes()
                             LOG.info("FileItem")
-                            File(filnavn).writeBytes(fileBytes) // TODO: Fjern, lagrer vedlegg lokalt
                             vedlegg.add(Vedlegg(filnavn = filnavn, dokument = fileBytes))
                             LOG.info { part.originalFileName }
                         }

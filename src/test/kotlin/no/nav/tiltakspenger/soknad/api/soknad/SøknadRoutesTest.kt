@@ -126,8 +126,8 @@ internal class SøknadRoutesTest {
                             append("vedlegg", "")
                         },
                         "WebAppBoundary",
-                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary")
-                    )
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
                 )
             }
             assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -159,8 +159,8 @@ internal class SøknadRoutesTest {
                             append("vedlegg", "")
                         },
                         "WebAppBoundary",
-                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary")
-                    )
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
                 )
             }
             assertEquals(HttpStatusCode.Created, response.status)

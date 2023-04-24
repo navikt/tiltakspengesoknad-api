@@ -15,11 +15,11 @@ import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.soknad.BadExtensionException
 import no.nav.tiltakspenger.soknad.api.soknad.LOG
 import no.nav.tiltakspenger.soknad.api.util.Bilde
+import no.nav.tiltakspenger.soknad.api.util.PdfTools
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.UUID
-import no.nav.tiltakspenger.soknad.api.util.PdfTools
 
 internal const val pdfgenPath = "api/v1/genpdf/tpts"
 internal const val pdfgenImagePath = "api/v1/genpdf/image/tpts"
