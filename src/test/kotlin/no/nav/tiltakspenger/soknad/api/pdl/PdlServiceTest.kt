@@ -7,7 +7,6 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
@@ -143,7 +142,6 @@ internal class PdlServiceTest {
         }
     }
 
-    @Disabled
     @Test
     fun `når fetchSøker med tokenx mot PDL feiler, kastes en IllegalStateExcepiton`() {
         val token = "token"
