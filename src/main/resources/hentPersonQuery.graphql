@@ -30,6 +30,9 @@ query($ident: ID!){
                 ...metadataDetails
             }
         }
+        doedsfall {
+            doedsdato
+        }
     }
 }
 
