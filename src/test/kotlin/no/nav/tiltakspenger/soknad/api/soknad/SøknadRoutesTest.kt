@@ -13,6 +13,8 @@ import io.mockk.mockk
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
+import no.nav.tiltakspenger.soknad.api.pdl.PdlService
+import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -22,6 +24,12 @@ internal class SøknadRoutesTest {
     val ugyldigSøknad = """{}"""
     val gyldigSøknad = """
         {
+          "id" : "1",
+          "personopplysninger" : {
+            "ident" : "12345678901",
+            "etternavn" : "etternavn",
+            "fornavn" : "fornavn"
+          },
           "tiltak": {
             "aktivitetId": "123",
             "søkerHeleTiltaksperioden": false,
@@ -90,9 +98,17 @@ internal class SøknadRoutesTest {
     """.trimMargin()
 
     private val søknadServiceMock = mockk<SøknadService>().also { mock ->
-        coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any()) } returns "1"
+        coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any()) } returns "1"
     }
 
+    private val pdlServiceMock = mockk<PdlService>().also { mock ->
+        coEvery { mock.hentPersonaliaMedBarn(any(), any()) } returns PersonDTO(
+            fornavn = "fornavn",
+            mellomnavn = null,
+            etternavn = "etternavn",
+            barn = emptyList(),
+        )
+    }
     private val mockOAuth2Server = MockOAuth2Server()
 
     @BeforeAll
@@ -149,7 +165,7 @@ internal class SøknadRoutesTest {
         )
 
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock)
+            configureTestApplication(søknadService = søknadServiceMock, pdlService = pdlServiceMock)
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(

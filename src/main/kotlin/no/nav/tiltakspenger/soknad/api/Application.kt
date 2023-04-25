@@ -110,7 +110,10 @@ internal fun Application.setupRouting(
     routing {
         authenticate(*issuers.toTypedArray()) {
             pdlRoutes(pdlService = pdlService)
-            søknadRoutes(søknadService = søknadService)
+            søknadRoutes(
+                søknadService = søknadService,
+                pdlService = pdlService,
+            )
             tiltakRoutes(tiltakService = tiltakService)
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
