@@ -138,7 +138,7 @@ fun Route.søknadRoutes(
 }
 
 private fun inferContentType(filnavn: String): String {
-    val extension = filnavn.split(".").last();
+    val extension = filnavn.split(".").last()
     return when (extension) {
         "pdf" -> "application/pdf"
         "jpg", "jpeg" -> "image/jpeg"
