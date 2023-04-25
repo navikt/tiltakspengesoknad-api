@@ -88,7 +88,7 @@ fun Route.søknadRoutes(
             }.onFailure {
                 when (it) {
                     is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException -> {
-                        LOG.error("Ugyldig søknad", it)
+                        LOG.error("Ugyldig søknad $it")
                         call.respondText(
                             text = "Bad Request",
                             contentType = ContentType.Text.Plain,
