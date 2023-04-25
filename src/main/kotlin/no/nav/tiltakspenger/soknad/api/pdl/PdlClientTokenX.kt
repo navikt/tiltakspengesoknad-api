@@ -2,7 +2,6 @@ package no.nav.tiltakspenger.soknad.api.pdl
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -31,7 +30,7 @@ class PdlClientTokenX(
         val token = tokenResponse.accessToken
         val pdlResponse: Result<SøkerRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
-                accept(ContentType.Any)
+                // accept(ContentType.Any)
                 header("Tema", INDIVIDSTONAD)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
