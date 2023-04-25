@@ -32,6 +32,7 @@ class PdlClientTokenX(
             httpClient.post(pdlEndpoint) {
                 // accept(ContentType.Any)
                 header("Tema", INDIVIDSTONAD)
+                header("behandlingsnummer", "B470")
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(hentPersonQuery(fødselsnummer))
