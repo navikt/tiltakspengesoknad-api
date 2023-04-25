@@ -29,7 +29,7 @@ fun Route.pdlRoutes(pdlService: PdlService) {
             LOG.info("Vi fikk hentet personalia fra PDL")
             call.respond(personDTO)
         } catch (e: Exception) {
-            secureLog.error { e.stackTraceToString() }
+            secureLog.error("Feil under kall mot PDL", e)
             call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
         }
     }
