@@ -37,10 +37,7 @@ class PdlClientTokenX(
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(hentPersonQuery(fødselsnummer))
-            }.let {
-                LOG.error { "Dette er response før det blir gjort om til 'Body' $it" }
-                return it.body()
-            }
+            }.body()
         }
         LOG.error { "Dette er pdl-body: $pdlResponse" }
         return pdlResponse
