@@ -18,8 +18,9 @@ import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.deserialize
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
+import no.nav.tiltakspenger.soknad.api.pdl.PdlService
+import no.nav.tiltakspenger.soknad.api.token
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
 val LOG = KotlinLogging.logger { }
@@ -27,13 +28,14 @@ val LOG = KotlinLogging.logger { }
 fun Route.søknadRoutes(
     søknadService: SøknadService,
     avService: AvService,
+    pdlService: PdlService,
 ) {
     route(SØKNAD_PATH) {
         post {
             val vedleggListe = mutableListOf<Vedlegg>()
             kotlin.runCatching {
                 val multipartData = call.receiveMultipart()
-                var søknad: SøknadDTO? = null
+                var søknad: SøknadRequest? = null
 
                 multipartData.forEachPart { part ->
                     when (part) {
@@ -71,13 +73,15 @@ fun Route.søknadRoutes(
                     call.respondText(status = HttpStatusCode.BadRequest, text = "Bad request")
                 } else {
                     val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
+                    val subjectToken = call.token()
+                    val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                     val journalpostId = runBlocking {
                         // todo: kan vi fjerne !! herfra?
                         val resultat = avService.scan(vedleggListe) // TODO: Test av av! Skriv om.
                         resultat.forEach {
                             LOG.info { "${it.filnavn}: ${it.resultat}" }
                         }
-                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, vedleggListe)
+                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, person, vedleggListe)
                     }
                     call.respondText(status = HttpStatusCode.Created, text = journalpostId)
                 }
@@ -134,7 +138,7 @@ fun Route.søknadRoutes(
 }
 
 private fun inferContentType(filnavn: String): String {
-    when (filnavn.split(".")[1] ?: "") {
+    return when (filnavn.split(".")[1]) {
         "pdf" -> "application/pdf"
         "jpg", "jpeg" -> "image/jpeg"
         "png" -> "image/png"
@@ -142,7 +146,6 @@ private fun inferContentType(filnavn: String): String {
             throw BadExtensionException("Vedleggstype ikke støttet!!!")
         }
     }
-    return ""
 }
 
 class BadExtensionException(message: String) : RuntimeException(message)

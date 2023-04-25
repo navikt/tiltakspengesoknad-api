@@ -47,11 +47,11 @@ private fun HttpClient.medDefaultConfig() = this.config {
         logger = object : Logger {
             override fun log(message: String) {
                 LOG.info("HttpClient detaljer logget til securelog")
-                LOG.info(message)
+                // LOG.info(message)
                 SECURELOG.info(message)
             }
         }
-        level = LogLevel.INFO
+        level = LogLevel.ALL
     }
     expectSuccess = true
 }

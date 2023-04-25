@@ -20,9 +20,11 @@ import no.nav.tiltakspenger.soknad.api.domain.Introduksjonsprogram
 import no.nav.tiltakspenger.soknad.api.domain.Kvalifiseringsprogram
 import no.nav.tiltakspenger.soknad.api.domain.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.domain.Periode
+import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.domain.Tiltak
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
+import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -73,11 +75,11 @@ internal class JoarkClientTest {
         val mockTokenService = mockk<TokenService>()
         coEvery { mockTokenService.getToken(any()) } returns "token"
 
-        val joarkResonse = JoarkClient.JoarkResponse(
-            journalpostId = journalpostId,
-            journalpostferdigstilt = false,
-            dokumenter = listOf(dokumentResponse),
-        )
+//        val joarkResonse = JoarkClient.JoarkResponse(
+//            journalpostId = journalpostId,
+//            journalpostferdigstilt = false,
+//            dokumenter = listOf(dokumentResponse),
+//        )
 
         val client = httpClientGeneric(mock)
         val config = ApplicationConfig("application.test.conf")
@@ -141,11 +143,11 @@ internal class JoarkClientTest {
         val mockTokenService = mockk<TokenService>()
         coEvery { mockTokenService.getToken(any()) } returns "token"
 
-        val joarkResonse = JoarkClient.JoarkResponse(
-            journalpostId = journalpostId,
-            journalpostferdigstilt = null,
-            dokumenter = listOf(dokumentResponse),
-        )
+//        val joarkResonse = JoarkClient.JoarkResponse(
+//            journalpostId = journalpostId,
+//            journalpostferdigstilt = null,
+//            dokumenter = listOf(dokumentResponse),
+//        )
 
         val client = httpClientGeneric(mock)
         val config = ApplicationConfig("application.test.conf")
@@ -204,6 +206,11 @@ internal class JoarkClientTest {
     private val dokument = Journalpost.Søknadspost.from(
         fnr = "ident",
         søknadDTO = SøknadDTO(
+            personopplysninger = Personopplysninger(
+                ident = "12345678901",
+                fornavn = "fornavn",
+                etternavn = "etternavn",
+            ),
             kvalifiseringsprogram = Kvalifiseringsprogram(
                 deltar = false,
                 periode = null,
@@ -248,11 +255,19 @@ internal class JoarkClientTest {
             ),
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
-        vedlegg = emptyList(),
+        vedlegg = listOf(
+            Vedlegg(
+                filnavn = "filnavnVedlegg",
+                contentType = "application/pdf",
+                dokument = "vedleggInnhold".toByteArray(),
+            ),
+        ),
     )
 
     private val dokumentInfoId = "485227498"
+    private val dokumentInfoVedleggId = "485227499"
     private val dokumentTittel = "Søknad om tiltakspenger"
+    private val dokumentVedleggFilnavn = "filnavnVedlegg"
     private val dokumentResponse = JoarkClient.Dokumenter(
         dokumentInfoId = dokumentInfoId,
         tittel = dokumentTittel,
@@ -266,6 +281,10 @@ internal class JoarkClientTest {
             {
               "dokumentInfoId": "$dokumentInfoId",
               "tittel": "$dokumentTittel"
+            },
+            {
+              "dokumentInfoId": "$dokumentInfoVedleggId",
+              "tittel": "$dokumentVedleggFilnavn"
             }
           ]
         }

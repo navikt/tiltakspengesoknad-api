@@ -3,7 +3,7 @@ package no.nav.tiltakspenger.soknad.api.pdl
 import io.ktor.server.config.ApplicationConfig
 import mu.KotlinLogging
 
-val LOG = KotlinLogging.logger { }
+val LOG = KotlinLogging.logger {}
 
 class PdlService(
     applicationConfig: ApplicationConfig,

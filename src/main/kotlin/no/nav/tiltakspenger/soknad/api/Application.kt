@@ -34,7 +34,18 @@ import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>) {
+    System.setProperty("logback.configurationFile", "egenLogback.xml")
+    val log = KotlinLogging.logger {}
+    val securelog = KotlinLogging.logger("tjenestekall")
+
+    Thread.setDefaultUncaughtExceptionHandler { _, e ->
+        log.error { "Uncaught exception logget i securelog" }
+        securelog.error(e) { e.message }
+    }
+
+    io.ktor.server.netty.EngineMain.main(args)
+}
 
 fun Application.soknadApi(
     pdlService: PdlService = PdlService(environment.config),
@@ -61,15 +72,7 @@ fun Application.soknadApi(
     ),
     tiltakService: TiltakService = TiltakService(environment.config),
 ) {
-    System.setProperty("logback.configurationFile", "egenLogback.xml")
-
     val log = KotlinLogging.logger {}
-    val securelog = KotlinLogging.logger("tjenestekall")
-
-    Thread.setDefaultUncaughtExceptionHandler { _, e ->
-        log.error { "Uncaught exception logget i securelog" }
-        securelog.error(e) { e.message }
-    }
     log.info { "starting server" }
 
     // Til debugging enn så lenge
@@ -121,6 +124,7 @@ internal fun Application.setupRouting(
             søknadRoutes(
                 søknadService = søknadService,
                 avService = avService,
+                pdlService = pdlService,
             )
             tiltakRoutes(tiltakService = tiltakService)
         }
