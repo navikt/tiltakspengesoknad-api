@@ -12,8 +12,8 @@ import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.token
 
 val secureLog = KotlinLogging.logger("tjenestekall")
-fun Route.pdlRoutes(pdlService: PdlService) {
 
+fun Route.pdlRoutes(pdlService: PdlService) {
     get(path = PERSONALIA_PATH) {
         LOG.info("Vi kom oss inn i GET på /personalia endepunktet!")
         try {
