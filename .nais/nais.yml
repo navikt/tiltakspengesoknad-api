@@ -38,6 +38,8 @@ spec:
     outbound:
       rules:
         - application: tiltakspenger-pdfgen
+        - application: clamav
+          namespace: clamav
       external:
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "dokarkiv.dev-fss-pub.nais.io"
@@ -57,6 +59,8 @@ spec:
       value: {{ scope.joark }}
     - name: PDF_ENDPOINT_URL
       value: {{ endpoints.pdf }}
+    - name: AV_ENDPOINT_URL
+      value: {{ endpoints.av }}
     - name: TILTAKSPENGER_ARENA_ENDPOINT_URL
       value: {{ endpoints.tiltakspengerarena }}
     - name: TILTAKSPENGER_ARENA_AUDIENCE
