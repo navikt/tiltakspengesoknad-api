@@ -31,7 +31,7 @@ class PdlClientTokenX(
         val token = tokenResponse.accessToken
         val pdlResponse: Result<SøkerRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
-                accept(ContentType.Application.Json)
+                accept(ContentType.Any)
                 header("Tema", INDIVIDSTONAD)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
