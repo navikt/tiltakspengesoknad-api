@@ -1,5 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.pdl
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
 data class SøkerFraPDL(
     val navn: List<Navn>,
     val adressebeskyttelse: List<Adressebeskyttelse>,
@@ -11,6 +13,7 @@ data class SøkerFraPDLRespons(
     val hentPerson: SøkerFraPDL?,
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SøkerRespons(
     val data: SøkerFraPDLRespons? = null,
     val errors: List<PdlError> = emptyList(),
