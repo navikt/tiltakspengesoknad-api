@@ -23,10 +23,10 @@ class PdlClientTokenX(
     private val pdlEndpoint = config.property("endpoints.pdl").getString()
     private val pdlAudience = config.property("audience.pdl").getString()
     private val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
-    val log = KotlinLogging.logger { }
+    val LOG = KotlinLogging.logger {}
 
     suspend fun fetchSøker(fødselsnummer: String, subjectToken: String): Result<SøkerRespons> {
-        log.error { "Dette er en test" }
+        LOG.error { "Dette er en test" }
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
         val token = tokenResponse.accessToken
         val pdlResponse: Result<SøkerRespons> = kotlin.runCatching {
@@ -37,11 +37,11 @@ class PdlClientTokenX(
                 contentType(ContentType.Application.Json)
                 setBody(hentPersonQuery(fødselsnummer))
             }.let {
-                log.error { "Dette er response før det blir gjort om til 'Body' $it" }
+                LOG.error { "Dette er response før det blir gjort om til 'Body' $it" }
                 return it.body()
             }
         }
-        log.error { "Dette er pdl-body: $pdlResponse" }
+        LOG.error { "Dette er pdl-body: $pdlResponse" }
         return pdlResponse
     }
 }
