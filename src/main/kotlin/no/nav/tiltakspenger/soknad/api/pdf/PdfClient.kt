@@ -58,15 +58,15 @@ class PdfClient(
                         genererPdfFraBilde(Bilde(ContentType.Image.PNG, bilde.data))
                     }
                     val resultatPdf = PdfTools.slåSammenPdfer(enkeltsider)
-                    Vedlegg("$baseFileName.pdf", resultatPdf)
+                    Vedlegg("$baseFileName.pdf", "application/pdf", resultatPdf)
                 }
                 "png" -> {
                     val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.PNG, it.dokument))
-                    Vedlegg("$baseFileName.pdf", pdfFraBilde)
+                    Vedlegg("$baseFileName.pdf", "application/pdf", pdfFraBilde)
                 }
                 "jpg", "jpeg" -> {
                     val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.JPEG, it.dokument))
-                    Vedlegg("$baseFileName.pdf", pdfFraBilde)
+                    Vedlegg("$baseFileName.pdf", "application/pdf", pdfFraBilde)
                 }
                 else -> {
                     throw BadExtensionException("Ugyldig filformat")

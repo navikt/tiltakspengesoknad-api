@@ -16,6 +16,9 @@ import io.ktor.server.request.path
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
 import no.nav.security.token.support.v2.asIssuerProps
+import no.nav.tiltakspenger.soknad.api.antivirus.AvClient
+import no.nav.tiltakspenger.soknad.api.antivirus.AvService
+import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
 import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
@@ -61,6 +64,12 @@ fun Application.soknadApi(
             ),
         ),
     ),
+    avService: AvService = AvServiceImpl(
+        av = AvClient(
+            config = environment.config,
+            client = httpClientCIO(),
+        ),
+    ),
     tiltakService: TiltakService = TiltakService(environment.config),
 ) {
     val log = KotlinLogging.logger {}
@@ -86,6 +95,7 @@ fun Application.soknadApi(
         pdlService = pdlService,
         søknadService = søknadService,
         tiltakService = tiltakService,
+        avService = avService,
     )
     installJacksonFeature()
 
@@ -105,6 +115,7 @@ internal fun Application.setupRouting(
     pdlService: PdlService,
     søknadService: SøknadService,
     tiltakService: TiltakService,
+    avService: AvService,
 ) {
     val issuers = environment.config.asIssuerProps().keys
     routing {
@@ -112,6 +123,7 @@ internal fun Application.setupRouting(
             pdlRoutes(pdlService = pdlService)
             søknadRoutes(
                 søknadService = søknadService,
+                avService = avService,
                 pdlService = pdlService,
             )
             tiltakRoutes(tiltakService = tiltakService)

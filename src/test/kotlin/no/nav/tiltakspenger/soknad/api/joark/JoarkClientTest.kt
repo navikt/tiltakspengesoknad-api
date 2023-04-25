@@ -258,6 +258,7 @@ internal class JoarkClientTest {
         vedlegg = listOf(
             Vedlegg(
                 filnavn = "filnavnVedlegg",
+                contentType = "application/pdf",
                 dokument = "vedleggInnhold".toByteArray(),
             ),
         ),

@@ -16,6 +16,7 @@ import io.ktor.server.routing.route
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
+import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
@@ -26,11 +27,12 @@ val LOG = KotlinLogging.logger { }
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
+    avService: AvService,
     pdlService: PdlService,
 ) {
     route(SØKNAD_PATH) {
         post {
-            val vedlegg = mutableListOf<Vedlegg>()
+            val vedleggListe = mutableListOf<Vedlegg>()
             kotlin.runCatching {
                 val multipartData = call.receiveMultipart()
                 var søknad: SøknadRequest? = null
@@ -57,8 +59,8 @@ fun Route.søknadRoutes(
                         is PartData.FileItem -> {
                             val filnavn = part.originalFileName ?: "untitled-${part.hashCode()}"
                             val fileBytes = part.streamProvider().readBytes()
-                            LOG.info("FileItem")
-                            vedlegg.add(Vedlegg(filnavn = filnavn, dokument = fileBytes))
+                            val vedlegg = Vedlegg(filnavn = filnavn, contentType = inferContentType(filnavn), dokument = fileBytes)
+                            vedleggListe.add(vedlegg)
                             LOG.info { part.originalFileName }
                         }
 
@@ -75,7 +77,11 @@ fun Route.søknadRoutes(
                     val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                     val journalpostId = runBlocking {
                         // todo: kan vi fjerne !! herfra?
-                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, person, vedlegg)
+                        val resultat = avService.scan(vedleggListe) // TODO: Test av av! Skriv om.
+                        resultat.forEach {
+                            LOG.info { "${it.filnavn}: ${it.resultat}" }
+                        }
+                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, person, vedleggListe)
                     }
                     call.respondText(status = HttpStatusCode.Created, text = journalpostId)
                 }
@@ -129,6 +135,17 @@ fun Route.søknadRoutes(
 //            }
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
+}
+
+private fun inferContentType(filnavn: String): String {
+    return when (filnavn.split(".")[1]) {
+        "pdf" -> "application/pdf"
+        "jpg", "jpeg" -> "image/jpeg"
+        "png" -> "image/png"
+        else -> {
+            throw BadExtensionException("Vedleggstype ikke støttet!!!")
+        }
+    }
 }
 
 class BadExtensionException(message: String) : RuntimeException(message)

@@ -12,6 +12,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
+import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
@@ -109,6 +110,10 @@ internal class SøknadRoutesTest {
             barn = emptyList(),
         )
     }
+    private val avServiceMock = mockk<AvService>().also { mock ->
+        coEvery { mock.scan(any()) } returns emptyList()
+    }
+
     private val mockOAuth2Server = MockOAuth2Server()
 
     @BeforeAll
@@ -165,7 +170,7 @@ internal class SøknadRoutesTest {
         )
 
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock, pdlService = pdlServiceMock)
+            configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(
