@@ -23,6 +23,7 @@ import no.nav.tiltakspenger.soknad.api.domain.Periode
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.domain.Tiltak
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
+import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -248,11 +249,18 @@ internal class JoarkClientTest {
             ),
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
-        vedlegg = emptyList(),
+        vedlegg = listOf(
+            Vedlegg(
+                filnavn = "filnavnVedlegg",
+                dokument = "vedleggInnhold".toByteArray(),
+            ),
+        ),
     )
 
     private val dokumentInfoId = "485227498"
+    private val dokumentInfoVedleggId = "485227499"
     private val dokumentTittel = "Søknad om tiltakspenger"
+    private val dokumentVedleggFilnavn = "filnavnVedlegg"
     private val dokumentResponse = JoarkClient.Dokumenter(
         dokumentInfoId = dokumentInfoId,
         tittel = dokumentTittel,
@@ -266,6 +274,10 @@ internal class JoarkClientTest {
             {
               "dokumentInfoId": "$dokumentInfoId",
               "tittel": "$dokumentTittel"
+            },
+            {
+              "dokumentInfoId": "$dokumentInfoVedleggId",
+              "tittel": "$dokumentVedleggFilnavn"
             }
           ]
         }

@@ -78,8 +78,9 @@ sealed class Journalpost {
                         tittel = vedlegg.filnavn,
                         brevkode = null,
                         dokumentvarianter = listOf(
-                            DokumentVariant.ArkivPDF(
+                            DokumentVariant.VedleggPDF(
                                 fysiskDokument = Base64.getEncoder().encodeToString(vedlegg.dokument),
+                                filnavn = vedlegg.filnavn,
                             ),
                         ),
                     )
@@ -142,6 +143,14 @@ sealed class DokumentVariant {
         override val filtype: String = "PDFA"
         override val variantformat: String = "ARKIV"
         override val filnavn: String = "tiltakspengersoknad.pdf"
+    }
+
+    data class VedleggPDF(
+        override val fysiskDokument: String,
+        override val filnavn: String,
+    ) : DokumentVariant() {
+        override val filtype: String = "PDFA"
+        override val variantformat: String = "ARKIV"
     }
 
     data class OriginalJson(
