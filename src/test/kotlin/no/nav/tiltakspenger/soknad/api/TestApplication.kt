@@ -3,6 +3,7 @@ package no.nav.tiltakspenger.soknad.api
 import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
+import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
@@ -12,6 +13,7 @@ fun ApplicationTestBuilder.configureTestApplication(
     pdlService: PdlService = mockk(),
     søknadService: SøknadService = mockk(),
     tiltakService: TiltakService = mockk(),
+    avService: AvService = mockk(),
 ) {
     environment {
         config = ApplicationConfig("application.test.conf")
@@ -23,6 +25,7 @@ fun ApplicationTestBuilder.configureTestApplication(
             pdlService = pdlService,
             søknadService = søknadService,
             tiltakService = tiltakService,
+            avService = avService,
         )
         installJacksonFeature()
     }
