@@ -20,6 +20,7 @@ import no.nav.tiltakspenger.soknad.api.domain.Introduksjonsprogram
 import no.nav.tiltakspenger.soknad.api.domain.Kvalifiseringsprogram
 import no.nav.tiltakspenger.soknad.api.domain.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.domain.Periode
+import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.domain.Tiltak
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
@@ -74,11 +75,11 @@ internal class JoarkClientTest {
         val mockTokenService = mockk<TokenService>()
         coEvery { mockTokenService.getToken(any()) } returns "token"
 
-        val joarkResonse = JoarkClient.JoarkResponse(
-            journalpostId = journalpostId,
-            journalpostferdigstilt = false,
-            dokumenter = listOf(dokumentResponse),
-        )
+//        val joarkResonse = JoarkClient.JoarkResponse(
+//            journalpostId = journalpostId,
+//            journalpostferdigstilt = false,
+//            dokumenter = listOf(dokumentResponse),
+//        )
 
         val client = httpClientGeneric(mock)
         val config = ApplicationConfig("application.test.conf")
@@ -142,11 +143,11 @@ internal class JoarkClientTest {
         val mockTokenService = mockk<TokenService>()
         coEvery { mockTokenService.getToken(any()) } returns "token"
 
-        val joarkResonse = JoarkClient.JoarkResponse(
-            journalpostId = journalpostId,
-            journalpostferdigstilt = null,
-            dokumenter = listOf(dokumentResponse),
-        )
+//        val joarkResonse = JoarkClient.JoarkResponse(
+//            journalpostId = journalpostId,
+//            journalpostferdigstilt = null,
+//            dokumenter = listOf(dokumentResponse),
+//        )
 
         val client = httpClientGeneric(mock)
         val config = ApplicationConfig("application.test.conf")
@@ -205,6 +206,11 @@ internal class JoarkClientTest {
     private val dokument = Journalpost.Søknadspost.from(
         fnr = "ident",
         søknadDTO = SøknadDTO(
+            personopplysninger = Personopplysninger(
+                ident = "12345678901",
+                fornavn = "fornavn",
+                etternavn = "etternavn",
+            ),
             kvalifiseringsprogram = Kvalifiseringsprogram(
                 deltar = false,
                 periode = null,

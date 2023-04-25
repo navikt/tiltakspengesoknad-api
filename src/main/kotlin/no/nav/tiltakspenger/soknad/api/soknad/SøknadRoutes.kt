@@ -17,21 +17,23 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.deserialize
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
+import no.nav.tiltakspenger.soknad.api.pdl.PdlService
+import no.nav.tiltakspenger.soknad.api.token
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
 val LOG = KotlinLogging.logger { }
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
+    pdlService: PdlService,
 ) {
     route(SØKNAD_PATH) {
         post {
             val vedlegg = mutableListOf<Vedlegg>()
             kotlin.runCatching {
                 val multipartData = call.receiveMultipart()
-                var søknad: SøknadDTO? = null
+                var søknad: SøknadRequest? = null
 
                 multipartData.forEachPart { part ->
                     when (part) {
@@ -69,9 +71,11 @@ fun Route.søknadRoutes(
                     call.respondText(status = HttpStatusCode.BadRequest, text = "Bad request")
                 } else {
                     val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
+                    val subjectToken = call.token()
+                    val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                     val journalpostId = runBlocking {
                         // todo: kan vi fjerne !! herfra?
-                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, vedlegg)
+                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, person, vedlegg)
                     }
                     call.respondText(status = HttpStatusCode.Created, text = journalpostId)
                 }
