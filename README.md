@@ -1,7 +1,7 @@
 tiltakspenger
 ================
 
-API-tjeneste for [Tiltakspengesøknaden](https://github.com/navikt/tiltakspengesoknad)
+API-tjeneste for [Tiltakspengesøknaden](https://github.com/navikt/tiltakspenger-soknad)
 
 En del av satsningen ["Flere i arbeid – P4"](https://memu.no/artikler/stor-satsing-skal-fornye-navs-utdaterte-it-losninger-og-digitale-verktoy/)
 

@@ -32,7 +32,7 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: tiltakspengesoknad
+        - application: tiltakspenger-soknad
           namespace: tpts
           cluster: {{ cluster }}
     outbound:
