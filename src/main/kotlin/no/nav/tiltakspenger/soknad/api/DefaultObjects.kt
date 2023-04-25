@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
@@ -27,6 +28,7 @@ fun httpClientGeneric(engine: HttpClientEngine) = HttpClient(engine).medDefaultC
 private fun HttpClient.medDefaultConfig() = this.config {
     install(ContentNegotiation) {
         jackson {
+            registerModule(KotlinModule.Builder().build())
             registerModule(JavaTimeModule())
             setDefaultPrettyPrinter(
                 DefaultPrettyPrinter().apply {
