@@ -88,7 +88,7 @@ fun Route.søknadRoutes(
             }.onFailure {
                 when (it) {
                     is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException -> {
-                        LOG.error("Ugyldig søknad $it")
+                        LOG.error("Ugyldig søknad", it)
                         call.respondText(
                             text = "Bad Request",
                             contentType = ContentType.Text.Plain,
@@ -138,7 +138,8 @@ fun Route.søknadRoutes(
 }
 
 private fun inferContentType(filnavn: String): String {
-    return when (filnavn.split(".")[1]) {
+    val extension = filnavn.split(".").last();
+    return when (extension) {
         "pdf" -> "application/pdf"
         "jpg", "jpeg" -> "image/jpeg"
         "png" -> "image/png"
