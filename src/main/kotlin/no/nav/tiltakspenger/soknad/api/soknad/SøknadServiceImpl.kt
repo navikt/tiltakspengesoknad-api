@@ -24,7 +24,7 @@ class SøknadServiceImpl(
     }
 
     override suspend fun taInnSøknadSomMultipart(søknadSomMultipart: MultiPartData): Pair<SpørsmålsbesvarelserDTO, List<Vedlegg>> {
-        var spørsmålsbesvarelserDTO: SpørsmålsbesvarelserDTO? = null
+        lateinit var spørsmålsbesvarelserDTO: SpørsmålsbesvarelserDTO
         val vedleggListe = mutableListOf<Vedlegg>()
         søknadSomMultipart.forEachPart { part ->
             when (part) {
@@ -42,11 +42,7 @@ class SøknadServiceImpl(
             part.dispose()
         }
 
-        spørsmålsbesvarelserDTO?.let {
-            return Pair(spørsmålsbesvarelserDTO!!, vedleggListe)
-        }
-
-        throw MissingContentException("Mangler spørsmålsbesvarelser i søknadsinnsendingen")
+        return Pair(spørsmålsbesvarelserDTO, vedleggListe)
     }
 }
 

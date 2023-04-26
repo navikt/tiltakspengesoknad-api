@@ -46,6 +46,7 @@ fun Route.søknadRoutes(
                     is MissingContentException,
                     is UnrecognizedFormItemException,
                     is MalwareFoundException,
+                    is UninitializedPropertyAccessException,
                     -> {
                         LOG.error("Ugyldig søknad", it)
                         call.respondText(
