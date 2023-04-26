@@ -22,10 +22,6 @@ import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.token
-import no.nav.tiltakspenger.soknad.api.util.Detect.APPLICATON_PDF
-import no.nav.tiltakspenger.soknad.api.util.Detect.IMAGE_JPEG
-import no.nav.tiltakspenger.soknad.api.util.Detect.IMAGE_PNG
-import no.nav.tiltakspenger.soknad.api.util.Detect.detect
 import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
