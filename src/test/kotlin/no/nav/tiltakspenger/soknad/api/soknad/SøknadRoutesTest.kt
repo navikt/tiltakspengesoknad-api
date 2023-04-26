@@ -24,7 +24,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 internal class SøknadRoutesTest {
-    val ugyldigSøknad = """{}"""
     val gyldigSøknad = """
         {
           "id" : "1",
@@ -100,10 +99,6 @@ internal class SøknadRoutesTest {
         }
     """.trimMargin()
 
-    private val søknadServiceMock = mockk<SøknadService>().also { mock ->
-        coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any()) } returns "1"
-    }
-
     private val pdlServiceMock = mockk<PdlService>().also { mock ->
         coEvery { mock.hentPersonaliaMedBarn(any(), any()) } returns PersonDTO(
             fornavn = "fornavn",
@@ -149,8 +144,6 @@ internal class SøknadRoutesTest {
                 setBody(
                     MultiPartFormDataContent(
                         formData {
-                            append("søknad", ugyldigSøknad)
-                            append("vedlegg", "")
                         },
                         "WebAppBoundary",
                         ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
@@ -163,6 +156,10 @@ internal class SøknadRoutesTest {
 
     @Test
     fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
+        }
+
         val token = mockOAuth2Server.issueToken(
             "tokendings",
             "testClientId",
