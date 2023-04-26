@@ -42,7 +42,6 @@ fun Route.søknadRoutes(
                 when (it) {
                     is CannotTransformContentToTypeException,
                     is BadRequestException,
-                    is BadExtensionException,
                     is MissingContentException,
                     is UnrecognizedFormItemException,
                     is MalwareFoundException,
@@ -68,5 +67,3 @@ fun Route.søknadRoutes(
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
 }
-
-class BadExtensionException(message: String) : RuntimeException(message)
