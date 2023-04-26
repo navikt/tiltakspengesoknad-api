@@ -42,7 +42,7 @@ spec:
       rules:
         - application: tiltakspenger-pdfgen
         - application: clamav
-          namespace: clamav
+          namespace: nais-system
       external:
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "dokarkiv.dev-fss-pub.nais.io"
