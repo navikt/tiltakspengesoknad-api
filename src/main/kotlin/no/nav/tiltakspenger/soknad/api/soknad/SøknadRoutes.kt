@@ -64,34 +64,6 @@ fun Route.søknadRoutes(
                     }
                 }
             }.getOrThrow()
-//            try {
-//                val søknad = call.receive<Søknad>()
-//                val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
-//                runBlocking {
-//                    søknadService.lagPdfOgSendTilJoark(søknad, fødselsnummer)
-//                }
-//
-//                call.respondText(status = HttpStatusCode.NoContent, text = "OK")
-//            } catch (exception: Exception) {
-//                when (exception) {
-//                    is CannotTransformContentToTypeException, is BadRequestException -> {
-//                        LOG.error("Ugyldig søknad", exception)
-//                        call.respondText(
-//                            text = "Bad Request",
-//                            contentType = ContentType.Text.Plain,
-//                            status = HttpStatusCode.BadRequest,
-//                        )
-//                    }
-//                    else -> {
-//                        LOG.error("Noe gikk galt ved post av søknad", exception)
-//                        call.respondText(
-//                            text = "Internal server error",
-//                            contentType = ContentType.Text.Plain,
-//                            status = HttpStatusCode.InternalServerError,
-//                        )
-//                    }
-//                }
-//            }
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
 }
