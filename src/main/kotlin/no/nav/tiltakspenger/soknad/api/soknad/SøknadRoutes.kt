@@ -22,6 +22,11 @@ import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.token
+import no.nav.tiltakspenger.soknad.api.util.Detect.APPLICATON_PDF
+import no.nav.tiltakspenger.soknad.api.util.Detect.IMAGE_JPEG
+import no.nav.tiltakspenger.soknad.api.util.Detect.IMAGE_PNG
+import no.nav.tiltakspenger.soknad.api.util.Detect.detect
+import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
 val LOG = KotlinLogging.logger { }
@@ -60,7 +65,7 @@ fun Route.søknadRoutes(
                         is PartData.FileItem -> {
                             val filnavn = part.originalFileName ?: "untitled-${part.hashCode()}"
                             val fileBytes = part.streamProvider().readBytes()
-                            val vedlegg = Vedlegg(filnavn = filnavn, contentType = inferContentType(filnavn), dokument = fileBytes)
+                            val vedlegg = Vedlegg(filnavn = filnavn, contentType = sjekkContentType(fileBytes), dokument = fileBytes)
                             vedleggListe.add(vedlegg)
                             LOG.info { part.originalFileName }
                         }
@@ -142,18 +147,6 @@ fun Route.søknadRoutes(
 //            }
         }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
-}
-
-private fun inferContentType(filnavn: String): String {
-    val extension = filnavn.split(".").last()
-    return when (extension) {
-        "pdf" -> "application/pdf"
-        "jpg", "jpeg" -> "image/jpeg"
-        "png" -> "image/png"
-        else -> {
-            throw BadExtensionException("Vedleggstype ikke støttet!!!")
-        }
-    }
 }
 
 class BadExtensionException(message: String) : RuntimeException(message)

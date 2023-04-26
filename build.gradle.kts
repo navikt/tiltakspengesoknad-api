@@ -60,6 +60,9 @@ dependencies {
     // PDF handling
     implementation("org.apache.pdfbox:pdfbox:2.0.28")
 
+    // Apache Tika
+    implementation("org.apache.tika:tika-core:2.7.0")
+
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.10")
