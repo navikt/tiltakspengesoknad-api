@@ -111,7 +111,7 @@ internal class SøknadRoutesTest {
         )
     }
     private val avServiceMock = mockk<AvService>().also { mock ->
-        coEvery { mock.scan(any()) } returns emptyList()
+        coEvery { mock.gjørVirussjekkAvVedlegg(any()) }
     }
 
     private val mockOAuth2Server = MockOAuth2Server()

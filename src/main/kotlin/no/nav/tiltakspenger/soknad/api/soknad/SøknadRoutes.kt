@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
-import no.nav.tiltakspenger.soknad.api.antivirus.Status
+import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.token
@@ -30,27 +30,23 @@ fun Route.søknadRoutes(
         post {
             kotlin.runCatching {
                 val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
+                avService.gjørVirussjekkAvVedlegg(vedlegg)
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                 val subjectToken = call.token()
                 val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                 val journalpostId = runBlocking {
-                    val resultat = avService.scan(vedlegg) // TODO: Test av av! Skriv om.
-                    resultat.forEach {
-                        LOG.info { "${it.filnavn}: ${it.resultat}" }
-                    }
-                    if (resultat.any { it.resultat == Status.FOUND }) {
-                        call.respondText(
-                            text = "Skadevare funnet i vedlegg",
-                            contentType = ContentType.Text.Plain,
-                            status = HttpStatusCode.BadRequest,
-                        )
-                    }
                     søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg)
                 }
                 call.respondText(status = HttpStatusCode.Created, text = journalpostId)
             }.onFailure {
                 when (it) {
-                    is CannotTransformContentToTypeException, is BadRequestException, is BadExtensionException, is MissingContentException, is UnrecognizedFormItemException -> {
+                    is CannotTransformContentToTypeException,
+                    is BadRequestException,
+                    is BadExtensionException,
+                    is MissingContentException,
+                    is UnrecognizedFormItemException,
+                    is MalwareFoundException,
+                    -> {
                         LOG.error("Ugyldig søknad", it)
                         call.respondText(
                             text = "Bad Request",
