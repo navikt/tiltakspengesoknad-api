@@ -7,6 +7,7 @@ metadata:
     team: tpts
   annotations:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
 spec:
   image: {{ image }}
   port: 8080
