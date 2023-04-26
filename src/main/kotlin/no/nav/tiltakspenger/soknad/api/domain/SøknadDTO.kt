@@ -1,69 +1,18 @@
 package no.nav.tiltakspenger.soknad.api.domain
 
 import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadRequest
-import java.time.LocalDate
+import no.nav.tiltakspenger.soknad.api.soknad.Barnetillegg
+import no.nav.tiltakspenger.soknad.api.soknad.Etterlønn
+import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
+import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.ManueltRegistrertBarn
+import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
+import no.nav.tiltakspenger.soknad.api.soknad.Periode
+import no.nav.tiltakspenger.soknad.api.soknad.RegistrertBarn
+import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
+import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
 import java.util.UUID
-
-data class Periode(
-    val fra: LocalDate,
-    val til: LocalDate,
-)
-
-data class ManueltRegistrertBarn(
-    val fornavn: String,
-    val mellomnavn: String?,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-    val bostedsland: String,
-)
-
-data class RegistrertBarn(
-    val fornavn: String,
-    val mellomnavn: String?,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-)
-
-data class Kvalifiseringsprogram(
-    val deltar: Boolean,
-    val periode: Periode?,
-)
-
-data class Introduksjonsprogram(
-    val deltar: Boolean,
-    val periode: Periode?,
-)
-
-data class Institusjonsopphold(
-    val borPåInstitusjon: Boolean,
-    val periode: Periode?,
-)
-
-data class Tiltak(
-    val aktivitetId: String,
-    val periode: Periode?,
-    val søkerHeleTiltaksperioden: Boolean,
-)
-
-data class Barnetillegg(
-    val søkerOmBarnetillegg: Boolean,
-    val ønskerÅSøkeBarnetilleggForAndreBarn: Boolean?,
-    val manueltRegistrerteBarnSøktBarnetilleggFor: List<ManueltRegistrertBarn>,
-    val registrerteBarnSøktBarnetilleggFor: List<RegistrertBarn>,
-)
-
-data class Pensjonsordning(
-    val mottarEllerSøktPensjonsordning: Boolean,
-    val utbetaler: String?,
-    val periode: Periode?,
-)
-
-data class Etterlønn(
-    val mottarEllerSøktEtterlønn: Boolean,
-    val utbetaler: String?,
-    val periode: Periode?,
-)
 
 data class Personopplysninger(
     val ident: String,
@@ -83,7 +32,7 @@ data class SøknadDTO(
     val personopplysninger: Personopplysninger,
 ) {
     companion object {
-        fun toDTO(req: SøknadRequest, fnr: String, person: PersonDTO): SøknadDTO {
+        fun toDTO(req: SpørsmålsbesvarelserDTO, fnr: String, person: PersonDTO): SøknadDTO {
             return SøknadDTO(
                 kvalifiseringsprogram = Kvalifiseringsprogram(
                     deltar = req.kvalifiseringsprogram.deltar,
