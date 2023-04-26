@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
+import no.nav.tiltakspenger.soknad.api.antivirus.Status
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
@@ -76,10 +77,16 @@ fun Route.søknadRoutes(
                     val subjectToken = call.token()
                     val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                     val journalpostId = runBlocking {
-                        // todo: kan vi fjerne !! herfra?
                         val resultat = avService.scan(vedleggListe) // TODO: Test av av! Skriv om.
                         resultat.forEach {
                             LOG.info { "${it.filnavn}: ${it.resultat}" }
+                        }
+                        if (resultat.any { it.resultat == Status.FOUND }) {
+                            call.respondText(
+                                text = "Skadevare funnet i vedlegg",
+                                contentType = ContentType.Text.Plain,
+                                status = HttpStatusCode.BadRequest,
+                            )
                         }
                         søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, person, vedleggListe)
                     }
