@@ -7,6 +7,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.CannotTransformContentToTypeException
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -124,6 +126,10 @@ internal class SøknadRoutesTest {
 
     @Test
     fun `post på soknad-endepunkt skal svare med 400 ved ugyldig søknad`() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } throwsMany(listOf(BadRequestException("1"), UnrecognizedFormItemException("2"), MissingContentException("3"), mockk<CannotTransformContentToTypeException>(), UninitializedPropertyAccessException("4")))
+        }
+
         val token = mockOAuth2Server.issueToken(
             "tokendings",
             "testClientId",
@@ -137,7 +143,7 @@ internal class SøknadRoutesTest {
         )
 
         testApplication {
-            configureTestApplication()
+            configureTestApplication(søknadService = søknadServiceMock)
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(
