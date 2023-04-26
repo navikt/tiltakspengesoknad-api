@@ -8,7 +8,7 @@ endpoints:
   pdf: http://tiltakspenger-pdfgen
   joark: https://dokarkiv.dev-fss-pub.nais.io
   tiltakspengerarena: https://tiltakspenger-arena.dev-fss-pub.nais.io
-  av: http://clamav.nais-system.svc.nais.local/scan
+  av: http://clamav.nais-system/scan
 
 audience:
   pdl: dev-fss:pdl:pdl-api
