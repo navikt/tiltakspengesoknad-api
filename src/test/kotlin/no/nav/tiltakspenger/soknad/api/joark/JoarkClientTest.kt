@@ -21,12 +21,13 @@ import no.nav.tiltakspenger.soknad.api.domain.Kvalifiseringsprogram
 import no.nav.tiltakspenger.soknad.api.domain.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.domain.Periode
 import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
+import no.nav.tiltakspenger.soknad.api.domain.SøknadTilJoarkDTO
 import no.nav.tiltakspenger.soknad.api.domain.Tiltak
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 internal class JoarkClientTest {
     private val journalpostId = "1"
@@ -205,7 +206,7 @@ internal class JoarkClientTest {
 
     private val dokument = Journalpost.Søknadspost.from(
         fnr = "ident",
-        søknadDTO = SøknadDTO(
+        søknadTilJoarkDTO = SøknadTilJoarkDTO(
             personopplysninger = Personopplysninger(
                 ident = "12345678901",
                 fornavn = "fornavn",
@@ -248,11 +249,10 @@ internal class JoarkClientTest {
                 utbetaler = "test",
             ),
             barnetillegg = Barnetillegg(
-                søkerOmBarnetillegg = false,
-                ønskerÅSøkeBarnetilleggForAndreBarn = null,
                 manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
                 registrerteBarnSøktBarnetilleggFor = emptyList(),
             ),
+            opprettet = LocalDateTime.now(),
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
         vedlegg = listOf(

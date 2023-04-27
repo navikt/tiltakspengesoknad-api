@@ -12,13 +12,17 @@ data class ManueltRegistrertBarn(
     val etternavn: String,
     val fødselsdato: LocalDate,
     val bostedsland: String,
+    // val oppholderSegUtenforEøs: Boolean, Denne kommer snart...
 )
 
 data class RegistrertBarn(
+    val ident: String = "Kommer snart",
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,
     val fødselsdato: LocalDate,
+    val bostedsland: String,
+    // val oppholderSegUtenforEøs: Boolean, Denne kommer snart...
 )
 
 data class Kvalifiseringsprogram(
@@ -43,8 +47,8 @@ data class Tiltak(
 )
 
 data class Barnetillegg(
-    val søkerOmBarnetillegg: Boolean,
-    val ønskerÅSøkeBarnetilleggForAndreBarn: Boolean?,
+    val søkerOmBarnetillegg: Boolean, // denne skal bort
+    val ønskerÅSøkeBarnetilleggForAndreBarn: Boolean?, // denne trenger vi vel ikke
     val manueltRegistrerteBarnSøktBarnetilleggFor: List<ManueltRegistrertBarn>,
     val registrerteBarnSøktBarnetilleggFor: List<RegistrertBarn>,
 )
@@ -61,7 +65,7 @@ data class Etterlønn(
     val periode: Periode?,
 )
 
-data class SøknadRequest(
+data class SøknadFraGuiDTO(
     val kvalifiseringsprogram: Kvalifiseringsprogram,
     val introduksjonsprogram: Introduksjonsprogram,
     val institusjonsopphold: Institusjonsopphold,

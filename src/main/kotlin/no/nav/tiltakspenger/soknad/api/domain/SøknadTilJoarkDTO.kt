@@ -1,8 +1,9 @@
 package no.nav.tiltakspenger.soknad.api.domain
 
 import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadRequest
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadFraGuiDTO
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class Periode(
@@ -16,13 +17,17 @@ data class ManueltRegistrertBarn(
     val etternavn: String,
     val fødselsdato: LocalDate,
     val bostedsland: String,
+    val oppholderSegUtenforEøs: Boolean,
 )
 
 data class RegistrertBarn(
+    val ident: String,
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,
     val fødselsdato: LocalDate,
+    val bostedsland: String,
+    val oppholderSegUtenforEøs: Boolean,
 )
 
 data class Kvalifiseringsprogram(
@@ -47,8 +52,6 @@ data class Tiltak(
 )
 
 data class Barnetillegg(
-    val søkerOmBarnetillegg: Boolean,
-    val ønskerÅSøkeBarnetilleggForAndreBarn: Boolean?,
     val manueltRegistrerteBarnSøktBarnetilleggFor: List<ManueltRegistrertBarn>,
     val registrerteBarnSøktBarnetilleggFor: List<RegistrertBarn>,
 )
@@ -71,8 +74,10 @@ data class Personopplysninger(
     val etternavn: String,
 )
 
-data class SøknadDTO(
+data class SøknadTilJoarkDTO(
     val id: UUID = UUID.randomUUID(),
+    val versjon: String = "2",
+    val opprettet: LocalDateTime,
     val kvalifiseringsprogram: Kvalifiseringsprogram,
     val introduksjonsprogram: Introduksjonsprogram,
     val institusjonsopphold: Institusjonsopphold,
@@ -83,8 +88,8 @@ data class SøknadDTO(
     val personopplysninger: Personopplysninger,
 ) {
     companion object {
-        fun toDTO(req: SøknadRequest, fnr: String, person: PersonDTO): SøknadDTO {
-            return SøknadDTO(
+        fun toDTO(req: SøknadFraGuiDTO, fnr: String, person: PersonDTO): SøknadTilJoarkDTO {
+            return SøknadTilJoarkDTO(
                 kvalifiseringsprogram = Kvalifiseringsprogram(
                     deltar = req.kvalifiseringsprogram.deltar,
                     periode = req.kvalifiseringsprogram.periode?.let {
@@ -123,8 +128,6 @@ data class SøknadDTO(
                     søkerHeleTiltaksperioden = req.tiltak.søkerHeleTiltaksperioden,
                 ),
                 barnetillegg = Barnetillegg(
-                    søkerOmBarnetillegg = req.barnetillegg.søkerOmBarnetillegg,
-                    ønskerÅSøkeBarnetilleggForAndreBarn = req.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn,
                     manueltRegistrerteBarnSøktBarnetilleggFor = req.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.map {
                         ManueltRegistrertBarn(
                             fornavn = it.fornavn,
@@ -132,17 +135,21 @@ data class SøknadDTO(
                             etternavn = it.etternavn,
                             fødselsdato = it.fødselsdato,
                             bostedsland = it.bostedsland,
+                            oppholderSegUtenforEøs = false, // denne skal sette til it.oppholderSegUtenforEøs når det er på plass
                         )
                     },
                     registrerteBarnSøktBarnetilleggFor = req.barnetillegg.registrerteBarnSøktBarnetilleggFor.map {
                         RegistrertBarn(
+                            ident = it.ident,
                             fornavn = it.fornavn,
                             mellomnavn = it.mellomnavn,
                             etternavn = it.etternavn,
                             fødselsdato = it.fødselsdato,
+                            bostedsland = it.bostedsland,
+                            oppholderSegUtenforEøs = false, // denne skal sette til it.oppholderSegUtenforEøs når det er på plass
                         )
                     },
-                ), // fylle ut barn fra person her?
+                ),
                 pensjonsordning = Pensjonsordning(
                     mottarEllerSøktPensjonsordning = req.pensjonsordning.mottarEllerSøktPensjonsordning,
                     utbetaler = req.pensjonsordning.utbetaler,
@@ -168,6 +175,7 @@ data class SøknadDTO(
                     fornavn = person.fornavn,
                     etternavn = person.etternavn,
                 ),
+                opprettet = LocalDateTime.now(),
             )
         }
     }

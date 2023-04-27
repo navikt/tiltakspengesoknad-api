@@ -19,11 +19,12 @@ import no.nav.tiltakspenger.soknad.api.domain.Kvalifiseringsprogram
 import no.nav.tiltakspenger.soknad.api.domain.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.domain.Periode
 import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
+import no.nav.tiltakspenger.soknad.api.domain.SøknadTilJoarkDTO
 import no.nav.tiltakspenger.soknad.api.domain.Tiltak
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 internal class PdfClientTest {
 
@@ -77,7 +78,7 @@ internal class PdfClientTest {
         }
     }
 
-    private fun tomSøknad() = SøknadDTO(
+    private fun tomSøknad() = SøknadTilJoarkDTO(
         personopplysninger = Personopplysninger(
             ident = "12345678901",
             fornavn = "fornavn",
@@ -120,10 +121,9 @@ internal class PdfClientTest {
             utbetaler = "test",
         ),
         barnetillegg = Barnetillegg(
-            søkerOmBarnetillegg = false,
-            ønskerÅSøkeBarnetilleggForAndreBarn = null,
             manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
             registrerteBarnSøktBarnetilleggFor = emptyList(),
         ),
+        opprettet = LocalDateTime.now(),
     )
 }

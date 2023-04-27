@@ -37,7 +37,7 @@ fun Route.søknadRoutes(
             val vedleggListe = mutableListOf<Vedlegg>()
             kotlin.runCatching {
                 val multipartData = call.receiveMultipart()
-                var søknad: SøknadRequest? = null
+                var søknad: SøknadFraGuiDTO? = null
 
                 multipartData.forEachPart { part ->
                     when (part) {
