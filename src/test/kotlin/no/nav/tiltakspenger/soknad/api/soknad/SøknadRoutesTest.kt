@@ -136,4 +136,35 @@ internal class SøknadRoutesTest {
             }
         }
     }
+
+    @Test
+    fun `post på soknad-endepunkt skal svare med 500 hvis man ikke får hentet personalia fra PDL`() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
+            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any()) } returns "123"
+        }
+
+        val pdlServiceMock = mockk<PdlService>().also { mock ->
+            coEvery { mock.hentPersonaliaMedBarn(any(), any()) } throws IllegalStateException("blabla")
+        }
+
+        val token = issueTestToken()
+
+        testApplication {
+            configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
+            kotlin.runCatching {
+                val response = client.post("/soknad") {
+                    header("Authorization", "Bearer ${token.serialize()}")
+                    setBody(
+                        MultiPartFormDataContent(
+                            formData {},
+                            "WebAppBoundary",
+                            ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                        ),
+                    )
+                }
+                assertEquals(HttpStatusCode.InternalServerError, response.status)
+            }
+        }
+    }
 }
