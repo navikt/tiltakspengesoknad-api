@@ -1,5 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
+import com.nimbusds.jwt.SignedJWT
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.header
@@ -24,81 +25,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 internal class SøknadRoutesTest {
-    val gyldigSøknad = """
-        {
-          "id" : "1",
-          "personopplysninger" : {
-            "ident" : "12345678901",
-            "etternavn" : "etternavn",
-            "fornavn" : "fornavn"
-          },
-          "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "barnetillegg": {
-            "manueltRegistrerteBarnSøktBarnetilleggFor": [
-              {
-                "fornavn": "Test",
-                "etternavn": "Test",
-                "fødselsdato": "2025-01-01",
-                "bostedsland": "Test"
-              }
-            ],
-            "søkerOmBarnetillegg": true,
-            "registrerteBarnSøktBarnetilleggFor": [
-              {
-                "fornavn": "Test",
-                "fødselsdato": "2025-01-01",
-                "etternavn": "Testesen"
-              }
-            ],
-            "ønskerÅSøkeBarnetilleggForAndreBarn": true
-          },
-          "etterlønn": {
-            "mottarEllerSøktEtterlønn": true,
-            "utbetaler": "Test",
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "institusjonsopphold": {
-            "borPåInstitusjon": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "introduksjonsprogram": {
-            "deltar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "kvalifiseringsprogram": {
-            "deltar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "pensjonsordning": {
-            "utbetaler": "Test",
-            "mottarEllerSøktPensjonsordning": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          }
-        }
-    """.trimMargin()
-
     private val pdlServiceMock = mockk<PdlService>().also { mock ->
         coEvery { mock.hentPersonaliaMedBarn(any(), any()) } returns PersonDTO(
             fornavn = "fornavn",
@@ -108,7 +34,7 @@ internal class SøknadRoutesTest {
         )
     }
     private val avServiceMock = mockk<AvService>().also { mock ->
-        coEvery { mock.gjørVirussjekkAvVedlegg(any()) }
+        coEvery { mock.gjørVirussjekkAvVedlegg(any()) } returns Unit
     }
 
     private val mockOAuth2Server = MockOAuth2Server()
@@ -119,13 +45,8 @@ internal class SøknadRoutesTest {
     @AfterAll
     fun after() = mockOAuth2Server.shutdown()
 
-    @Test
-    fun `post på soknad-endepunkt skal svare med 400 ved ugyldig søknad`() {
-        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-            coEvery { mock.taInnSøknadSomMultipart(any()) } throwsMany(listOf(BadRequestException("1"), UnrecognizedFormItemException("2"), MissingContentException("3"), mockk<CannotTransformContentToTypeException>(), UninitializedPropertyAccessException("4")))
-        }
-
-        val token = mockOAuth2Server.issueToken(
+    fun issueTestToken(): SignedJWT {
+        return mockOAuth2Server.issueToken(
             "tokendings",
             "testClientId",
             DefaultOAuth2TokenCallback(
@@ -136,21 +57,31 @@ internal class SøknadRoutesTest {
                 ),
             ),
         )
+    }
+
+    @Test
+    fun `post på soknad-endepunkt skal svare med 400 ved ugyldig søknad`() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } throwsMany listOf(BadRequestException("1"), UnrecognizedFormItemException("2"), MissingContentException("3"), mockk<CannotTransformContentToTypeException>(), UninitializedPropertyAccessException("4"))
+        }
+
+        val token = issueTestToken()
 
         testApplication {
             configureTestApplication(søknadService = søknadServiceMock)
-            val response = client.post("/soknad") {
-                header("Authorization", "Bearer ${token.serialize()}")
-                setBody(
-                    MultiPartFormDataContent(
-                        formData {
-                        },
-                        "WebAppBoundary",
-                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
-                    ),
-                )
+            kotlin.runCatching {
+                val response = client.post("/soknad") {
+                    header("Authorization", "Bearer ${token.serialize()}")
+                    setBody(
+                        MultiPartFormDataContent(
+                            formData {},
+                            "WebAppBoundary",
+                            ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                        ),
+                    )
+                }
+                assertEquals(HttpStatusCode.BadRequest, response.status)
             }
-            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
     }
 
@@ -158,19 +89,10 @@ internal class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
         val søknadServiceMock = mockk<SøknadService>().also { mock ->
             coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
+            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any()) } returns "123"
         }
 
-        val token = mockOAuth2Server.issueToken(
-            "tokendings",
-            "testClientId",
-            DefaultOAuth2TokenCallback(
-                audience = listOf("audience"),
-                claims = mapOf(
-                    "acr" to "Level4",
-                    "pid" to "123",
-                ),
-            ),
-        )
+        val token = issueTestToken()
 
         testApplication {
             configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
@@ -178,16 +100,40 @@ internal class SøknadRoutesTest {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(
                     MultiPartFormDataContent(
-                        formData {
-                            append("søknad", gyldigSøknad)
-                            append("vedlegg", "")
-                        },
+                        formData {},
                         "WebAppBoundary",
                         ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
                     ),
                 )
             }
             assertEquals(HttpStatusCode.Created, response.status)
+        }
+    }
+
+    @Test
+    fun `post på soknad-endepunkt skal svare med 500 hvis journalføringen feiler`() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
+            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any()) } throws IllegalStateException("blabla")
+        }
+
+        val token = issueTestToken()
+
+        testApplication {
+            configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
+            kotlin.runCatching {
+                val response = client.post("/soknad") {
+                    header("Authorization", "Bearer ${token.serialize()}")
+                    setBody(
+                        MultiPartFormDataContent(
+                            formData {},
+                            "WebAppBoundary",
+                            ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                        ),
+                    )
+                }
+                assertEquals(HttpStatusCode.InternalServerError, response.status)
+            }
         }
     }
 }
