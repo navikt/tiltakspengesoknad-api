@@ -76,7 +76,7 @@ fun Route.søknadRoutes(
                     call.respondText(status = HttpStatusCode.BadRequest, text = "Bad request")
                 } else {
                     val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
-                    LOG.info { "${call.acr()}" }
+                    val acr = call.acr() ?: "Ingen Level"
                     val subjectToken = call.token()
                     val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                     val journalpostId = runBlocking {
@@ -91,7 +91,7 @@ fun Route.søknadRoutes(
                                 status = HttpStatusCode.BadRequest,
                             )
                         }
-                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, person, vedleggListe)
+                        søknadService.opprettDokumenterOgArkiverIJoark(søknad!!, fødselsnummer, person, vedleggListe, acr)
                     }
                     call.respondText(status = HttpStatusCode.Created, text = journalpostId)
                 }

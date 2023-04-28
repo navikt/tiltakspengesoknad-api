@@ -99,7 +99,7 @@ internal class SøknadRoutesTest {
     """.trimMargin()
 
     private val søknadServiceMock = mockk<SøknadService>().also { mock ->
-        coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any()) } returns "1"
+        coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any()) } returns "1"
     }
 
     private val pdlServiceMock = mockk<PdlService>().also { mock ->

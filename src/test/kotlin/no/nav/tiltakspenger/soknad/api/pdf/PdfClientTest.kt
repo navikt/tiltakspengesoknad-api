@@ -78,6 +78,7 @@ internal class PdfClientTest {
     }
 
     private fun tomSøknad() = SøknadDTO(
+        acr = "Level4",
         personopplysninger = Personopplysninger(
             ident = "12345678901",
             fornavn = "fornavn",

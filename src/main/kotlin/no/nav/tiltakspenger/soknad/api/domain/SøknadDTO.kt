@@ -73,6 +73,7 @@ data class Personopplysninger(
 
 data class SøknadDTO(
     val id: UUID = UUID.randomUUID(),
+    val acr: String,
     val kvalifiseringsprogram: Kvalifiseringsprogram,
     val introduksjonsprogram: Introduksjonsprogram,
     val institusjonsopphold: Institusjonsopphold,
@@ -83,7 +84,7 @@ data class SøknadDTO(
     val personopplysninger: Personopplysninger,
 ) {
     companion object {
-        fun toDTO(req: SøknadRequest, fnr: String, person: PersonDTO): SøknadDTO {
+        fun toDTO(req: SøknadRequest, fnr: String, person: PersonDTO, acr: String): SøknadDTO {
             return SøknadDTO(
                 kvalifiseringsprogram = Kvalifiseringsprogram(
                     deltar = req.kvalifiseringsprogram.deltar,
@@ -168,6 +169,7 @@ data class SøknadDTO(
                     fornavn = person.fornavn,
                     etternavn = person.etternavn,
                 ),
+                acr = acr,
             )
         }
     }

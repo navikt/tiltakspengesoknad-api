@@ -10,8 +10,14 @@ class SøknadServiceImpl(
     private val pdfService: PdfService,
     private val joarkService: JoarkService,
 ) : SøknadService {
-    override suspend fun opprettDokumenterOgArkiverIJoark(søknad: SøknadRequest, fnr: String, person: PersonDTO, vedlegg: List<Vedlegg>): String {
-        val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person)
+    override suspend fun opprettDokumenterOgArkiverIJoark(
+        søknad: SøknadRequest,
+        fnr: String,
+        person: PersonDTO,
+        vedlegg: List<Vedlegg>,
+        acr: String,
+    ): String {
+        val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr)
         val pdf = pdfService.lagPdf(søknadDTO)
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         return joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer)

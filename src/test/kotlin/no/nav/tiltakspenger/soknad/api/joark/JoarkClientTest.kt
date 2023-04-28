@@ -206,6 +206,7 @@ internal class JoarkClientTest {
     private val dokument = Journalpost.Søknadspost.from(
         fnr = "ident",
         søknadDTO = SøknadDTO(
+            acr = "Level4",
             personopplysninger = Personopplysninger(
                 ident = "12345678901",
                 fornavn = "fornavn",
