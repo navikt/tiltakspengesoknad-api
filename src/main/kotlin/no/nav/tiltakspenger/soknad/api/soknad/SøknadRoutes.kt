@@ -16,6 +16,7 @@ import io.ktor.server.routing.route
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
+import no.nav.tiltakspenger.soknad.api.acr
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.Status
 import no.nav.tiltakspenger.soknad.api.deserialize
@@ -75,6 +76,7 @@ fun Route.søknadRoutes(
                     call.respondText(status = HttpStatusCode.BadRequest, text = "Bad request")
                 } else {
                     val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
+                    LOG.info { "${call.acr()}" }
                     val subjectToken = call.token()
                     val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                     val journalpostId = runBlocking {

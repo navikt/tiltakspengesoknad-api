@@ -10,6 +10,10 @@ fun ApplicationCall.fødselsnummer(): String? {
     return this.getClaim("tokendings", "pid")
 }
 
+fun ApplicationCall.acr(): String? {
+    return this.getClaim("tokendings", "acr")
+}
+
 fun ApplicationCall.token(): String {
     return this.principal<TokenValidationContextPrincipal>().asTokenString()
 }
