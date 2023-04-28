@@ -98,7 +98,7 @@ internal class SøknadServiceTest {
         }
     """.trimMargin()
 
-    class MockMultiPartData(private val partDataList: MutableList<PartData>): MultiPartData {
+    class MockMultiPartData(private val partDataList: MutableList<PartData>) : MultiPartData {
         override suspend fun readPart(): PartData? {
             return if (partDataList.isNotEmpty()) partDataList.removeLast() else null
         }
@@ -112,26 +112,39 @@ internal class SøknadServiceTest {
     @Test
     fun `taInnSøknadSomMultipart leser inn MultiPartData med gyldig søknad to vedlegg`() {
         val input: Input = mockk()
-        every {input.endOfInput} returns true
-        justRun {input.release()}
+        every { input.endOfInput } returns true
+        justRun { input.release() }
         mockkStatic("no.nav.tiltakspenger.soknad.api.util.DetectKt")
         every { sjekkContentType(any()) } returns Detect.APPLICATON_PDF
 
         val mockMultiPartData = MockMultiPartData(
-                mutableListOf(
-                    PartData.FormItem(gyldigSøknad , {}, Headers.build{
+            mutableListOf(
+                PartData.FormItem(
+                    gyldigSøknad,
+                    {},
+                    Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
                         append(HttpHeaders.ContentDisposition, ContentDisposition("søknad", listOf(HeaderValueParam("name", "søknad"))))
-                    }),
-                    PartData.FileItem({ input }, { input.release() }, Headers.build{
+                    },
+                ),
+                PartData.FileItem(
+                    { input },
+                    { input.release() },
+                    Headers.build {
                         append(HttpHeaders.ContentType, "application/pdf")
                         append(HttpHeaders.ContentDisposition, ContentDisposition("vedlegg", listOf(HeaderValueParam("name", "vedlegg"))))
-                    }),
-                    PartData.FileItem({ input }, { input.release() }, Headers.build{
+                    },
+                ),
+                PartData.FileItem(
+                    { input },
+                    { input.release() },
+                    Headers.build {
                         append(HttpHeaders.ContentType, "application/pdf")
                         append(HttpHeaders.ContentDisposition, ContentDisposition("vedlegg", listOf(HeaderValueParam("name", "vedlegg"))))
-                    })
-                ))
+                    },
+                ),
+            ),
+        )
 
         runBlocking {
             val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(mockMultiPartData)
@@ -139,5 +152,4 @@ internal class SøknadServiceTest {
             assertEquals(vedlegg.size, 2)
         }
     }
-
 }

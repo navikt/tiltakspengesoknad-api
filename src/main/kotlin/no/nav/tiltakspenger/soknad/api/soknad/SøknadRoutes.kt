@@ -36,14 +36,14 @@ fun Route.søknadRoutes(
                 val journalpostId =
                     søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg)
                 call.respondText(status = HttpStatusCode.Created, text = journalpostId)
-            } catch(exception: Exception) {
+            } catch (exception: Exception) {
                 when (exception) {
                     is CannotTransformContentToTypeException,
                     is BadRequestException,
                     is MissingContentException,
                     is UnrecognizedFormItemException,
                     is MalwareFoundException,
-                    is UninitializedPropertyAccessException
+                    is UninitializedPropertyAccessException,
                     -> {
                         LOG.error("Ugyldig søknad", exception)
                         call.respondText(
