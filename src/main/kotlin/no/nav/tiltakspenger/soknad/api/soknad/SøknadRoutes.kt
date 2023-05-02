@@ -62,7 +62,11 @@ fun Route.søknadRoutes(
                         is PartData.FileItem -> {
                             val filnavn = part.originalFileName ?: "untitled-${part.hashCode()}"
                             val fileBytes = part.streamProvider().readBytes()
-                            val vedlegg = Vedlegg(filnavn = filnavn, contentType = sjekkContentType(fileBytes), dokument = fileBytes)
+                            val vedlegg = Vedlegg(
+                                filnavn = filnavn,
+                                contentType = sjekkContentType(fileBytes),
+                                dokument = fileBytes,
+                            )
                             vedleggListe.add(vedlegg)
                             LOG.info { part.originalFileName }
                         }
