@@ -1,6 +1,5 @@
 package no.nav.tiltakspenger.soknad.api.util
 
-import no.nav.tiltakspenger.soknad.api.soknad.BadExtensionException
 import no.nav.tiltakspenger.soknad.api.util.Detect.detect
 import no.nav.tiltakspenger.soknad.api.util.Detect.godkjenteFiltyper
 import org.apache.tika.Tika
@@ -38,4 +37,6 @@ object Detect {
     }
 }
 
-fun sjekkContentType(filInnholdBa: ByteArray) = filInnholdBa.detect().takeIf { godkjenteFiltyper.contains(it) } ?: throw BadExtensionException("Vedleggstype ikke støttet!")
+fun sjekkContentType(filInnholdBa: ByteArray) = filInnholdBa.detect().takeIf { godkjenteFiltyper.contains(it) } ?: throw UnsupportedContentException("Vedleggstype ikke støttet!")
+
+class UnsupportedContentException(message: String) : RuntimeException(message)

@@ -12,10 +12,14 @@ import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.objectMapper
-import no.nav.tiltakspenger.soknad.api.soknad.BadExtensionException
 import no.nav.tiltakspenger.soknad.api.soknad.LOG
 import no.nav.tiltakspenger.soknad.api.util.Bilde
+import no.nav.tiltakspenger.soknad.api.util.Detect.APPLICATON_PDF
+import no.nav.tiltakspenger.soknad.api.util.Detect.IMAGE_JPEG
+import no.nav.tiltakspenger.soknad.api.util.Detect.IMAGE_PNG
+import no.nav.tiltakspenger.soknad.api.util.Detect.detect
 import no.nav.tiltakspenger.soknad.api.util.PdfTools
+import no.nav.tiltakspenger.soknad.api.util.UnsupportedContentException
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -49,27 +53,26 @@ class PdfClient(
     override suspend fun konverterVedlegg(vedlegg: List<Vedlegg>): List<Vedlegg> {
         return vedlegg.map { it ->
             LOG.info("Konverterer vedlegg: ${it.filnavn}")
-            val baseFileName = it.filnavn.split(".").first().lowercase()
-            val extension = it.filnavn.split(".").last().lowercase()
-            when (extension) {
-                "pdf" -> {
+            val contentType = it.dokument.detect()
+            when (contentType) {
+                APPLICATON_PDF -> {
                     val bilder = PdfTools.konverterPdfTilBilder(it.dokument)
                     val enkeltsider = bilder.map { bilde ->
                         genererPdfFraBilde(Bilde(ContentType.Image.PNG, bilde.data))
                     }
                     val resultatPdf = PdfTools.slåSammenPdfer(enkeltsider)
-                    Vedlegg("$baseFileName.pdf", "application/pdf", resultatPdf)
+                    Vedlegg(it.filnavn, "application/pdf", resultatPdf)
                 }
-                "png" -> {
+                IMAGE_PNG -> {
                     val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.PNG, it.dokument))
-                    Vedlegg("$baseFileName.pdf", "application/pdf", pdfFraBilde)
+                    Vedlegg("$${it.filnavn}-konvertert.pdf", "application/pdf", pdfFraBilde)
                 }
-                "jpg", "jpeg" -> {
+                IMAGE_JPEG -> {
                     val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.JPEG, it.dokument))
-                    Vedlegg("$baseFileName.pdf", "application/pdf", pdfFraBilde)
+                    Vedlegg("$${it.filnavn}-konvertert.pdf", "application/pdf", pdfFraBilde)
                 }
                 else -> {
-                    throw BadExtensionException("Ugyldig filformat")
+                    throw UnsupportedContentException("Ugyldig filformat")
                 }
             }
         }

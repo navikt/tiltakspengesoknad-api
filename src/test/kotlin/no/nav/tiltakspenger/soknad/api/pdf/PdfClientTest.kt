@@ -11,17 +11,17 @@ import io.ktor.http.headersOf
 import io.ktor.server.config.ApplicationConfig
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import no.nav.tiltakspenger.soknad.api.domain.Barnetillegg
-import no.nav.tiltakspenger.soknad.api.domain.Etterlønn
-import no.nav.tiltakspenger.soknad.api.domain.Institusjonsopphold
-import no.nav.tiltakspenger.soknad.api.domain.Introduksjonsprogram
-import no.nav.tiltakspenger.soknad.api.domain.Kvalifiseringsprogram
-import no.nav.tiltakspenger.soknad.api.domain.Pensjonsordning
-import no.nav.tiltakspenger.soknad.api.domain.Periode
 import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
-import no.nav.tiltakspenger.soknad.api.domain.Tiltak
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
+import no.nav.tiltakspenger.soknad.api.soknad.Barnetillegg
+import no.nav.tiltakspenger.soknad.api.soknad.Etterlønn
+import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
+import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
+import no.nav.tiltakspenger.soknad.api.soknad.Periode
+import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
