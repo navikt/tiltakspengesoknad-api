@@ -23,7 +23,7 @@ class SøknadServiceImpl(
         vedlegg: List<Vedlegg>,
         acr: String,
     ): String {
-        val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person)
+        val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr)
         val pdf = pdfService.lagPdf(søknadDTO)
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         return joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer)
