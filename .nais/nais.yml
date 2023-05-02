@@ -46,7 +46,7 @@ spec:
           namespace: nais-system
       external:
         - host: "pdl-api.dev-fss-pub.nais.io"
-        - host: "dokarkiv.dev-fss-pub.nais.io"
+        - host: "dokarkiv-q2.dev-fss-pub.nais.io"
         - host: "tiltakspenger-arena.dev-fss-pub.nais.io"
   env:
     - name: PDL_ENDPOINT_URL
