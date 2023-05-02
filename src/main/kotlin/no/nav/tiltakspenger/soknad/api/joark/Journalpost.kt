@@ -76,7 +76,7 @@ sealed class Journalpost {
                 vedleggListe.map { vedlegg ->
                     JournalpostDokument(
                         tittel = vedlegg.filnavn,
-                        brevkode = null,
+                        brevkode = vedlegg.brevkode,
                         dokumentvarianter = listOf(
                             DokumentVariant.VedleggPDF(
                                 fysiskDokument = Base64.getEncoder().encodeToString(vedlegg.dokument),

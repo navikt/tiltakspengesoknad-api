@@ -1,8 +1,8 @@
 val javaVersion = JavaVersion.VERSION_17
-val mockkVersion = "1.13.4"
+val mockkVersion = "1.13.5"
 val ktorVersion = "2.3.0"
-val kotestVersion = "5.5.5"
-val jacksonVersion = "2.14.2"
+val kotestVersion = "5.6.1"
+val jacksonVersion = "2.15.0"
 val kotlinxCoroutinesVersion = "1.6.4"
 val tokenSupportVersion = "3.0.8"
 
@@ -24,7 +24,7 @@ dependencies {
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation(kotlin("stdlib"))
-    implementation("ch.qos.logback:logback-classic:1.4.6")
+    implementation("ch.qos.logback:logback-classic:1.4.7")
     implementation("net.logstash.logback:logstash-logback-encoder:7.3")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.jetbrains:annotations:24.0.1")
@@ -65,7 +65,7 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.21")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.mockk:mockk-dsl-jvm:$mockkVersion")

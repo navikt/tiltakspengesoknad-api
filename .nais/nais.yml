@@ -8,6 +8,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
 spec:
   image: {{ image }}
   port: 8080
@@ -45,7 +46,7 @@ spec:
           namespace: nais-system
       external:
         - host: "pdl-api.dev-fss-pub.nais.io"
-        - host: "dokarkiv.dev-fss-pub.nais.io"
+        - host: "dokarkiv-q2.dev-fss-pub.nais.io"
         - host: "tiltakspenger-arena.dev-fss-pub.nais.io"
   env:
     - name: PDL_ENDPOINT_URL

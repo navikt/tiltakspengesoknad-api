@@ -12,6 +12,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
+import no.nav.tiltakspenger.soknad.api.acr
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
@@ -31,10 +32,11 @@ fun Route.søknadRoutes(
                 val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
                 avService.gjørVirussjekkAvVedlegg(vedlegg)
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
+                val acr = call.acr() ?: "Ingen Level"
                 val subjectToken = call.token()
                 val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                 val journalpostId =
-                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg)
+                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg, acr)
                 call.respondText(status = HttpStatusCode.Created, text = journalpostId)
             } catch (exception: Exception) {
                 when (exception) {
