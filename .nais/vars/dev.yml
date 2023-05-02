@@ -16,4 +16,4 @@ audience:
   tiltakspengerarena: dev-fss:tpts:tiltakspenger-arena
 scope:
   pdl: api://dev-fss.pdl.pdl-api/.default
-  joark: api://dev-fss.teamdokumenthandtering.dokarkiv-q2/.default
+  joark: api://dev-fss.teamdokumenthandtering.dokarkiv/.default
