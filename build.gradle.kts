@@ -9,7 +9,7 @@ val tokenSupportVersion = "3.0.8"
 plugins {
     application
     distribution
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.8.21"
     id("ca.cutterslade.analyze") version "1.9.0"
     id("com.diffplug.spotless") version "6.17.0"
 }
