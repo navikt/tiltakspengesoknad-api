@@ -16,9 +16,7 @@ import no.nav.tiltakspenger.soknad.api.acr
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
-import no.nav.tiltakspenger.soknad.api.pdl.AdressebeskyttelseGradering
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
-import no.nav.tiltakspenger.soknad.api.pdl.Person
 import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
 
@@ -32,16 +30,15 @@ fun Route.søknadRoutes(
     route(SØKNAD_PATH) {
         post {
             try {
-                val innsendingsTidspunkt = LocalDateTime.now()
+                val innsendingTidspunkt = LocalDateTime.now()
                 val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
-                //avService.gjørVirussjekkAvVedlegg(vedlegg)
+                avService.gjørVirussjekkAvVedlegg(vedlegg)
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                 val acr = call.acr() ?: "Ingen Level"
                 val subjectToken = call.token()
-                //val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
-                val person = Person(fornavn= "fornavn", mellomnavn= "mellomnavn", etternavn= "etternavn", erDød= false, adressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT).toPersonDTO()
+                val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                 val journalpostId =
-                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg, acr, innsendingsTidspunkt)
+                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg, acr, innsendingTidspunkt)
                 call.respondText(status = HttpStatusCode.Created, text = journalpostId)
             } catch (exception: Exception) {
                 when (exception) {
