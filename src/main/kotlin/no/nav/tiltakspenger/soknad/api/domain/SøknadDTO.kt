@@ -12,6 +12,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import no.nav.tiltakspenger.soknad.api.soknad.RegistrertBarn
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class Personopplysninger(
@@ -31,9 +32,10 @@ data class SøknadDTO(
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
     val personopplysninger: Personopplysninger,
+    val innsendingTidspunkt: LocalDateTime,
 ) {
     companion object {
-        fun toDTO(req: SpørsmålsbesvarelserDTO, fnr: String, person: PersonDTO, acr: String): SøknadDTO {
+        fun toDTO(req: SpørsmålsbesvarelserDTO, fnr: String, person: PersonDTO, acr: String, innsendingTidspunkt: LocalDateTime): SøknadDTO {
             return SøknadDTO(
                 kvalifiseringsprogram = Kvalifiseringsprogram(
                     deltar = req.kvalifiseringsprogram.deltar,
@@ -121,6 +123,7 @@ data class SøknadDTO(
                     etternavn = person.etternavn,
                 ),
                 acr = acr,
+                innsendingTidspunkt = innsendingTidspunkt,
             )
         }
     }
