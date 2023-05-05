@@ -64,6 +64,8 @@ internal class SpørsmålsbesvarelserDTOTest {
 
         val tiltak = """
         "tiltak": {
+            "arrangør": "test",
+            "type": "test",
             "aktivitetId": "123",
             "søkerHeleTiltaksperioden": false,
             "periode": {
@@ -92,6 +94,8 @@ internal class SpørsmålsbesvarelserDTOTest {
 
         val tiltak = """
         "tiltak": {
+            "arrangør": "test",
+            "type": "test",
             "aktivitetId": "123",
             "søkerHeleTiltaksperioden": false,
             "periode": {
@@ -122,6 +126,8 @@ internal class SpørsmålsbesvarelserDTOTest {
 
     private fun tiltak() = """
         "tiltak": {
+            "arrangør": "test",
+            "type": "test",
             "aktivitetId": "123",
             "søkerHeleTiltaksperioden": false,
             "periode": {

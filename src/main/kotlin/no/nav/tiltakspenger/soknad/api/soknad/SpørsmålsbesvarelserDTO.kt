@@ -40,6 +40,8 @@ data class Tiltak(
     val aktivitetId: String,
     val periode: Periode?,
     val søkerHeleTiltaksperioden: Boolean,
+    val arrangør: String,
+    val type: String,
 )
 
 data class Barnetillegg(

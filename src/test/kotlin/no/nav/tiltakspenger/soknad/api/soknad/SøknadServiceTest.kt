@@ -34,6 +34,8 @@ internal class SøknadServiceTest {
           "tiltak": {
             "aktivitetId": "123",
             "søkerHeleTiltaksperioden": false,
+            "arrangør": "test",
+            "type": "test",
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-01-01"

@@ -231,6 +231,8 @@ internal class JoarkClientTest {
                 ),
                 aktivitetId = "123",
                 søkerHeleTiltaksperioden = false,
+                arrangør = "test",
+                type = "test",
             ),
             etterlønn = Etterlønn(
                 mottarEllerSøktEtterlønn = false,
