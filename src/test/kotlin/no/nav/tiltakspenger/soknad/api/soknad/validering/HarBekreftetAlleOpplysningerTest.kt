@@ -7,7 +7,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import org.junit.jupiter.api.Test
 
 internal class HarBekreftetAlleOpplysningerTest {
-    
+
     @Test
     fun `happy case`() {
         deserialize<SpørsmålsbesvarelserDTO>(søknad()).valider() shouldBe emptyList()
