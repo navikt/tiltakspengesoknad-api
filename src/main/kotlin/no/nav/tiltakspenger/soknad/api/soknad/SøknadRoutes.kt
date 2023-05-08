@@ -33,7 +33,6 @@ fun Route.søknadRoutes(
             try {
                 val innsendingTidspunkt = LocalDateTime.now()
                 val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
-                // søknad.validerRequest()
                 avService.gjørVirussjekkAvVedlegg(vedlegg)
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                 val acr = call.acr() ?: "Ingen Level"

@@ -16,11 +16,12 @@ fun RequestValidationConfig.validateSøknad() {
     }
 }
 
-fun SpørsmålsbesvarelserDTO.validerRequest() {
+fun SpørsmålsbesvarelserDTO.validerRequest(): SpørsmålsbesvarelserDTO {
     val feilmeldinger = valider(this)
     if (feilmeldinger.isNotEmpty()) {
         throw RequestValidationException(this, feilmeldinger)
     }
+    return this
 }
 
 fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {

@@ -9,7 +9,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.CannotTransformContentToTypeException
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -60,9 +60,38 @@ internal class SøknadRoutesTest {
     }
 
     @Test
-    fun `post på soknad-endepunkt skal svare med 400 ved ugyldig søknad`() {
+    fun `post på soknad-endepunkt skal svare med 400 hvis taInnSøknadSomMultipart svarer med BadRequest`() {
         val søknadServiceMock = mockk<SøknadService>().also { mock ->
-            coEvery { mock.taInnSøknadSomMultipart(any()) } throwsMany listOf(BadRequestException("1"), UnrecognizedFormItemException("2"), MissingContentException("3"), mockk<CannotTransformContentToTypeException>(), UninitializedPropertyAccessException("4"))
+            coEvery { mock.taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
+        }
+
+        val token = issueTestToken()
+
+        testApplication {
+            configureTestApplication(søknadService = søknadServiceMock)
+            kotlin.runCatching {
+                val response = client.post("/soknad") {
+                    header("Authorization", "Bearer ${token.serialize()}")
+                    setBody(
+                        MultiPartFormDataContent(
+                            formData {},
+                            "WebAppBoundary",
+                            ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                        ),
+                    )
+                }
+                assertEquals(HttpStatusCode.BadRequest, response.status)
+            }
+        }
+    }
+
+    @Test
+    fun `post på soknad-endepunkt skal svare med 400 hvis søknadJson ikke er gyldig`() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } throws RequestValidationException(
+                "søknadJson",
+                listOf("Kvalifisering fra dato må være tidligere eller lik til dato"),
+            )
         }
 
         val token = issueTestToken()

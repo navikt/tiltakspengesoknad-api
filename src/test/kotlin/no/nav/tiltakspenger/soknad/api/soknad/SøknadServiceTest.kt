@@ -7,6 +7,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.append
 import io.ktor.http.content.MultiPartData
 import io.ktor.http.content.PartData
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.utils.io.core.Input
 import io.mockk.coEvery
 import io.mockk.every
@@ -16,10 +17,12 @@ import io.mockk.mockkStatic
 import kotlinx.coroutines.runBlocking
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.pdf.PdfService
+import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
 import no.nav.tiltakspenger.soknad.api.util.Detect
 import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class SøknadServiceTest {
     private val mockPdfService = mockk<PdfService>().also { mock ->
@@ -153,6 +156,42 @@ internal class SøknadServiceTest {
             val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(mockMultiPartData)
             assertEquals(søknad.tiltak.aktivitetId, "123")
             assertEquals(vedlegg.size, 2)
+        }
+    }
+
+    @Test
+    fun `taInnSøknadSomMultipart gir feil ved ugyldig søknad`() {
+        val input: Input = mockk()
+        every { input.endOfInput } returns true
+        justRun { input.release() }
+        mockkStatic("no.nav.tiltakspenger.soknad.api.util.DetectKt")
+        every { sjekkContentType(any()) } returns Detect.APPLICATON_PDF
+
+        val introduksjonsprogram = """
+            "introduksjonsprogram": {
+                "deltar": true,
+                "periode": {
+                  "fra": "2025-02-01",
+                  "til": "2025-01-01"
+                }
+              }
+        """.trimIndent()
+
+        val mockMultiPartData = MockMultiPartData(
+            mutableListOf(
+                PartData.FormItem(
+                    søknad(introduksjonsprogram = introduksjonsprogram),
+                    {},
+                    Headers.build {
+                        append(HttpHeaders.ContentType, "application/json")
+                        append(HttpHeaders.ContentDisposition, ContentDisposition("søknad", listOf(HeaderValueParam("name", "søknad"))))
+                    },
+                ),
+            ),
+        )
+
+        runBlocking {
+            assertThrows<RequestValidationException> { søknadService.taInnSøknadSomMultipart(mockMultiPartData) }
         }
     }
 }
