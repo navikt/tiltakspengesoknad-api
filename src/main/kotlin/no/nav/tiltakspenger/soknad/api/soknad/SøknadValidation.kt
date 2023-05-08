@@ -26,6 +26,10 @@ fun SpørsmålsbesvarelserDTO.validerRequest() {
 fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
     val feilmeldinger = mutableListOf<String>()
 
+    if (søknad.harBekreftetAlleOpplysninger == false) {
+        feilmeldinger.add("Bruker må bekrefte å ha oppgitt riktige opplysninger")
+    }
+
     if (søknad.kvalifiseringsprogram.deltar == false) {
         if (søknad.kvalifiseringsprogram.periode != null) {
             feilmeldinger.add("Kvalifisering uten deltagelse kan ikke ha noen periode")
