@@ -11,6 +11,7 @@ import no.nav.tiltakspenger.soknad.api.pdf.PdfService
 import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
 import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
+import java.time.LocalDateTime
 
 class SøknadServiceImpl(
     private val pdfService: PdfService,
@@ -22,8 +23,9 @@ class SøknadServiceImpl(
         person: PersonDTO,
         vedlegg: List<Vedlegg>,
         acr: String,
+        innsendingTidspunkt: LocalDateTime,
     ): String {
-        val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr)
+        val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr, innsendingTidspunkt)
         val pdf = pdfService.lagPdf(søknadDTO)
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         return joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer)
