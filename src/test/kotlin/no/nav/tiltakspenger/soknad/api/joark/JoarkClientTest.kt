@@ -258,6 +258,7 @@ internal class JoarkClientTest {
                 registrerteBarnSøktBarnetilleggFor = emptyList(),
             ),
             innsendingTidspunkt = LocalDateTime.now(),
+            harBekreftetAlleOpplysninger = true,
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
         vedlegg = listOf(

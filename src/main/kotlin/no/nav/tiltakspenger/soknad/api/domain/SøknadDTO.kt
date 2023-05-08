@@ -32,6 +32,7 @@ data class SøknadDTO(
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
     val personopplysninger: Personopplysninger,
+    val harBekreftetAlleOpplysninger: Boolean,
     val innsendingTidspunkt: LocalDateTime,
 ) {
     companion object {
@@ -129,6 +130,7 @@ data class SøknadDTO(
                     etternavn = person.etternavn,
                 ),
                 acr = acr,
+                harBekreftetAlleOpplysninger = req.harBekreftetAlleOpplysninger,
                 innsendingTidspunkt = innsendingTidspunkt,
             )
         }
