@@ -31,6 +31,7 @@ data class SøknadDTO(
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
     val personopplysninger: Personopplysninger,
+    val harBekreftetAlleOpplysninger: Boolean,
 ) {
     companion object {
         fun toDTO(req: SpørsmålsbesvarelserDTO, fnr: String, person: PersonDTO, acr: String): SøknadDTO {
@@ -119,6 +120,7 @@ data class SøknadDTO(
                     etternavn = person.etternavn,
                 ),
                 acr = acr,
+                harBekreftetAlleOpplysninger = req.harBekreftetAlleOpplysninger,
             )
         }
     }

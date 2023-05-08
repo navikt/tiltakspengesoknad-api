@@ -101,6 +101,7 @@ fun søknad(
           $institusjonsopphold,
           $introduksjonsprogram,
           $kvalifiseringsprogram,
-          $pensjonsordning
+          $pensjonsordning,
+          "harBekreftetAlleOpplysninger": true
         }
 """.trimMargin()

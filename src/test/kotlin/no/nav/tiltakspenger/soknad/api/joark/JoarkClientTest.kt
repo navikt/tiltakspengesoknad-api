@@ -254,6 +254,7 @@ internal class JoarkClientTest {
                 manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
                 registrerteBarnSøktBarnetilleggFor = emptyList(),
             ),
+            harBekreftetAlleOpplysninger = true,
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
         vedlegg = listOf(

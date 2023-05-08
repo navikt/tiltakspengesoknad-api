@@ -69,8 +69,12 @@ data class SpørsmålsbesvarelserDTO(
     val barnetillegg: Barnetillegg,
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
+    val harBekreftetAlleOpplysninger: Boolean,
 ) {
     init {
+        if (harBekreftetAlleOpplysninger == false) {
+            require(harBekreftetAlleOpplysninger == true) { "Bruker må bekrefte å ha oppgitt riktige opplysninger" }
+        }
         if (kvalifiseringsprogram.deltar == false) {
             require(kvalifiseringsprogram.periode == null) { "Kvalifisering uten deltagelse kan ikke ha noen periode" }
         } else {

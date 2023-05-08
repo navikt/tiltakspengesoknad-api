@@ -94,7 +94,8 @@ internal class SøknadServiceTest {
               "fra": "2025-01-01",
               "til": "2025-01-01"
             }
-          }
+          },
+          "harBekreftetAlleOpplysninger": true
         }
     """.trimMargin()
 

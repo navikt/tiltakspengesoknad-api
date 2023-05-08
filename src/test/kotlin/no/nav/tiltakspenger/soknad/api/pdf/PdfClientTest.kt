@@ -126,5 +126,6 @@ internal class PdfClientTest {
             manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
             registrerteBarnSøktBarnetilleggFor = emptyList(),
         ),
+        harBekreftetAlleOpplysninger = true,
     )
 }
