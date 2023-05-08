@@ -31,7 +31,7 @@ internal class IntroduksjonsprogramTest {
 
         shouldThrow<ValueInstantiationException> {
             deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = fraDatoEtterTil))
-        }.message shouldContain Regex("Introduksjonsprogram fra dato må være tidligere eller lik til dato")
+        }.message shouldContain "Introduksjonsprogram fra dato må være tidligere eller lik til dato"
     }
 
     @Test
@@ -48,7 +48,7 @@ internal class IntroduksjonsprogramTest {
 
         shouldThrow<ValueInstantiationException> {
             deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = periodeMedDeltarFalse))
-        }.message shouldContain Regex("Introduksjonsprogram uten deltagelse kan ikke ha noen periode")
+        }.message shouldContain "Introduksjonsprogram uten deltagelse kan ikke ha noen periode"
     }
 
     @Test
@@ -78,7 +78,7 @@ internal class IntroduksjonsprogramTest {
 
         shouldThrow<ValueInstantiationException> {
             deserialize<SpørsmålsbesvarelserDTO>(søknad(tiltak = tiltak, introduksjonsprogram = fraDatoTidligereEnnTiltakPeriode))
-        }.message shouldContain Regex("Introduksjonsprogram fra dato kan ikke være før fra dato på tiltaket")
+        }.message shouldContain "Introduksjonsprogram fra dato kan ikke være før fra dato på tiltaket"
     }
 
     @Test
@@ -108,7 +108,7 @@ internal class IntroduksjonsprogramTest {
 
         shouldThrow<ValueInstantiationException> {
             deserialize<SpørsmålsbesvarelserDTO>(søknad(tiltak = tiltak, introduksjonsprogram = fraDatoTidligereEnnTiltakPeriode))
-        }.message shouldContain Regex("Introduksjonsprogram til dato kan ikke være etter til dato på tiltaket")
+        }.message shouldContain "Introduksjonsprogram til dato kan ikke være etter til dato på tiltaket"
     }
 
     @Test
@@ -122,6 +122,6 @@ internal class IntroduksjonsprogramTest {
 
         shouldThrow<ValueInstantiationException> {
             deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = deltarTrueUtenPeriode))
-        }.message shouldContain Regex("Introduksjonsprogram med deltagelse må ha periode")
+        }.message shouldContain "Introduksjonsprogram med deltagelse må ha periode"
     }
 }
