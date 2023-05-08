@@ -45,11 +45,11 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
             ) {
                 feilmeldinger.add("Kvalifisering fra dato må være tidligere eller lik til dato")
             }
-            if (søknad.kvalifiseringsprogram.periode.fra.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Kvalifisering fra dato kan ikke være før fra dato på tiltaket")
+            if (søknad.kvalifiseringsprogram.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                feilmeldinger.add("Kvalifisering periode kan ikke være senere enn tiltakets periode")
             }
-            if (søknad.kvalifiseringsprogram.periode.til.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Kvalifisering til dato kan ikke være etter til dato på tiltaket")
+            if (søknad.kvalifiseringsprogram.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                feilmeldinger.add("Kvalifisering periode kan ikke være tidligere enn tiltakets periode")
             }
         }
     }
@@ -68,11 +68,11 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
             ) {
                 feilmeldinger.add("Introduksjonsprogram fra dato må være tidligere eller lik til dato")
             }
-            if (søknad.introduksjonsprogram.periode.fra.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Introduksjonsprogram fra dato kan ikke være før fra dato på tiltaket")
+            if (søknad.introduksjonsprogram.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                feilmeldinger.add("Introduksjonsprogram periode kan ikke være senere enn tiltakets periode")
             }
-            if (søknad.introduksjonsprogram.periode.til.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Introduksjonsprogram til dato kan ikke være etter til dato på tiltaket")
+            if (søknad.introduksjonsprogram.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                feilmeldinger.add("Introduksjonsprogram periode kan ikke være tidligere enn tiltakets periode")
             }
         }
     }

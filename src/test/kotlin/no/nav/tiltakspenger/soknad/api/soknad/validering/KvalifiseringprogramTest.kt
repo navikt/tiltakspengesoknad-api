@@ -45,8 +45,9 @@ internal class KvalifiseringprogramTest {
             .valider() shouldContain "Kvalifisering uten deltagelse kan ikke ha noen periode"
     }
 
+
     @Test
-    fun `kvalifiseringsprogram periode fra kan ikke være tidligere enn tiltakets periode`() {
+    fun `kvalifiseringsprogram periode kan starte tidligere enn tiltakets periode`() {
         val fraDatoTidligereEnnTiltakPeriode = """
             "kvalifiseringsprogram": {
                 "deltar": true,
@@ -59,50 +60,110 @@ internal class KvalifiseringprogramTest {
 
         val tiltak = """
         "tiltak": {
-            "arrangør": "test",
-            "type": "test",
             "aktivitetId": "123",
             "søkerHeleTiltaksperioden": false,
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-04-01"
-            }
+            },
+            "arrangør": "test",
+            "type": "test"
           }
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
             søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoTidligereEnnTiltakPeriode),
-        ).valider() shouldContain "Kvalifisering fra dato kan ikke være før fra dato på tiltaket"
+        ).valider() shouldBe emptyList()
     }
 
     @Test
-    fun `kvalifiseringsprogram periode til kan ikke være senere enn tiltakets periode`() {
-        val fraDatoTidligereEnnTiltakPeriode = """
+    fun `kvalifiseringsprogram periode kan slutte senere enn tiltakets periode`() {
+        val tilDatoSenereEnnTiltakPeriode = """
             "kvalifiseringsprogram": {
                 "deltar": true,
                 "periode": {
                   "fra": "2025-01-01",
-                  "til": "2025-05-01"
+                  "til": "2026-04-01"
                 }
               }
         """.trimIndent()
 
         val tiltak = """
         "tiltak": {
-            "arrangør": "test",
-            "type": "test",
             "aktivitetId": "123",
             "søkerHeleTiltaksperioden": false,
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-04-01"
-            }
+            },
+            "arrangør": "test",
+            "type": "test"
           }
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoTidligereEnnTiltakPeriode),
-        ).valider() shouldContain "Kvalifisering til dato kan ikke være etter til dato på tiltaket"
+            søknad(tiltak = tiltak, kvalifiseringsprogram = tilDatoSenereEnnTiltakPeriode),
+        ).valider() shouldBe emptyList()
+    }
+
+    @Test
+    fun `kvalifiseringsprogram periode til kan ikke være tidligere enn tiltakets periode`() {
+        val tilDatoTidligereEnnTiltakPeriode = """
+            "kvalifiseringsprogram": {
+                "deltar": true,
+                "periode": {
+                  "fra": "2024-01-01",
+                  "til": "2024-05-01"
+                }
+              }
+        """.trimIndent()
+
+        val tiltak = """
+        "tiltak": {
+            "aktivitetId": "123",
+            "søkerHeleTiltaksperioden": false,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-04-01"
+            },
+            "arrangør": "test",
+            "type": "test"
+          }
+        """.trimIndent()
+
+        deserialize<SpørsmålsbesvarelserDTO>(
+            søknad(tiltak = tiltak, kvalifiseringsprogram = tilDatoTidligereEnnTiltakPeriode),
+        ).valider() shouldContain "Kvalifisering periode kan ikke være tidligere enn tiltakets periode"
+    }
+
+    @Test
+    fun `kvalifiseringsprogram periode kan ikke være senere enn tiltakets periode`() {
+        val fraDatoSenereEnnTiltakPeriode = """
+            "kvalifiseringsprogram": {
+                "deltar": true,
+                "periode": {
+                  "fra": "2026-01-01",
+                  "til": "2026-05-01"
+                }
+              }
+        """.trimIndent()
+
+        val tiltak = """
+        "tiltak": {
+            "aktivitetId": "123",
+            "søkerHeleTiltaksperioden": false,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-04-01"
+            },
+            "arrangør": "test",
+            "type": "test"
+          }
+        """.trimIndent()
+
+        deserialize<SpørsmålsbesvarelserDTO>(
+            søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoSenereEnnTiltakPeriode),
+        ).valider() shouldContain "Kvalifisering periode kan ikke være senere enn tiltakets periode"
     }
 
     @Test
