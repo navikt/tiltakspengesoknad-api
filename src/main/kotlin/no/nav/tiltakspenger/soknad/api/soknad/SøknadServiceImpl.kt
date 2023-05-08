@@ -23,7 +23,7 @@ class SøknadServiceImpl(
         person: PersonDTO,
         vedlegg: List<Vedlegg>,
         acr: String,
-        innsendingTidspunkt: LocalDateTime
+        innsendingTidspunkt: LocalDateTime,
     ): String {
         val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr, innsendingTidspunkt)
         val pdf = pdfService.lagPdf(søknadDTO)

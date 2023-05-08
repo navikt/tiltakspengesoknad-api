@@ -129,6 +129,6 @@ internal class PdfClientTest {
             manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
             registrerteBarnSøktBarnetilleggFor = emptyList(),
         ),
-        innsendingTidspunkt = LocalDateTime.now()
+        innsendingTidspunkt = LocalDateTime.now(),
     )
 }
