@@ -45,7 +45,6 @@ internal class KvalifiseringprogramTest {
             .valider() shouldContain "Kvalifisering uten deltagelse kan ikke ha noen periode"
     }
 
-
     @Test
     fun `kvalifiseringsprogram periode kan starte tidligere enn tiltakets periode`() {
         val fraDatoTidligereEnnTiltakPeriode = """
