@@ -27,6 +27,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 internal class JoarkClientTest {
     private val journalpostId = "1"
@@ -231,6 +232,8 @@ internal class JoarkClientTest {
                 ),
                 aktivitetId = "123",
                 søkerHeleTiltaksperioden = false,
+                arrangør = "test",
+                type = "test",
             ),
             etterlønn = Etterlønn(
                 mottarEllerSøktEtterlønn = false,
@@ -254,6 +257,7 @@ internal class JoarkClientTest {
                 manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
                 registrerteBarnSøktBarnetilleggFor = emptyList(),
             ),
+            innsendingTidspunkt = LocalDateTime.now(),
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
         vedlegg = listOf(

@@ -70,7 +70,9 @@ internal class IntroduksjonsprogramTest {
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-04-01"
-            }
+            },
+            "arrangør": "test",
+            "type": "test"
           }
         """.trimIndent()
 
@@ -98,7 +100,9 @@ internal class IntroduksjonsprogramTest {
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-04-01"
-            }
+            },
+            "arrangør": "test",
+            "type": "test"
           }
         """.trimIndent()
 

@@ -24,6 +24,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 internal class PdfClientTest {
 
@@ -103,6 +104,8 @@ internal class PdfClientTest {
             ),
             aktivitetId = "123",
             søkerHeleTiltaksperioden = false,
+            arrangør = "test",
+            type = "test",
         ),
         etterlønn = Etterlønn(
             mottarEllerSøktEtterlønn = false,
@@ -126,5 +129,6 @@ internal class PdfClientTest {
             manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
             registrerteBarnSøktBarnetilleggFor = emptyList(),
         ),
+        innsendingTidspunkt = LocalDateTime.now(),
     )
 }

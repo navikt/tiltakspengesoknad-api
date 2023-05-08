@@ -7,7 +7,9 @@ private fun tiltak() = """
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-01-01"
-            }
+            },
+            "arrangør": "test",
+            "type": "test"
           }
 """.trimIndent()
 

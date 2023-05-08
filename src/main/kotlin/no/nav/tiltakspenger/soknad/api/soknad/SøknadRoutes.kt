@@ -18,6 +18,7 @@ import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.token
+import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
 
@@ -29,6 +30,7 @@ fun Route.søknadRoutes(
     route(SØKNAD_PATH) {
         post {
             try {
+                val innsendingTidspunkt = LocalDateTime.now()
                 val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
                 avService.gjørVirussjekkAvVedlegg(vedlegg)
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
@@ -36,7 +38,7 @@ fun Route.søknadRoutes(
                 val subjectToken = call.token()
                 val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                 val journalpostId =
-                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg, acr)
+                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg, acr, innsendingTidspunkt)
                 call.respondText(status = HttpStatusCode.Created, text = journalpostId)
             } catch (exception: Exception) {
                 when (exception) {
