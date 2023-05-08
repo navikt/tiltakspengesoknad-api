@@ -1,4 +1,5 @@
 package no.nav.tiltakspenger.soknad.api.soknad
+
 import java.time.LocalDate
 
 data class Periode(
@@ -38,7 +39,7 @@ data class Institusjonsopphold(
 
 data class Tiltak(
     val aktivitetId: String,
-    val periode: Periode?,
+    val periode: Periode,
     val søkerHeleTiltaksperioden: Boolean,
     val arrangør: String,
     val type: String,
@@ -73,29 +74,5 @@ data class SpørsmålsbesvarelserDTO(
     val etterlønn: Etterlønn,
     val harBekreftetAlleOpplysninger: Boolean,
 ) {
-    init {
-        if (harBekreftetAlleOpplysninger == false) {
-            require(harBekreftetAlleOpplysninger == true) { "Bruker må bekrefte å ha oppgitt riktige opplysninger" }
-        }
-        if (kvalifiseringsprogram.deltar == false) {
-            require(kvalifiseringsprogram.periode == null) { "Kvalifisering uten deltagelse kan ikke ha noen periode" }
-        } else {
-            require(kvalifiseringsprogram.periode != null) { "Kvalifisering med deltagelse må ha periode" }
-            require(kvalifiseringsprogram.periode.fra.isBefore(kvalifiseringsprogram.periode.til.plusDays(1))) { "Kvalifisering fra dato må være tidligere eller lik til dato" }
-            if (tiltak.periode != null) { // kan denne være null??
-                require(!kvalifiseringsprogram.periode.fra.isBefore(tiltak.periode.fra)) { "Kvalifisering fra dato kan ikke være før fra dato på tiltaket" }
-                require(!kvalifiseringsprogram.periode.til.isAfter(tiltak.periode.til)) { "Kvalifisering til dato kan ikke være etter til dato på tiltaket" }
-            }
-        }
-        if (introduksjonsprogram.deltar == false) {
-            require(introduksjonsprogram.periode == null) { "Introduksjonsprogram uten deltagelse kan ikke ha noen periode" }
-        } else {
-            require(introduksjonsprogram.periode != null) { "Introduksjonsprogram med deltagelse må ha periode" }
-            require(introduksjonsprogram.periode.fra.isBefore(introduksjonsprogram.periode.til.plusDays(1))) { "Introduksjonsprogram fra dato må være tidligere eller lik til dato" }
-            if (tiltak.periode != null) { // kan denne være null??
-                require(!introduksjonsprogram.periode.fra.isBefore(tiltak.periode.fra)) { "Introduksjonsprogram fra dato kan ikke være før fra dato på tiltaket" }
-                require(!introduksjonsprogram.periode.til.isAfter(tiltak.periode.til)) { "Introduksjonsprogram til dato kan ikke være etter til dato på tiltaket" }
-            }
-        }
-    }
+    fun valider(): List<String> = valider(this)
 }

@@ -36,7 +36,13 @@ data class SøknadDTO(
     val innsendingTidspunkt: LocalDateTime,
 ) {
     companion object {
-        fun toDTO(req: SpørsmålsbesvarelserDTO, fnr: String, person: PersonDTO, acr: String, innsendingTidspunkt: LocalDateTime): SøknadDTO {
+        fun toDTO(
+            req: SpørsmålsbesvarelserDTO,
+            fnr: String,
+            person: PersonDTO,
+            acr: String,
+            innsendingTidspunkt: LocalDateTime,
+        ): SøknadDTO {
             return SøknadDTO(
                 kvalifiseringsprogram = Kvalifiseringsprogram(
                     deltar = req.kvalifiseringsprogram.deltar,
@@ -67,7 +73,7 @@ data class SøknadDTO(
                 ),
                 tiltak = Tiltak(
                     aktivitetId = req.tiltak.aktivitetId,
-                    periode = req.tiltak.periode?.let {
+                    periode = req.tiltak.periode.let {
                         Periode(
                             fra = it.fra,
                             til = it.til,

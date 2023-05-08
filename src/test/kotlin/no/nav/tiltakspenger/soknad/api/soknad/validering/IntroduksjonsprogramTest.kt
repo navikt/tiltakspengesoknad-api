@@ -1,9 +1,8 @@
 package no.nav.tiltakspenger.soknad.api.soknad.validering
 
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException
-import io.kotest.assertions.throwables.shouldNotThrowAny
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import org.junit.jupiter.api.Test
@@ -12,9 +11,7 @@ internal class IntroduksjonsprogramTest {
 
     @Test
     fun `happy case`() {
-        shouldNotThrowAny {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad())
-        }
+        deserialize<SpørsmålsbesvarelserDTO>(søknad()).valider() shouldBe emptyList()
     }
 
     @Test
@@ -29,9 +26,8 @@ internal class IntroduksjonsprogramTest {
               }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = fraDatoEtterTil))
-        }.message shouldContain Regex("Introduksjonsprogram fra dato må være tidligere eller lik til dato")
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = fraDatoEtterTil))
+            .valider() shouldContain "Introduksjonsprogram fra dato må være tidligere eller lik til dato"
     }
 
     @Test
@@ -46,9 +42,8 @@ internal class IntroduksjonsprogramTest {
               }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = periodeMedDeltarFalse))
-        }.message shouldContain Regex("Introduksjonsprogram uten deltagelse kan ikke ha noen periode")
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = periodeMedDeltarFalse))
+            .valider() shouldContain "Introduksjonsprogram uten deltagelse kan ikke ha noen periode"
     }
 
     @Test
@@ -76,9 +71,9 @@ internal class IntroduksjonsprogramTest {
           }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(tiltak = tiltak, introduksjonsprogram = fraDatoTidligereEnnTiltakPeriode))
-        }.message shouldContain Regex("Introduksjonsprogram fra dato kan ikke være før fra dato på tiltaket")
+        deserialize<SpørsmålsbesvarelserDTO>(
+            søknad(tiltak = tiltak, introduksjonsprogram = fraDatoTidligereEnnTiltakPeriode),
+        ).valider() shouldContain "Introduksjonsprogram fra dato kan ikke være før fra dato på tiltaket"
     }
 
     @Test
@@ -106,9 +101,9 @@ internal class IntroduksjonsprogramTest {
           }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(tiltak = tiltak, introduksjonsprogram = fraDatoTidligereEnnTiltakPeriode))
-        }.message shouldContain Regex("Introduksjonsprogram til dato kan ikke være etter til dato på tiltaket")
+        deserialize<SpørsmålsbesvarelserDTO>(
+            søknad(tiltak = tiltak, introduksjonsprogram = fraDatoTidligereEnnTiltakPeriode),
+        ).valider() shouldContain "Introduksjonsprogram til dato kan ikke være etter til dato på tiltaket"
     }
 
     @Test
@@ -120,8 +115,32 @@ internal class IntroduksjonsprogramTest {
               }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = deltarTrueUtenPeriode))
-        }.message shouldContain Regex("Introduksjonsprogram med deltagelse må ha periode")
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = deltarTrueUtenPeriode))
+            .valider() shouldContain "Introduksjonsprogram med deltagelse må ha periode"
+    }
+
+    @Test
+    fun `introduksjonsprogram OG kvalifiseringsprogrammet med deltar = true må ha en periode`() {
+        val deltarIntroTrueUtenPeriode = """
+            "introduksjonsprogram": {
+                "deltar": true,
+                "periode": null
+              }
+        """.trimIndent()
+
+        val deltarKvpTrueUtenPeriode = """
+            "kvalifiseringsprogram": {
+                "deltar": true,
+                "periode": null
+              }
+        """.trimIndent()
+
+        deserialize<SpørsmålsbesvarelserDTO>(
+            søknad(kvalifiseringsprogram = deltarKvpTrueUtenPeriode, introduksjonsprogram = deltarIntroTrueUtenPeriode),
+        )
+            .valider() shouldContainExactlyInAnyOrder listOf(
+            "Kvalifisering med deltagelse må ha periode",
+            "Introduksjonsprogram med deltagelse må ha periode",
+        )
     }
 }
