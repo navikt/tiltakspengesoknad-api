@@ -1,6 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
 import io.ktor.server.plugins.requestvalidation.RequestValidationConfig
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.plugins.requestvalidation.ValidationResult
 
 fun RequestValidationConfig.validateSøknad() {
@@ -12,6 +13,13 @@ fun RequestValidationConfig.validateSøknad() {
         } else {
             ValidationResult.Invalid(feilmeldinger)
         }
+    }
+}
+
+fun SpørsmålsbesvarelserDTO.validerRequest() {
+    val feilmeldinger = valider(this)
+    if (feilmeldinger.isNotEmpty()) {
+        throw RequestValidationException(this, feilmeldinger)
     }
 }
 

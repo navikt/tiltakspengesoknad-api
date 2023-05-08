@@ -5,6 +5,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
@@ -32,13 +33,21 @@ fun Route.søknadRoutes(
             try {
                 val innsendingTidspunkt = LocalDateTime.now()
                 val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
+                // søknad.validerRequest()
                 avService.gjørVirussjekkAvVedlegg(vedlegg)
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                 val acr = call.acr() ?: "Ingen Level"
                 val subjectToken = call.token()
                 val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
                 val journalpostId =
-                    søknadService.opprettDokumenterOgArkiverIJoark(søknad, fødselsnummer, person, vedlegg, acr, innsendingTidspunkt)
+                    søknadService.opprettDokumenterOgArkiverIJoark(
+                        søknad,
+                        fødselsnummer,
+                        person,
+                        vedlegg,
+                        acr,
+                        innsendingTidspunkt,
+                    )
                 call.respondText(status = HttpStatusCode.Created, text = journalpostId)
             } catch (exception: Exception) {
                 when (exception) {
@@ -48,6 +57,7 @@ fun Route.søknadRoutes(
                     is UnrecognizedFormItemException,
                     is MalwareFoundException,
                     is UninitializedPropertyAccessException,
+                    is RequestValidationException,
                     -> {
                         LOG.error("Ugyldig søknad", exception)
                         call.respondText(
@@ -56,6 +66,7 @@ fun Route.søknadRoutes(
                             status = HttpStatusCode.BadRequest,
                         )
                     }
+
                     else -> {
                         LOG.error("Noe gikk galt ved post av søknad", exception)
                         call.respondText(
