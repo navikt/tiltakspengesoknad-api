@@ -1,9 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.soknad.validering
 
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException
-import io.kotest.assertions.throwables.shouldNotThrowAny
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import org.junit.jupiter.api.Test
@@ -12,9 +10,7 @@ internal class KvalifiseringprogramTest {
 
     @Test
     fun `happy case`() {
-        shouldNotThrowAny {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad())
-        }
+        deserialize<SpørsmålsbesvarelserDTO>(søknad()).valider() shouldBe emptyList()
     }
 
     @Test
@@ -29,9 +25,8 @@ internal class KvalifiseringprogramTest {
               }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = fraDatoEtterTil))
-        }.message shouldContain "Kvalifisering fra dato må være tidligere eller lik til dato"
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = fraDatoEtterTil))
+            .valider() shouldContain "Kvalifisering fra dato må være tidligere eller lik til dato"
     }
 
     @Test
@@ -46,9 +41,8 @@ internal class KvalifiseringprogramTest {
               }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = periodeMedDeltarFalse))
-        }.message shouldContain "Kvalifisering uten deltagelse kan ikke ha noen periode"
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = periodeMedDeltarFalse))
+            .valider() shouldContain "Kvalifisering uten deltagelse kan ikke ha noen periode"
     }
 
     @Test
@@ -76,9 +70,9 @@ internal class KvalifiseringprogramTest {
           }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoTidligereEnnTiltakPeriode))
-        }.message shouldContain "Kvalifisering fra dato kan ikke være før fra dato på tiltaket"
+        deserialize<SpørsmålsbesvarelserDTO>(
+            søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoTidligereEnnTiltakPeriode),
+        ).valider() shouldContain "Kvalifisering fra dato kan ikke være før fra dato på tiltaket"
     }
 
     @Test
@@ -106,9 +100,9 @@ internal class KvalifiseringprogramTest {
           }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoTidligereEnnTiltakPeriode))
-        }.message shouldContain "Kvalifisering til dato kan ikke være etter til dato på tiltaket"
+        deserialize<SpørsmålsbesvarelserDTO>(
+            søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoTidligereEnnTiltakPeriode),
+        ).valider() shouldContain "Kvalifisering til dato kan ikke være etter til dato på tiltaket"
     }
 
     @Test
@@ -120,8 +114,7 @@ internal class KvalifiseringprogramTest {
               }
         """.trimIndent()
 
-        shouldThrow<ValueInstantiationException> {
-            deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = deltarTrueUtenPeriode))
-        }.message shouldContain "Kvalifisering med deltagelse må ha periode"
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = deltarTrueUtenPeriode))
+            .valider() shouldContain "Kvalifisering med deltagelse må ha periode"
     }
 }

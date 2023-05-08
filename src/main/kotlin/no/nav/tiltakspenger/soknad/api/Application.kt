@@ -11,6 +11,7 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.request.httpMethod
 import io.ktor.server.request.path
 import io.ktor.server.routing.routing
@@ -31,6 +32,7 @@ import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
+import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
 
@@ -99,9 +101,9 @@ fun Application.soknadApi(
     )
     installJacksonFeature()
 
-//    install(RequestValidation) {
-//        validateSøknad()
-//    }
+    install(RequestValidation) {
+        validateSøknad()
+    }
 
     environment.monitor.subscribe(ApplicationStarted) {
         log.info { "Starter server" }
