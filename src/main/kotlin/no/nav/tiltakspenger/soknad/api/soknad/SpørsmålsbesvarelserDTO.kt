@@ -83,5 +83,15 @@ data class SpørsmålsbesvarelserDTO(
                 require(!kvalifiseringsprogram.periode.til.isAfter(tiltak.periode.til)) { "Kvalifisering til dato kan ikke være etter til dato på tiltaket" }
             }
         }
+        if (introduksjonsprogram.deltar == false) {
+            require(introduksjonsprogram.periode == null) { "Introduksjonsprogram uten deltagelse kan ikke ha noen periode" }
+        } else {
+            require(introduksjonsprogram.periode != null) { "Introduksjonsprogram med deltagelse må ha periode" }
+            require(introduksjonsprogram.periode.fra.isBefore(introduksjonsprogram.periode.til.plusDays(1))) { "Introduksjonsprogram fra dato må være tidligere eller lik til dato" }
+            if (tiltak.periode != null) { // kan denne være null??
+                require(!introduksjonsprogram.periode.fra.isBefore(tiltak.periode.fra)) { "Introduksjonsprogram fra dato kan ikke være før fra dato på tiltaket" }
+                require(!introduksjonsprogram.periode.til.isAfter(tiltak.periode.til)) { "Introduksjonsprogram til dato kan ikke være etter til dato på tiltaket" }
+            }
+        }
     }
 }

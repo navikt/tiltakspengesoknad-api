@@ -1,13 +1,14 @@
-package no.nav.tiltakspenger.soknad.api.soknad
+package no.nav.tiltakspenger.soknad.api.soknad.validering
 
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.string.shouldContain
 import no.nav.tiltakspenger.soknad.api.deserialize
+import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import org.junit.jupiter.api.Test
 
-internal class SpørsmålsbesvarelserDTOTest {
+internal class KvalifiseringprogramTest {
 
     @Test
     fun `happy case`() {
@@ -56,7 +57,7 @@ internal class SpørsmålsbesvarelserDTOTest {
             "kvalifiseringsprogram": {
                 "deltar": true,
                 "periode": {
-                  "fra": "2025-01-01",
+                  "fra": "2024-01-01",
                   "til": "2025-04-01"
                 }
               }
@@ -69,7 +70,7 @@ internal class SpørsmålsbesvarelserDTOTest {
             "aktivitetId": "123",
             "søkerHeleTiltaksperioden": false,
             "periode": {
-              "fra": "2025-02-01",
+              "fra": "2025-01-01",
               "til": "2025-04-01"
             }
           }
