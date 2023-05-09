@@ -77,5 +77,28 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         }
     }
 
+    if (søknad.institusjonsopphold.borPåInstitusjon == false) {
+        if (søknad.institusjonsopphold.periode != null) {
+            feilmeldinger.add("Institusjonsopphold uten deltagelse kan ikke ha noen periode")
+        }
+    } else {
+        if (søknad.institusjonsopphold.periode == null) {
+            feilmeldinger.add("Institusjonsopphold med deltagelse må ha periode")
+        } else {
+            if (!søknad.institusjonsopphold.periode.fra.isBefore(
+                    søknad.institusjonsopphold.periode.til.plusDays(1),
+                )
+            ) {
+                feilmeldinger.add("Institusjonsopphold fra dato må være tidligere eller lik til dato")
+            }
+            if (søknad.institusjonsopphold.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                feilmeldinger.add("Institusjonsopphold periode kan ikke være senere enn tiltakets periode")
+            }
+            if (søknad.institusjonsopphold.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                feilmeldinger.add("Institusjonsopphold periode kan ikke være tidligere enn tiltakets periode")
+            }
+        }
+    }
+
     return feilmeldinger
 }
