@@ -7,7 +7,7 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.request.receiveMultipart
-import io.ktor.server.response.respondText
+import io.ktor.server.response.*
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -28,8 +28,7 @@ fun Route.søknadRoutes(
     avService: AvService,
     pdlService: PdlService,
 ) {
-    route(SØKNAD_PATH) {
-        post {
+    post(SØKNAD_PATH) {
             try {
                 val innsendingTidspunkt = LocalDateTime.now()
                 val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
@@ -48,7 +47,11 @@ fun Route.søknadRoutes(
                         acr,
                         innsendingTidspunkt,
                     )
-                call.respondText(status = HttpStatusCode.Created, text = journalpostId)
+                val søknadResponse = SøknadResponse(
+                    journalpostId = journalpostId,
+                    innsendingTidspunkt = innsendingTidspunkt
+                )
+                call.respond(status = HttpStatusCode.Created, message = søknadResponse)
             } catch (exception: Exception) {
                 when (exception) {
                     is CannotTransformContentToTypeException,
@@ -77,6 +80,5 @@ fun Route.søknadRoutes(
                     }
                 }
             }
-        }
     }.also { LOG.info { "satt opp endepunkt /soknad" } }
 }

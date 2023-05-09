@@ -7,13 +7,14 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import mu.KotlinLogging
+import no.nav.tiltakspenger.soknad.api.TILTAK_PATH
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.token
 
 fun Route.tiltakRoutes(tiltakService: TiltakService) {
     val secureLog = KotlinLogging.logger("tjenestekall")
 
-    get(path = "/tiltak") {
+    get(TILTAK_PATH) {
         try {
             val fødselsnummer = call.fødselsnummer()
             val subjectToken = call.token()

@@ -14,7 +14,7 @@ import no.nav.tiltakspenger.soknad.api.token
 val secureLog = KotlinLogging.logger("tjenestekall")
 
 fun Route.pdlRoutes(pdlService: PdlService) {
-    get(path = PERSONALIA_PATH) {
+    get(PERSONALIA_PATH) {
         try {
             val fødselsnummer = call.fødselsnummer()
             val subjectToken = call.token()
