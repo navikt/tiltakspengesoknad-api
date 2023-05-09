@@ -87,6 +87,10 @@ private fun pensjonsordning() = """
           }
 """.trimIndent()
 
+private fun harBekreftetAlleOpplysninger(svar: Boolean) = """
+    "harBekreftetAlleOpplysninger": $svar
+""".trimIndent()
+
 fun søknad(
     tiltak: String = tiltak(),
     barneTillegg: String = barnetillegg(),
@@ -95,6 +99,7 @@ fun søknad(
     introduksjonsprogram: String = introduksjonsprogram(),
     kvalifiseringsprogram: String = kvalifiseringsprogram(),
     pensjonsordning: String = pensjonsordning(),
+    harBekreftetAlleOpplysningerSvar: Boolean = true,
 ) = """
         {
           $tiltak,
@@ -103,6 +108,7 @@ fun søknad(
           $institusjonsopphold,
           $introduksjonsprogram,
           $kvalifiseringsprogram,
-          $pensjonsordning
+          $pensjonsordning,
+          ${harBekreftetAlleOpplysninger(harBekreftetAlleOpplysningerSvar)}
         }
 """.trimMargin()

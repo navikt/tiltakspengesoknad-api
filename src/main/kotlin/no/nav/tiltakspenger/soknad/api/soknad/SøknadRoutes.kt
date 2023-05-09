@@ -32,7 +32,6 @@ fun Route.søknadRoutes(
             try {
                 val innsendingTidspunkt = LocalDateTime.now()
                 val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
-                // søknad.validerRequest()
                 avService.gjørVirussjekkAvVedlegg(vedlegg)
                 val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
                 val acr = call.acr() ?: "Ingen Level"
@@ -62,7 +61,7 @@ fun Route.søknadRoutes(
                     is UninitializedPropertyAccessException,
                     is RequestValidationException,
                     -> {
-                        LOG.error("Ugyldig søknad", exception)
+                        LOG.error("Ugyldig søknad ${exception.message}", exception)
                         call.respondText(
                             text = "Bad Request",
                             contentType = ContentType.Text.Plain,
@@ -71,7 +70,7 @@ fun Route.søknadRoutes(
                     }
 
                     else -> {
-                        LOG.error("Noe gikk galt ved post av søknad", exception)
+                        LOG.error("Noe gikk galt ved post av søknad ${exception.message}", exception)
                         call.respondText(
                             text = "Internal server error",
                             contentType = ContentType.Text.Plain,

@@ -62,7 +62,7 @@ fun PartData.FileItem.toVedlegg(): Vedlegg {
 
 fun PartData.FormItem.toSpørsmålsbesvarelser(): SpørsmålsbesvarelserDTO {
     if (this.name == "søknad") {
-        return deserialize(this.value)
+        return deserialize<SpørsmålsbesvarelserDTO>(this.value).validerRequest()
     }
     throw UnrecognizedFormItemException(message = "Recieved multipart form with unknown key ${this.name}")
 }

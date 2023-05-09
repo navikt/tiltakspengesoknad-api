@@ -7,7 +7,7 @@ import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import org.junit.jupiter.api.Test
 
-internal class IntroduksjonsprogramTest {
+internal class PensjonsordningTest {
 
     @Test
     fun `happy case`() {
@@ -15,10 +15,11 @@ internal class IntroduksjonsprogramTest {
     }
 
     @Test
-    fun `introduksjonsprogram periode fra må være lik eller før fra dato`() {
+    fun `pensjonsordning periode fra må være lik eller før fra dato`() {
         val fraDatoEtterTil = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "pensjonsordning": {
+                "mottarEllerSøktPensjonsordning": true,
+                "utbetaler": "En som betaler pensjon",
                 "periode": {
                   "fra": "2025-02-01",
                   "til": "2025-01-01"
@@ -26,15 +27,16 @@ internal class IntroduksjonsprogramTest {
               }
         """.trimIndent()
 
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = fraDatoEtterTil))
-            .valider() shouldContain "Introduksjonsprogram fra dato må være tidligere eller lik til dato"
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(pensjonsordning = fraDatoEtterTil))
+            .valider() shouldContain "Pensjonsordning fra dato må være tidligere eller lik til dato"
     }
 
     @Test
-    fun `introduksjonsprogram med deltar = false skal ikke ha en periode`() {
+    fun `pensjonsordning med mottarEllerSøktPensjonsordning = false skal ikke ha en periode eller utbetaler`() {
         val periodeMedDeltarFalse = """
-            "introduksjonsprogram": {
-                "deltar": false,
+            "pensjonsordning": {
+                "mottarEllerSøktPensjonsordning": false,
+                "utbetaler": "En som betaler pensjon",
                 "periode": {
                   "fra": "2025-02-01",
                   "til": "2025-01-01"
@@ -42,15 +44,19 @@ internal class IntroduksjonsprogramTest {
               }
         """.trimIndent()
 
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = periodeMedDeltarFalse))
-            .valider() shouldContain "Introduksjonsprogram uten deltagelse kan ikke ha noen periode"
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(pensjonsordning = periodeMedDeltarFalse))
+            .valider() shouldContainExactlyInAnyOrder listOf(
+            "En som ikke mottar pensjon kan ikke ha periode",
+            "En som ikke mottar pensjon kan ikke ha en utbetaler",
+        )
     }
 
     @Test
-    fun `introduksjonsprogram periode kan starte tidligere enn tiltakets periode`() {
+    fun `pensjonsordning periode kan starte tidligere enn tiltakets periode`() {
         val fraDatoTidligereEnnTiltakPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "pensjonsordning": {
+                "mottarEllerSøktPensjonsordning": true,
+                "utbetaler": "En som betaler pensjon",
                 "periode": {
                   "fra": "2024-01-01",
                   "til": "2025-04-01"
@@ -72,15 +78,16 @@ internal class IntroduksjonsprogramTest {
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, introduksjonsprogram = fraDatoTidligereEnnTiltakPeriode),
+            søknad(tiltak = tiltak, pensjonsordning = fraDatoTidligereEnnTiltakPeriode),
         ).valider() shouldBe emptyList()
     }
 
     @Test
-    fun `introduksjonsprogram periode kan slutte senere enn tiltakets periode`() {
+    fun `pensjonsordning periode kan slutte senere enn tiltakets periode`() {
         val tilDatoSenereEnnTiltakPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "pensjonsordning": {
+                "mottarEllerSøktPensjonsordning": true,
+                "utbetaler": "En som betaler pensjon",
                 "periode": {
                   "fra": "2025-01-01",
                   "til": "2026-04-01"
@@ -102,15 +109,16 @@ internal class IntroduksjonsprogramTest {
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, introduksjonsprogram = tilDatoSenereEnnTiltakPeriode),
+            søknad(tiltak = tiltak, pensjonsordning = tilDatoSenereEnnTiltakPeriode),
         ).valider() shouldBe emptyList()
     }
 
     @Test
-    fun `introduksjonsprogram periode til kan ikke være tidligere enn tiltakets periode`() {
+    fun `pensjonsordning periode til kan ikke være tidligere enn tiltakets periode`() {
         val tilDatoTidligereEnnTiltakPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "pensjonsordning": {
+                "mottarEllerSøktPensjonsordning": true,
+                "utbetaler": "En som betaler pensjon",
                 "periode": {
                   "fra": "2024-01-01",
                   "til": "2024-05-01"
@@ -132,15 +140,16 @@ internal class IntroduksjonsprogramTest {
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, introduksjonsprogram = tilDatoTidligereEnnTiltakPeriode),
-        ).valider() shouldContain "Introduksjonsprogram periode kan ikke være tidligere enn tiltakets periode"
+            søknad(tiltak = tiltak, pensjonsordning = tilDatoTidligereEnnTiltakPeriode),
+        ).valider() shouldContain "Pensjonsordning periode kan ikke være tidligere enn tiltakets periode"
     }
 
     @Test
-    fun `introduksjonsprogram periode kan ikke være senere enn tiltakets periode`() {
+    fun `pensjonsordning periode kan ikke være senere enn tiltakets periode`() {
         val fraDatoSenereEnnTiltakPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "pensjonsordning": {
+                "mottarEllerSøktPensjonsordning": true,
+                "utbetaler": "En som betaler pensjon",
                 "periode": {
                   "fra": "2026-01-01",
                   "til": "2026-05-01"
@@ -162,45 +171,24 @@ internal class IntroduksjonsprogramTest {
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, introduksjonsprogram = fraDatoSenereEnnTiltakPeriode),
-        ).valider() shouldContain "Introduksjonsprogram periode kan ikke være senere enn tiltakets periode"
+            søknad(tiltak = tiltak, pensjonsordning = fraDatoSenereEnnTiltakPeriode),
+        ).valider() shouldContain "Pensjonsordning periode kan ikke være senere enn tiltakets periode"
     }
 
     @Test
-    fun `introduksjonsprogram med deltar = true må ha en periode`() {
+    fun `pensjonsordning med mottarEllerSøktPensjonsordning = true må ha en periode og en utbetaler`() {
         val deltarTrueUtenPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "pensjonsordning": {
+                "mottarEllerSøktPensjonsordning": true,
+                "utbetaler": null,
                 "periode": null
               }
         """.trimIndent()
 
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = deltarTrueUtenPeriode))
-            .valider() shouldContain "Introduksjonsprogram med deltagelse må ha periode"
-    }
-
-    @Test
-    fun `introduksjonsprogram OG kvalifiseringsprogrammet med deltar = true må ha en periode`() {
-        val deltarIntroTrueUtenPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
-                "periode": null
-              }
-        """.trimIndent()
-
-        val deltarKvpTrueUtenPeriode = """
-            "kvalifiseringsprogram": {
-                "deltar": true,
-                "periode": null
-              }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(kvalifiseringsprogram = deltarKvpTrueUtenPeriode, introduksjonsprogram = deltarIntroTrueUtenPeriode),
-        )
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(pensjonsordning = deltarTrueUtenPeriode))
             .valider() shouldContainExactlyInAnyOrder listOf(
-            "Kvalifisering med deltagelse må ha periode",
-            "Introduksjonsprogram med deltagelse må ha periode",
+            "En som mottar pensjon må ha periode",
+            "En som mottar pensjon må ha en utbetaler",
         )
     }
 }

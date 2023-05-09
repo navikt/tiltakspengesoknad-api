@@ -1,13 +1,12 @@
 package no.nav.tiltakspenger.soknad.api.soknad.validering
 
 import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import org.junit.jupiter.api.Test
 
-internal class IntroduksjonsprogramTest {
+internal class InstitusjonsoppholdTest {
 
     @Test
     fun `happy case`() {
@@ -15,10 +14,10 @@ internal class IntroduksjonsprogramTest {
     }
 
     @Test
-    fun `introduksjonsprogram periode fra må være lik eller før fra dato`() {
+    fun `institusjonsopphold periode fra må være lik eller før fra dato`() {
         val fraDatoEtterTil = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "institusjonsopphold": {
+                "borPåInstitusjon": true,
                 "periode": {
                   "fra": "2025-02-01",
                   "til": "2025-01-01"
@@ -26,15 +25,15 @@ internal class IntroduksjonsprogramTest {
               }
         """.trimIndent()
 
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = fraDatoEtterTil))
-            .valider() shouldContain "Introduksjonsprogram fra dato må være tidligere eller lik til dato"
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(institusjonsopphold = fraDatoEtterTil))
+            .valider() shouldContain "Institusjonsopphold fra dato må være tidligere eller lik til dato"
     }
 
     @Test
-    fun `introduksjonsprogram med deltar = false skal ikke ha en periode`() {
+    fun `institusjonsopphold med borPåInstitusjon = false skal ikke ha en periode`() {
         val periodeMedDeltarFalse = """
-            "introduksjonsprogram": {
-                "deltar": false,
+            "institusjonsopphold": {
+                "borPåInstitusjon": false,
                 "periode": {
                   "fra": "2025-02-01",
                   "til": "2025-01-01"
@@ -42,15 +41,15 @@ internal class IntroduksjonsprogramTest {
               }
         """.trimIndent()
 
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = periodeMedDeltarFalse))
-            .valider() shouldContain "Introduksjonsprogram uten deltagelse kan ikke ha noen periode"
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(institusjonsopphold = periodeMedDeltarFalse))
+            .valider() shouldContain "Institusjonsopphold uten deltagelse kan ikke ha noen periode"
     }
 
     @Test
-    fun `introduksjonsprogram periode kan starte tidligere enn tiltakets periode`() {
+    fun `institusjonsopphold periode kan starte tidligere enn tiltakets periode`() {
         val fraDatoTidligereEnnTiltakPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "institusjonsopphold": {
+                "borPåInstitusjon": true,
                 "periode": {
                   "fra": "2024-01-01",
                   "til": "2025-04-01"
@@ -72,15 +71,15 @@ internal class IntroduksjonsprogramTest {
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, introduksjonsprogram = fraDatoTidligereEnnTiltakPeriode),
+            søknad(tiltak = tiltak, institusjonsopphold = fraDatoTidligereEnnTiltakPeriode),
         ).valider() shouldBe emptyList()
     }
 
     @Test
-    fun `introduksjonsprogram periode kan slutte senere enn tiltakets periode`() {
+    fun `institusjonsopphold periode kan slutte senere enn tiltakets periode`() {
         val tilDatoSenereEnnTiltakPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "institusjonsopphold": {
+                "borPåInstitusjon": true,
                 "periode": {
                   "fra": "2025-01-01",
                   "til": "2026-04-01"
@@ -102,15 +101,15 @@ internal class IntroduksjonsprogramTest {
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, introduksjonsprogram = tilDatoSenereEnnTiltakPeriode),
+            søknad(tiltak = tiltak, institusjonsopphold = tilDatoSenereEnnTiltakPeriode),
         ).valider() shouldBe emptyList()
     }
 
     @Test
-    fun `introduksjonsprogram periode til kan ikke være tidligere enn tiltakets periode`() {
+    fun `institusjonsopphold periode til kan ikke være tidligere enn tiltakets periode`() {
         val tilDatoTidligereEnnTiltakPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "institusjonsopphold": {
+                "borPåInstitusjon": true,
                 "periode": {
                   "fra": "2024-01-01",
                   "til": "2024-05-01"
@@ -132,15 +131,15 @@ internal class IntroduksjonsprogramTest {
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, introduksjonsprogram = tilDatoTidligereEnnTiltakPeriode),
-        ).valider() shouldContain "Introduksjonsprogram periode kan ikke være tidligere enn tiltakets periode"
+            søknad(tiltak = tiltak, institusjonsopphold = tilDatoTidligereEnnTiltakPeriode),
+        ).valider() shouldContain "Institusjonsopphold periode kan ikke være tidligere enn tiltakets periode"
     }
 
     @Test
-    fun `introduksjonsprogram periode kan ikke være senere enn tiltakets periode`() {
+    fun `institusjonsopphold periode kan ikke være senere enn tiltakets periode`() {
         val fraDatoSenereEnnTiltakPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "institusjonsopphold": {
+                "borPåInstitusjon": true,
                 "periode": {
                   "fra": "2026-01-01",
                   "til": "2026-05-01"
@@ -162,45 +161,20 @@ internal class IntroduksjonsprogramTest {
         """.trimIndent()
 
         deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, introduksjonsprogram = fraDatoSenereEnnTiltakPeriode),
-        ).valider() shouldContain "Introduksjonsprogram periode kan ikke være senere enn tiltakets periode"
+            søknad(tiltak = tiltak, institusjonsopphold = fraDatoSenereEnnTiltakPeriode),
+        ).valider() shouldContain "Institusjonsopphold periode kan ikke være senere enn tiltakets periode"
     }
 
     @Test
-    fun `introduksjonsprogram med deltar = true må ha en periode`() {
+    fun `institusjonsopphold med borPåInstitusjon = true må ha en periode`() {
         val deltarTrueUtenPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
+            "institusjonsopphold": {
+                "borPåInstitusjon": true,
                 "periode": null
               }
         """.trimIndent()
 
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(introduksjonsprogram = deltarTrueUtenPeriode))
-            .valider() shouldContain "Introduksjonsprogram med deltagelse må ha periode"
-    }
-
-    @Test
-    fun `introduksjonsprogram OG kvalifiseringsprogrammet med deltar = true må ha en periode`() {
-        val deltarIntroTrueUtenPeriode = """
-            "introduksjonsprogram": {
-                "deltar": true,
-                "periode": null
-              }
-        """.trimIndent()
-
-        val deltarKvpTrueUtenPeriode = """
-            "kvalifiseringsprogram": {
-                "deltar": true,
-                "periode": null
-              }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(kvalifiseringsprogram = deltarKvpTrueUtenPeriode, introduksjonsprogram = deltarIntroTrueUtenPeriode),
-        )
-            .valider() shouldContainExactlyInAnyOrder listOf(
-            "Kvalifisering med deltagelse må ha periode",
-            "Introduksjonsprogram med deltagelse må ha periode",
-        )
+        deserialize<SpørsmålsbesvarelserDTO>(søknad(institusjonsopphold = deltarTrueUtenPeriode))
+            .valider() shouldContain "Institusjonsopphold med deltagelse må ha periode"
     }
 }
