@@ -100,5 +100,33 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         }
     }
 
+    if (søknad.pensjonsordning.mottarEllerSøktPensjonsordning == false) {
+        if (søknad.pensjonsordning.periode != null) {
+            feilmeldinger.add("En som ikke mottar pensjon kan ikke ha periode")
+        }
+        if (søknad.pensjonsordning.utbetaler != null) {
+            feilmeldinger.add("En som ikke mottar pensjon kan ikke ha en utbetaler")
+        }
+    } else {
+        if (søknad.pensjonsordning.utbetaler == null) {
+            feilmeldinger.add("En som mottar pensjon må ha en utbetaler")
+        }
+        if (søknad.pensjonsordning.periode == null) {
+            feilmeldinger.add("En som mottar pensjon må ha periode")
+        } else {
+            if (!søknad.pensjonsordning.periode.fra.isBefore(
+                    søknad.pensjonsordning.periode.til.plusDays(1),
+                )
+            ) {
+                feilmeldinger.add("Pensjonsordning fra dato må være tidligere eller lik til dato")
+            }
+            if (søknad.pensjonsordning.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                feilmeldinger.add("Pensjonsordning periode kan ikke være senere enn tiltakets periode")
+            }
+            if (søknad.pensjonsordning.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                feilmeldinger.add("Pensjonsordning periode kan ikke være tidligere enn tiltakets periode")
+            }
+        }
+    }
     return feilmeldinger
 }
