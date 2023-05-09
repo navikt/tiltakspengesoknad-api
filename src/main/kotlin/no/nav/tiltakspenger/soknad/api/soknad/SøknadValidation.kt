@@ -128,5 +128,35 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
             }
         }
     }
+
+    if (søknad.etterlønn.mottarEllerSøktEtterlønn == false) {
+        if (søknad.etterlønn.periode != null) {
+            feilmeldinger.add("En som ikke mottar etterlønn kan ikke ha periode")
+        }
+        if (søknad.etterlønn.utbetaler != null) {
+            feilmeldinger.add("En som ikke mottar etterlønn kan ikke ha en utbetaler")
+        }
+    } else {
+        if (søknad.etterlønn.utbetaler == null) {
+            feilmeldinger.add("En som mottar etterlønn må ha en utbetaler")
+        }
+        if (søknad.etterlønn.periode == null) {
+            feilmeldinger.add("En som mottar etterlønn må ha periode")
+        } else {
+            if (!søknad.etterlønn.periode.fra.isBefore(
+                    søknad.etterlønn.periode.til.plusDays(1),
+                )
+            ) {
+                feilmeldinger.add("Etterlønn fra dato må være tidligere eller lik til dato")
+            }
+            if (søknad.etterlønn.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                feilmeldinger.add("Etterlønn periode kan ikke være senere enn tiltakets periode")
+            }
+            if (søknad.etterlønn.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                feilmeldinger.add("Etterlønn periode kan ikke være tidligere enn tiltakets periode")
+            }
+        }
+    }
+
     return feilmeldinger
 }
