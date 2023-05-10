@@ -190,5 +190,9 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         }
     }
 
+    if (søknad.tiltak.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+        feilmeldinger.add("Tiltak fra dato kan ikke være etter til dato")
+    }
+
     return feilmeldinger
 }
