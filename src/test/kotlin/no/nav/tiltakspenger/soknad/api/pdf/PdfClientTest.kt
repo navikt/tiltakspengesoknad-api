@@ -132,5 +132,6 @@ internal class PdfClientTest {
         ),
         harBekreftetAlleOpplysninger = true,
         innsendingTidspunkt = LocalDateTime.now(),
+        vedleggsnavn = emptyList(),
     )
 }
