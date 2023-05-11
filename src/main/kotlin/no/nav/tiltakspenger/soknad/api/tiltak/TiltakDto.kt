@@ -11,6 +11,7 @@ data class Deltakelsesperiode(
 data class TiltaksdeltakelseDto(
     val aktivitetId: String,
     val type: ArenaTiltaksaktivitetResponsDTO.TiltakType,
+    val typeNavn: String,
     val deltakelsePeriode: Deltakelsesperiode,
     val arrangør: String,
     val status: ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType,
@@ -52,6 +53,7 @@ data class ArenaTiltakResponse(
                 TiltaksdeltakelseDto(
                     aktivitetId = it.aktivitetId,
                     type = it.tiltakType,
+                    typeNavn = it.tiltakType.navn,
                     deltakelsePeriode = Deltakelsesperiode(
                         fra = it.deltakelsePeriode?.fom,
                         til = it.deltakelsePeriode?.tom,

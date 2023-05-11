@@ -106,6 +106,7 @@ internal class PdfClientTest {
             søkerHeleTiltaksperioden = false,
             arrangør = "test",
             type = "test",
+            typeNavn = "test",
         ),
         etterlønn = Etterlønn(
             mottarEllerSøktEtterlønn = false,

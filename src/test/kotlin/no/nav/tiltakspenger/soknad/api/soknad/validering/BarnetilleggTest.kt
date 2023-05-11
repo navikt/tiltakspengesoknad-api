@@ -4,7 +4,6 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
-import no.nav.tiltakspenger.soknad.api.soknad.valider
 import org.junit.jupiter.api.Test
 
 internal class BarnetilleggTest {
@@ -47,7 +46,8 @@ internal class BarnetilleggTest {
               "til": "2025-04-01"
             },
             "arrangør": "test",
-            "type": "test"
+            "type": "test",
+            "typeNavn": "test"
           }
         """.trimIndent()
 
@@ -93,7 +93,8 @@ internal class BarnetilleggTest {
               "til": "2025-04-01"
             },
             "arrangør": "test",
-            "type": "test"
+            "type": "test",
+            "typeNavn": "test"
           }
         """.trimIndent()
 
