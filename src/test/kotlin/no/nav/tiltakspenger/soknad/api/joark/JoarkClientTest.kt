@@ -259,6 +259,7 @@ internal class JoarkClientTest {
             ),
             innsendingTidspunkt = LocalDateTime.now(),
             harBekreftetAlleOpplysninger = true,
+            vedleggsnavn = emptyList(),
         ),
         pdf = "dette er pdf innholdet".toByteArray(),
         vedlegg = listOf(

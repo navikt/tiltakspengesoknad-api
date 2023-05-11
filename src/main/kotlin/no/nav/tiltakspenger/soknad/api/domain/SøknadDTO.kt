@@ -28,6 +28,7 @@ data class SøknadDTO(
     val introduksjonsprogram: Introduksjonsprogram,
     val institusjonsopphold: Institusjonsopphold,
     val tiltak: Tiltak,
+    val vedleggsnavn: List<String>,
     val barnetillegg: Barnetillegg,
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
@@ -42,6 +43,7 @@ data class SøknadDTO(
             person: PersonDTO,
             acr: String,
             innsendingTidspunkt: LocalDateTime,
+            vedleggsnavn: List<String>,
         ): SøknadDTO {
             return SøknadDTO(
                 kvalifiseringsprogram = Kvalifiseringsprogram(
@@ -84,6 +86,7 @@ data class SøknadDTO(
                     type = req.tiltak.type,
                     typeNavn = req.tiltak.typeNavn,
                 ),
+                vedleggsnavn = vedleggsnavn,
                 barnetillegg = Barnetillegg(
                     søkerOmBarnetillegg = req.barnetillegg.søkerOmBarnetillegg,
                     ønskerÅSøkeBarnetilleggForAndreBarn = req.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn,
