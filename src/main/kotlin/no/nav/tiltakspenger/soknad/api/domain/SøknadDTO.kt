@@ -82,6 +82,7 @@ data class SøknadDTO(
                     søkerHeleTiltaksperioden = req.tiltak.søkerHeleTiltaksperioden,
                     arrangør = req.tiltak.arrangør,
                     type = req.tiltak.type,
+                    typeNavn = req.tiltak.typeNavn,
                 ),
                 barnetillegg = Barnetillegg(
                     søkerOmBarnetillegg = req.barnetillegg.søkerOmBarnetillegg,

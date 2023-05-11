@@ -51,7 +51,6 @@ internal class JoarkClientTest {
             config = config,
             client = client,
             tokenService = mockTokenService,
-
         )
 
         runTest {
@@ -234,6 +233,7 @@ internal class JoarkClientTest {
                 søkerHeleTiltaksperioden = false,
                 arrangør = "test",
                 type = "test",
+                typeNavn = "test",
             ),
             etterlønn = Etterlønn(
                 mottarEllerSøktEtterlønn = false,

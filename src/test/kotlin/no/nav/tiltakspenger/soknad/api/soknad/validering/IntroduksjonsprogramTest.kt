@@ -67,7 +67,8 @@ internal class IntroduksjonsprogramTest {
               "til": "2025-04-01"
             },
             "arrangør": "test",
-            "type": "test"
+            "type": "test",
+            "typeNavn": "test"
           }
         """.trimIndent()
 
@@ -97,7 +98,8 @@ internal class IntroduksjonsprogramTest {
               "til": "2025-04-01"
             },
             "arrangør": "test",
-            "type": "test"
+            "type": "test",
+            "typeNavn": "test"
           }
         """.trimIndent()
 
@@ -127,7 +129,8 @@ internal class IntroduksjonsprogramTest {
               "til": "2025-04-01"
             },
             "arrangør": "test",
-            "type": "test"
+            "type": "test",
+            "typeNavn": "test"
           }
         """.trimIndent()
 
@@ -157,7 +160,8 @@ internal class IntroduksjonsprogramTest {
               "til": "2025-04-01"
             },
             "arrangør": "test",
-            "type": "test"
+            "type": "test",
+            "typeNavn": "test"
           }
         """.trimIndent()
 

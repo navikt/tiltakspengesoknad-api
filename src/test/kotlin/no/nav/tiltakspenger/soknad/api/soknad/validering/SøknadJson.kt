@@ -9,7 +9,8 @@ private fun tiltak() = """
               "til": "2025-01-01"
             },
             "arrangør": "test",
-            "type": "test"
+            "type": "test",
+            "typeNavn": "test"
           }
 """.trimIndent()
 

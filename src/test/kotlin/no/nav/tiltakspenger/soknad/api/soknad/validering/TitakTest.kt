@@ -4,7 +4,6 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
-import no.nav.tiltakspenger.soknad.api.soknad.valider
 import org.junit.jupiter.api.Test
 
 internal class TitakTest {
@@ -25,7 +24,8 @@ internal class TitakTest {
               "til": "2025-01-01"
             },
             "arrangør": "test",
-            "type": "test"
+            "type": "test",
+            "typeNavn": "test"
           }
         """.trimIndent()
 

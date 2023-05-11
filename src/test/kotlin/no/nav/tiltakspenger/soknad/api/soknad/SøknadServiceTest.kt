@@ -39,6 +39,7 @@ internal class SøknadServiceTest {
             "søkerHeleTiltaksperioden": false,
             "arrangør": "test",
             "type": "test",
+            "typeNavn": "test",
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-01-01"
@@ -130,7 +131,10 @@ internal class SøknadServiceTest {
                     {},
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
-                        append(HttpHeaders.ContentDisposition, ContentDisposition("søknad", listOf(HeaderValueParam("name", "søknad"))))
+                        append(
+                            HttpHeaders.ContentDisposition,
+                            ContentDisposition("søknad", listOf(HeaderValueParam("name", "søknad"))),
+                        )
                     },
                 ),
                 PartData.FileItem(
@@ -138,7 +142,10 @@ internal class SøknadServiceTest {
                     { input.release() },
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/pdf")
-                        append(HttpHeaders.ContentDisposition, ContentDisposition("vedlegg", listOf(HeaderValueParam("name", "vedlegg"))))
+                        append(
+                            HttpHeaders.ContentDisposition,
+                            ContentDisposition("vedlegg", listOf(HeaderValueParam("name", "vedlegg"))),
+                        )
                     },
                 ),
                 PartData.FileItem(
@@ -146,7 +153,10 @@ internal class SøknadServiceTest {
                     { input.release() },
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/pdf")
-                        append(HttpHeaders.ContentDisposition, ContentDisposition("vedlegg", listOf(HeaderValueParam("name", "vedlegg"))))
+                        append(
+                            HttpHeaders.ContentDisposition,
+                            ContentDisposition("vedlegg", listOf(HeaderValueParam("name", "vedlegg"))),
+                        )
                     },
                 ),
             ),
@@ -184,7 +194,10 @@ internal class SøknadServiceTest {
                     {},
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
-                        append(HttpHeaders.ContentDisposition, ContentDisposition("søknad", listOf(HeaderValueParam("name", "søknad"))))
+                        append(
+                            HttpHeaders.ContentDisposition,
+                            ContentDisposition("søknad", listOf(HeaderValueParam("name", "søknad"))),
+                        )
                     },
                 ),
             ),
