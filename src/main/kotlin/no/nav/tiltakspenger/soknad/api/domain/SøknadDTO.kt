@@ -85,6 +85,7 @@ data class SøknadDTO(
                     arrangør = req.tiltak.arrangør,
                     type = req.tiltak.type,
                     typeNavn = req.tiltak.typeNavn,
+                    arenaRegistrertPeriode = req.tiltak.arenaRegistrertPeriode,
                 ),
                 vedleggsnavn = vedleggsnavn,
                 barnetillegg = Barnetillegg(
