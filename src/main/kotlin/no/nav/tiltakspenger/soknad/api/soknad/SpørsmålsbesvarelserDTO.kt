@@ -1,5 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
+import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import java.time.LocalDate
 
 data class Periode(
@@ -40,7 +41,8 @@ data class Institusjonsopphold(
 data class Tiltak(
     val aktivitetId: String,
     val periode: Periode,
-    val søkerHeleTiltaksperioden: Boolean,
+    val arenaRegistrertPeriode: Deltakelsesperiode?,
+    val søkerHeleTiltaksperioden: Boolean?,
     val arrangør: String,
     val type: String,
     val typeNavn: String,

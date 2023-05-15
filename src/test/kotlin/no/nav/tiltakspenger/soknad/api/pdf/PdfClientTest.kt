@@ -22,6 +22,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
 import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
+import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -107,6 +108,10 @@ internal class PdfClientTest {
             arrangør = "test",
             type = "test",
             typeNavn = "test",
+            arenaRegistrertPeriode = Deltakelsesperiode(
+                fra = LocalDate.MAX,
+                til = LocalDate.MAX,
+            ),
         ),
         etterlønn = Etterlønn(
             mottarEllerSøktEtterlønn = false,

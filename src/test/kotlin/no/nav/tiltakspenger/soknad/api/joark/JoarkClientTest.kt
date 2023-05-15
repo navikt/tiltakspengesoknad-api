@@ -24,6 +24,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
 import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
+import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -234,6 +235,10 @@ internal class JoarkClientTest {
                 arrangør = "test",
                 type = "test",
                 typeNavn = "test",
+                arenaRegistrertPeriode = Deltakelsesperiode(
+                    fra = LocalDate.MAX,
+                    til = LocalDate.MAX,
+                ),
             ),
             etterlønn = Etterlønn(
                 mottarEllerSøktEtterlønn = false,
