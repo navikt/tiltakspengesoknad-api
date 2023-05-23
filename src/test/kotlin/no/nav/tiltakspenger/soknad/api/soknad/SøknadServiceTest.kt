@@ -101,7 +101,8 @@ internal class SøknadServiceTest {
               "til": "2025-01-01"
             }
           },
-          "harBekreftetAlleOpplysninger": true
+          "harBekreftetAlleOpplysninger": true,
+          "harBekreftetÅSvareSåGodtManKan" : true
         }
     """.trimMargin()
 

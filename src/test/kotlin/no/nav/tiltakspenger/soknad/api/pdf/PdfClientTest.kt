@@ -136,6 +136,7 @@ internal class PdfClientTest {
             registrerteBarnSøktBarnetilleggFor = emptyList(),
         ),
         harBekreftetAlleOpplysninger = true,
+        harBekreftetÅSvareSåGodtManKan = true,
         innsendingTidspunkt = LocalDateTime.now(),
         vedleggsnavn = emptyList(),
     )
