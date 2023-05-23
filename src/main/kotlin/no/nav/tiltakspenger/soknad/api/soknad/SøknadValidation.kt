@@ -163,13 +163,17 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
     }
 
     if (søknad.barnetillegg.søkerOmBarnetillegg) {
-        if (søknad.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn == true) {
-            if (søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.isEmpty()) {
-                feilmeldinger.add("Har sagt at man skal søke barnetillegg for andre barn, men ikke sendt inn noen barn")
-            }
-            søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.map {
-                if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
-                    feilmeldinger.add("Kan ikke søke for manuelle barn som er mer enn 16 år når tiltaket starter")
+        if (søknad.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn == null) {
+            feilmeldinger.add("Hvis man søker om barnetillegg må man velge om man skal søke for andre barn eller ikke")
+        } else {
+            if (søknad.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn == true) {
+                if (søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.isEmpty()) {
+                    feilmeldinger.add("Har sagt at man skal søke barnetillegg for andre barn, men ikke sendt inn noen barn")
+                }
+                søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.map {
+                    if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
+                        feilmeldinger.add("Kan ikke søke for manuelle barn som er mer enn 16 år når tiltaket starter")
+                    }
                 }
             }
         }
