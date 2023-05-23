@@ -95,7 +95,6 @@ private fun harBekreftetÅSvareSåGodtManKan(svar: Boolean) = """
     "harBekreftetÅSvareSåGodtManKan": $svar
 """.trimIndent()
 
-
 fun søknad(
     tiltak: String = tiltak(),
     barneTillegg: String = barnetillegg(),
