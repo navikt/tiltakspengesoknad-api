@@ -21,8 +21,7 @@ internal class BarnetilleggTest {
               {
                 "fornavn": "Test",
                 "etternavn": "Test",
-                "fødselsdato": "2008-12-31",
-                "bostedsland": "Test"
+                "fødselsdato": "2008-12-31"
               }
             ],
             "søkerOmBarnetillegg": true,
@@ -68,8 +67,7 @@ internal class BarnetilleggTest {
               {
                 "fornavn": "Test",
                 "etternavn": "Test",
-                "fødselsdato": "2009-01-01",
-                "bostedsland": "Test"
+                "fødselsdato": "2009-01-01"
               }
             ],
             "søkerOmBarnetillegg": true,

@@ -97,7 +97,6 @@ data class SøknadDTO(
                             mellomnavn = it.mellomnavn,
                             etternavn = it.etternavn,
                             fødselsdato = it.fødselsdato,
-                            bostedsland = it.bostedsland,
                         )
                     },
                     registrerteBarnSøktBarnetilleggFor = req.barnetillegg.registrerteBarnSøktBarnetilleggFor.map {

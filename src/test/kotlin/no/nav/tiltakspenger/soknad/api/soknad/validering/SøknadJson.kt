@@ -20,8 +20,7 @@ private fun barnetillegg() = """
               {
                 "fornavn": "Test",
                 "etternavn": "Test",
-                "fødselsdato": "2025-01-01",
-                "bostedsland": "Test"
+                "fødselsdato": "2025-01-01"
               }
             ],
             "søkerOmBarnetillegg": true,

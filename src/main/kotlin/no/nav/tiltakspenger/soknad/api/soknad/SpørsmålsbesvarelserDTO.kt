@@ -13,7 +13,6 @@ data class ManueltRegistrertBarn(
     val mellomnavn: String?,
     val etternavn: String,
     val fødselsdato: LocalDate,
-    val bostedsland: String,
 )
 
 data class RegistrertBarn(
