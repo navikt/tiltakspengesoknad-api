@@ -34,6 +34,7 @@ data class SøknadDTO(
     val etterlønn: Etterlønn,
     val personopplysninger: Personopplysninger,
     val harBekreftetAlleOpplysninger: Boolean,
+    val harBekreftetÅSvareSåGodtManKan: Boolean,
     val innsendingTidspunkt: LocalDateTime,
 ) {
     companion object {
@@ -135,6 +136,7 @@ data class SøknadDTO(
                 ),
                 acr = acr,
                 harBekreftetAlleOpplysninger = req.harBekreftetAlleOpplysninger,
+                harBekreftetÅSvareSåGodtManKan = req.harBekreftetÅSvareSåGodtManKan,
                 innsendingTidspunkt = innsendingTidspunkt,
             )
         }

@@ -75,6 +75,7 @@ data class SpørsmålsbesvarelserDTO(
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
     val harBekreftetAlleOpplysninger: Boolean,
+    val harBekreftetÅSvareSåGodtManKan: Boolean,
 ) {
     fun valider(): List<String> = valider(this)
 }

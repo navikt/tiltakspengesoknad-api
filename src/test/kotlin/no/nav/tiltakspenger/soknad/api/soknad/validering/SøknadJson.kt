@@ -91,6 +91,10 @@ private fun harBekreftetAlleOpplysninger(svar: Boolean) = """
     "harBekreftetAlleOpplysninger": $svar
 """.trimIndent()
 
+private fun harBekreftetÅSvareSåGodtManKan(svar: Boolean) = """
+    "harBekreftetÅSvareSåGodtManKan": $svar
+""".trimIndent()
+
 fun søknad(
     tiltak: String = tiltak(),
     barneTillegg: String = barnetillegg(),
@@ -100,6 +104,7 @@ fun søknad(
     kvalifiseringsprogram: String = kvalifiseringsprogram(),
     pensjonsordning: String = pensjonsordning(),
     harBekreftetAlleOpplysningerSvar: Boolean = true,
+    harBekreftetÅSvareSåGodtManKanSvar: Boolean = true,
 ) = """
         {
           $tiltak,
@@ -109,6 +114,7 @@ fun søknad(
           $introduksjonsprogram,
           $kvalifiseringsprogram,
           $pensjonsordning,
-          ${harBekreftetAlleOpplysninger(harBekreftetAlleOpplysningerSvar)}
+          ${harBekreftetAlleOpplysninger(harBekreftetAlleOpplysningerSvar)},
+          ${harBekreftetÅSvareSåGodtManKan(harBekreftetÅSvareSåGodtManKanSvar)}
         }
 """.trimMargin()
