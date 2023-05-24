@@ -31,6 +31,10 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         feilmeldinger.add("Bruker må bekrefte å ha oppgitt riktige opplysninger")
     }
 
+    if (søknad.harBekreftetÅSvareSåGodtManKan == false) {
+        feilmeldinger.add("Bruker må bekrefte å svare så godt man kan")
+    }
+
     if (søknad.kvalifiseringsprogram.deltar == false) {
         if (søknad.kvalifiseringsprogram.periode != null) {
             feilmeldinger.add("Kvalifisering uten deltagelse kan ikke ha noen periode")
