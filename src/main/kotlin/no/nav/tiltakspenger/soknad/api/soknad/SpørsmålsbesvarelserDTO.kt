@@ -72,7 +72,6 @@ data class Gjenlevendepensjon(
     val periode: Periode?,
 )
 
-
 data class Alderspensjon(
     val mottar: Boolean,
     val fraDato: LocalDate?,
@@ -85,7 +84,7 @@ data class Supplerendestønadover67(
 
 data class Supplerendestønadflyktninger(
     val mottar: Boolean,
-    val periode: Periode?
+    val periode: Periode?,
 )
 
 data class Jobbsjansen(
