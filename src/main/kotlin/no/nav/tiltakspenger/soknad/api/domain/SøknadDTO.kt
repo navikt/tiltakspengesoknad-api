@@ -1,17 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.domain
 
 import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
-import no.nav.tiltakspenger.soknad.api.soknad.Barnetillegg
-import no.nav.tiltakspenger.soknad.api.soknad.Etterlønn
-import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
-import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
-import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
-import no.nav.tiltakspenger.soknad.api.soknad.ManueltRegistrertBarn
-import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
-import no.nav.tiltakspenger.soknad.api.soknad.Periode
-import no.nav.tiltakspenger.soknad.api.soknad.RegistrertBarn
-import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
-import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
+import no.nav.tiltakspenger.soknad.api.soknad.*
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,8 +20,15 @@ data class SøknadDTO(
     val tiltak: Tiltak,
     val vedleggsnavn: List<String>,
     val barnetillegg: Barnetillegg,
+    val mottarAndreUtbetalinger: Boolean,
+    val sykepenger: Sykepenger,
+    val gjenlevendepensjon: Gjenlevendepensjon,
+    val alderspensjon: Alderspensjon,
+    val supplerendestønadover67: Supplerendestønadover67,
+    val supplerendestønadflyktninger: Supplerendestønadflyktninger,
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
+    val jobbsjansen: Jobbsjansen,
     val personopplysninger: Personopplysninger,
     val harBekreftetAlleOpplysninger: Boolean,
     val harBekreftetÅSvareSåGodtManKan: Boolean,
@@ -109,20 +106,56 @@ data class SøknadDTO(
                         )
                     },
                 ), // fylle ut barn fra person her?
+                mottarAndreUtbetalinger = req.mottarAndreUtbetalinger,
                 pensjonsordning = Pensjonsordning(
-                    mottarEllerSøktPensjonsordning = req.pensjonsordning.mottarEllerSøktPensjonsordning,
-                    utbetaler = req.pensjonsordning.utbetaler,
-                    periode = req.pensjonsordning.periode?.let {
+                    mottar = req.pensjonsordning.mottar,
+                ),
+                etterlønn = Etterlønn(
+                    mottar = req.etterlønn.mottar,
+                ),
+                sykepenger = Sykepenger(
+                    mottar = req.sykepenger.mottar,
+                    periode= req.sykepenger.periode?.let {
                         Periode(
                             fra = it.fra,
                             til = it.til,
                         )
                     },
                 ),
-                etterlønn = Etterlønn(
-                    mottarEllerSøktEtterlønn = req.etterlønn.mottarEllerSøktEtterlønn,
-                    utbetaler = req.etterlønn.utbetaler,
-                    periode = req.etterlønn.periode?.let {
+                gjenlevendepensjon = Gjenlevendepensjon(
+                    mottar = req.gjenlevendepensjon.mottar,
+                    periode = req.gjenlevendepensjon.periode?.let {
+                        Periode(
+                            fra = it.fra,
+                            til = it.til,
+                        )
+                    },
+                ),
+                alderspensjon = Alderspensjon(
+                    mottar = req.alderspensjon.mottar,
+                    fraDato = req.alderspensjon.fraDato,
+                ),
+                supplerendestønadover67 = Supplerendestønadover67(
+                    mottar = req.supplerendestønadover67.mottar,
+                    periode = req.supplerendestønadover67.periode?.let {
+                        Periode(
+                            fra = it.fra,
+                            til = it.til,
+                        )
+                    }
+                ),
+                supplerendestønadflyktninger = Supplerendestønadflyktninger(
+                    mottar = req.supplerendestønadflyktninger.mottar,
+                    periode = req.supplerendestønadflyktninger.periode?.let {
+                        Periode(
+                            fra = it.fra,
+                            til = it.til,
+                        )
+                    }
+                ),
+                jobbsjansen = Jobbsjansen(
+                    mottar = req.jobbsjansen.mottar,
+                    periode = req.jobbsjansen.periode?.let {
                         Periode(
                             fra = it.fra,
                             til = it.til,

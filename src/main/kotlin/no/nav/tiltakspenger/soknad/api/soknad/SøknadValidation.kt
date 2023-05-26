@@ -104,64 +104,6 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         }
     }
 
-    if (søknad.pensjonsordning.mottarEllerSøktPensjonsordning == false) {
-        if (søknad.pensjonsordning.periode != null) {
-            feilmeldinger.add("En som ikke mottar pensjon kan ikke ha periode")
-        }
-        if (søknad.pensjonsordning.utbetaler != null) {
-            feilmeldinger.add("En som ikke mottar pensjon kan ikke ha en utbetaler")
-        }
-    } else {
-        if (søknad.pensjonsordning.utbetaler == null) {
-            feilmeldinger.add("En som mottar pensjon må ha en utbetaler")
-        }
-        if (søknad.pensjonsordning.periode == null) {
-            feilmeldinger.add("En som mottar pensjon må ha periode")
-        } else {
-            if (!søknad.pensjonsordning.periode.fra.isBefore(
-                    søknad.pensjonsordning.periode.til.plusDays(1),
-                )
-            ) {
-                feilmeldinger.add("Pensjonsordning fra dato må være tidligere eller lik til dato")
-            }
-            if (søknad.pensjonsordning.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Pensjonsordning periode kan ikke være senere enn tiltakets periode")
-            }
-            if (søknad.pensjonsordning.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Pensjonsordning periode kan ikke være tidligere enn tiltakets periode")
-            }
-        }
-    }
-
-    if (søknad.etterlønn.mottarEllerSøktEtterlønn == false) {
-        if (søknad.etterlønn.periode != null) {
-            feilmeldinger.add("En som ikke mottar etterlønn kan ikke ha periode")
-        }
-        if (søknad.etterlønn.utbetaler != null) {
-            feilmeldinger.add("En som ikke mottar etterlønn kan ikke ha en utbetaler")
-        }
-    } else {
-        if (søknad.etterlønn.utbetaler == null) {
-            feilmeldinger.add("En som mottar etterlønn må ha en utbetaler")
-        }
-        if (søknad.etterlønn.periode == null) {
-            feilmeldinger.add("En som mottar etterlønn må ha periode")
-        } else {
-            if (!søknad.etterlønn.periode.fra.isBefore(
-                    søknad.etterlønn.periode.til.plusDays(1),
-                )
-            ) {
-                feilmeldinger.add("Etterlønn fra dato må være tidligere eller lik til dato")
-            }
-            if (søknad.etterlønn.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Etterlønn periode kan ikke være senere enn tiltakets periode")
-            }
-            if (søknad.etterlønn.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Etterlønn periode kan ikke være tidligere enn tiltakets periode")
-            }
-        }
-    }
-
     if (søknad.barnetillegg.søkerOmBarnetillegg) {
         if (søknad.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn == null) {
             feilmeldinger.add("Hvis man søker om barnetillegg må man velge om man skal søke for andre barn eller ikke")

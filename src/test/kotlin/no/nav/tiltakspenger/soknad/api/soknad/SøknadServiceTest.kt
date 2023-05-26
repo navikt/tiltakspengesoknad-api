@@ -63,14 +63,6 @@ internal class SøknadServiceTest {
             ],
             "ønskerÅSøkeBarnetilleggForAndreBarn": true
           },
-          "etterlønn": {
-            "mottarEllerSøktEtterlønn": true,
-            "utbetaler": "Test",
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
           "institusjonsopphold": {
             "borPåInstitusjon": true,
             "periode": {
@@ -92,13 +84,50 @@ internal class SøknadServiceTest {
               "til": "2025-01-01"
             }
           },
-          "pensjonsordning": {
-            "utbetaler": "Test",
-            "mottarEllerSøktPensjonsordning": true,
+          "sykepenger": {
+            "mottar": true,
             "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
+              "fra" : "2025-01-01",
+              "til" : "2025-01-01",
+            },
+          }
+          "gjenlevendepensjon": {
+            "mottar" : true,
+            "periode" : {
+              "fra" : "2025-01-01",
+              "til" : "2025-01-01",
+            },
+          }
+          "alderspensjon": {
+            "mottar" : true,
+            "fraDato": "2025-01-01",
+          },
+          "supplerendestønadover67" : {
+            "mottar": true,
+            "periode" : {
+              "fra" : "2025-01-01",
+              "til" : "2025-01-01",
             }
+          }
+          "supplerendestønadflyktninger" : {
+            "mottar" : true,
+            "periode" : {
+               "fra" : "2025-01-01",
+               "til" : "2025-01-01",
+            }
+          }   
+          "jobbsjansen" : {
+             "mottar" : true,
+             "periode" : {
+                "fra" : "2025-01-01",
+                "til" : "2025-01-01",
+             }
+          }
+          "etterlønn": {
+            "mottar": true,
+          },
+          "pensjonsordning": {
+            "mottar": true,
           },
           "harBekreftetAlleOpplysninger": true,
           "harBekreftetÅSvareSåGodtManKan" : true
