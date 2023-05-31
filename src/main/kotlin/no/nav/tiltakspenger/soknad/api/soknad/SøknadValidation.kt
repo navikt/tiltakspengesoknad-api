@@ -81,7 +81,7 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         }
     }
 
-    if(søknad.mottarAndreUtbetalinger == true) {
+    if (søknad.mottarAndreUtbetalinger == true) {
         if (søknad.sykepenger.mottar == false) {
             if (søknad.sykepenger.periode != null) {
                 feilmeldinger.add("Person som mottar ikke sykepenger kan ikke ha sykepenger periode")

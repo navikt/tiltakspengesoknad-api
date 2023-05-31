@@ -154,7 +154,7 @@ fun søknad(
     kvalifiseringsprogram: String = kvalifiseringsprogram(),
     pensjonsordning: String = pensjonsordning(),
     mottarAndreUtbetalinger: Boolean = true,
-    sykepenger: String  = sykepenger(),
+    sykepenger: String = sykepenger(),
     gjenlevendepensjon: String = gjenlevendepensjon(),
     alderspensjon: String = alderspensjon(),
     supplerendestønadover67: String = supplerendestønadover67år(),
