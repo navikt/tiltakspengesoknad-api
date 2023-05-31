@@ -87,50 +87,51 @@ internal class SøknadServiceTest {
           "sykepenger": {
             "mottar": true,
             "periode": {
-              "fra" : "2025-01-01",
-              "til" : "2025-01-01",
-            },
-          }
-          "gjenlevendepensjon": {
-            "mottar" : true,
-            "periode" : {
-              "fra" : "2025-01-01",
-              "til" : "2025-01-01",
-            },
-          }
-          "alderspensjon": {
-            "mottar" : true,
-            "fraDato": "2025-01-01",
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
           },
-          "supplerendestønadover67" : {
+          "gjenlevendepensjon": {
             "mottar": true,
-            "periode" : {
-              "fra" : "2025-01-01",
-              "til" : "2025-01-01",
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
             }
-          }
-          "supplerendestønadflyktninger" : {
-            "mottar" : true,
-            "periode" : {
-               "fra" : "2025-01-01",
-               "til" : "2025-01-01",
+          },
+          "alderspensjon": {
+            "mottar": true,
+            "fraDato": "2025-01-01"
+          },
+          "supplerendestønadover67": {
+            "mottar": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
             }
-          }   
-          "jobbsjansen" : {
-             "mottar" : true,
-             "periode" : {
-                "fra" : "2025-01-01",
-                "til" : "2025-01-01",
+          },
+          "supplerendestønadflyktninger": {
+            "mottar": true,
+            "periode": {
+               "fra": "2025-01-01",
+               "til": "2025-01-01"
+            }
+          },   
+          "jobbsjansen": {
+             "mottar": true,
+             "periode": {
+                "fra": "2025-01-01",
+                "til": "2025-01-01"
              }
-          }
+          },
           "etterlønn": {
-            "mottar": true,
+            "mottar": true
           },
           "pensjonsordning": {
-            "mottar": true,
+            "mottar": true
           },
+          "mottarAndreUtbetalinger": true,
           "harBekreftetAlleOpplysninger": true,
-          "harBekreftetÅSvareSåGodtManKan" : true
+          "harBekreftetÅSvareSåGodtManKan": true
         }
     """.trimMargin()
 

@@ -63,7 +63,7 @@ data class Etterlønn(
 )
 
 data class Sykepenger(
-    val mottar: Boolean,
+    val mottar: Boolean?,
     val periode: Periode?,
 )
 
