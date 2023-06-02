@@ -125,7 +125,7 @@ private fun alderspensjon() = """
         "alderspensjon": {
             "mottar": true,
             "fraDato": "2025-01-01"
-          }
+        }
 """.trimIndent()
 
 private fun pensjonsordning() = """

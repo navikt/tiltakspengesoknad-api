@@ -55,11 +55,11 @@ data class Barnetillegg(
 )
 
 data class Pensjonsordning(
-    val mottar: Boolean,
+    val mottar: Boolean?,
 )
 
 data class Etterlønn(
-    val mottar: Boolean,
+    val mottar: Boolean?,
 )
 
 data class Sykepenger(
@@ -68,27 +68,27 @@ data class Sykepenger(
 )
 
 data class Gjenlevendepensjon(
-    val mottar: Boolean,
+    val mottar: Boolean?,
     val periode: Periode?,
 )
 
 data class Alderspensjon(
-    val mottar: Boolean,
+    val mottar: Boolean?,
     val fraDato: LocalDate?,
 )
 
 data class Supplerendestønadover67(
-    val mottar: Boolean,
+    val mottar: Boolean?,
     val periode: Periode?,
 )
 
 data class Supplerendestønadflyktninger(
-    val mottar: Boolean,
+    val mottar: Boolean?,
     val periode: Periode?,
 )
 
 data class Jobbsjansen(
-    val mottar: Boolean,
+    val mottar: Boolean?,
     val periode: Periode?,
 )
 
