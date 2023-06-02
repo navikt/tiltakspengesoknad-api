@@ -14,13 +14,19 @@ import kotlinx.coroutines.test.runTest
 import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
+import no.nav.tiltakspenger.soknad.api.soknad.Alderspensjon
 import no.nav.tiltakspenger.soknad.api.soknad.Barnetillegg
 import no.nav.tiltakspenger.soknad.api.soknad.Etterlønn
+import no.nav.tiltakspenger.soknad.api.soknad.Gjenlevendepensjon
 import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
 import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.Jobbsjansen
 import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
 import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
+import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadflyktninger
+import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadover67
+import no.nav.tiltakspenger.soknad.api.soknad.Sykepenger
 import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
 import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import org.junit.jupiter.api.Test
@@ -113,21 +119,51 @@ internal class PdfClientTest {
                 til = LocalDate.MAX,
             ),
         ),
-        etterlønn = Etterlønn(
-            mottarEllerSøktEtterlønn = false,
+        mottarAndreUtbetalinger = false,
+        sykepenger = Sykepenger(
+            mottar = false,
             periode = Periode(
                 fra = LocalDate.of(2023, 1, 1),
                 til = LocalDate.of(2023, 1, 31),
             ),
-            utbetaler = "test",
+        ),
+        gjenlevendepensjon = Gjenlevendepensjon(
+            mottar = false,
+            periode = Periode(
+                fra = LocalDate.of(2023, 1, 1),
+                til = LocalDate.of(2023, 1, 31),
+            ),
+        ),
+        alderspensjon = Alderspensjon(
+            mottar = false,
+            fraDato = LocalDate.of(2023, 1, 1),
+        ),
+        supplerendestønadover67 = Supplerendestønadover67(
+            mottar = false,
+            periode = Periode(
+                fra = LocalDate.of(2023, 1, 1),
+                til = LocalDate.of(2023, 1, 31),
+            ),
+        ),
+        supplerendestønadflyktninger = Supplerendestønadflyktninger(
+            mottar = false,
+            periode = Periode(
+                fra = LocalDate.of(2023, 1, 1),
+                til = LocalDate.of(2023, 1, 31),
+            ),
         ),
         pensjonsordning = Pensjonsordning(
-            mottarEllerSøktPensjonsordning = false,
+            mottar = false,
+        ),
+        etterlønn = Etterlønn(
+            mottar = false,
+        ),
+        jobbsjansen = Jobbsjansen(
+            mottar = false,
             periode = Periode(
                 fra = LocalDate.of(2023, 1, 1),
                 til = LocalDate.of(2023, 1, 31),
             ),
-            utbetaler = "test",
         ),
         barnetillegg = Barnetillegg(
             søkerOmBarnetillegg = false,

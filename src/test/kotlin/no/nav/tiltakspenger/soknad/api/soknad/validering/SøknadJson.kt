@@ -11,7 +11,7 @@ private fun tiltak() = """
             "arrangør": "test",
             "type": "test",
             "typeNavn": "test"
-          }
+        }
 """.trimIndent()
 
 private fun barnetillegg() = """
@@ -37,13 +37,8 @@ private fun barnetillegg() = """
 
 private fun etterlønn() = """
         "etterlønn": {
-            "mottarEllerSøktEtterlønn": true,
-            "utbetaler": "Test",
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          }
+            "mottar": true
+        }
 """.trimIndent()
 
 private fun institusjonsopphold() = """
@@ -76,15 +71,71 @@ private fun kvalifiseringsprogram() = """
           }
 """.trimIndent()
 
-private fun pensjonsordning() = """
-        "pensjonsordning": {
-            "utbetaler": "Test",
-            "mottarEllerSøktPensjonsordning": true,
+private fun sykepenger() = """
+        "sykepenger": {
+            "mottar": true,
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-01-01"
             }
           }
+""".trimIndent()
+
+private fun gjenlevendepensjon() = """
+        "gjenlevendepensjon": {
+            "mottar": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          }
+""".trimIndent()
+
+private fun supplerendestønadover67år() = """
+        "supplerendestønadover67": {
+            "mottar": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          }
+""".trimIndent()
+
+private fun supplerendestønadflyktninger() = """
+        "supplerendestønadflyktninger": {
+            "mottar": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          }
+""".trimIndent()
+
+private fun jobbsjansen() = """
+        "jobbsjansen": {
+            "mottar": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
+          }
+""".trimIndent()
+
+private fun alderspensjon() = """
+        "alderspensjon": {
+            "mottar": true,
+            "fraDato": "2025-01-01"
+        }
+""".trimIndent()
+
+private fun pensjonsordning() = """
+        "pensjonsordning": {
+            "mottar": true
+        }
+""".trimIndent()
+
+private fun mottarAndreUtbetalinger(svar: Boolean) = """
+    "mottarAndreUtbetalinger": $svar
 """.trimIndent()
 
 private fun harBekreftetAlleOpplysninger(svar: Boolean) = """
@@ -98,22 +149,36 @@ private fun harBekreftetÅSvareSåGodtManKan(svar: Boolean) = """
 fun søknad(
     tiltak: String = tiltak(),
     barneTillegg: String = barnetillegg(),
-    etterlønn: String = etterlønn(),
     institusjonsopphold: String = institusjonsopphold(),
     introduksjonsprogram: String = introduksjonsprogram(),
     kvalifiseringsprogram: String = kvalifiseringsprogram(),
     pensjonsordning: String = pensjonsordning(),
+    mottarAndreUtbetalinger: Boolean = true,
+    sykepenger: String = sykepenger(),
+    gjenlevendepensjon: String = gjenlevendepensjon(),
+    alderspensjon: String = alderspensjon(),
+    supplerendestønadover67: String = supplerendestønadover67år(),
+    supplerendestønadflyktninger: String = supplerendestønadflyktninger(),
+    etterlønn: String = etterlønn(),
+    jobbsjansen: String = jobbsjansen(),
     harBekreftetAlleOpplysningerSvar: Boolean = true,
     harBekreftetÅSvareSåGodtManKanSvar: Boolean = true,
 ) = """
         {
           $tiltak,
           $barneTillegg,
-          $etterlønn,
           $institusjonsopphold,
           $introduksjonsprogram,
           $kvalifiseringsprogram,
+          ${mottarAndreUtbetalinger(mottarAndreUtbetalinger)},
+          $sykepenger,
+          $gjenlevendepensjon,
+          $alderspensjon,
+          $supplerendestønadover67,
+          $supplerendestønadflyktninger,
           $pensjonsordning,
+          $etterlønn,
+          $jobbsjansen,
           ${harBekreftetAlleOpplysninger(harBekreftetAlleOpplysningerSvar)},
           ${harBekreftetÅSvareSåGodtManKan(harBekreftetÅSvareSåGodtManKanSvar)}
         }

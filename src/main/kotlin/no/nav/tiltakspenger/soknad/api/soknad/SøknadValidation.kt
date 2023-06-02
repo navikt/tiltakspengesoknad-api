@@ -81,6 +81,137 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         }
     }
 
+    if (søknad.mottarAndreUtbetalinger == true) {
+        if (søknad.sykepenger.mottar == false) {
+            if (søknad.sykepenger.periode != null) {
+                feilmeldinger.add("Sykepenger med mottar = false kan ikke ha noen periode")
+            }
+        } else {
+            if (søknad.sykepenger.periode == null) {
+                feilmeldinger.add("Sykepenger med mottar = true må ha periode")
+            } else {
+                if (!søknad.sykepenger.periode.fra.isBefore(
+                        søknad.sykepenger.periode.til.plusDays(1),
+                    )
+                ) {
+                    feilmeldinger.add("Sykepenger fra dato må være tidligere eller lik til dato")
+                }
+                if (søknad.sykepenger.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                    feilmeldinger.add("Sykepenger periode kan ikke være senere enn tiltakets periode")
+                }
+                if (søknad.sykepenger.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                    feilmeldinger.add("sykepenger periode kan ikke være tidligere enn tiltakets periode")
+                }
+            }
+        }
+
+        if (søknad.gjenlevendepensjon.mottar == false) {
+            if (søknad.gjenlevendepensjon.periode != null) {
+                feilmeldinger.add("Gjenlevendepensjon med mottar = false kan ikke ha noen periode")
+            }
+        } else {
+            if (søknad.gjenlevendepensjon.periode == null) {
+                feilmeldinger.add("Gjenlevendepensjon med mottar = true må ha periode")
+            } else {
+                if (!søknad.gjenlevendepensjon.periode.fra.isBefore(
+                        søknad.gjenlevendepensjon.periode.til.plusDays(1),
+                    )
+                ) {
+                    feilmeldinger.add("Gjenlevendepensjon fra dato må være tidligere eller lik til dato")
+                }
+                if (søknad.gjenlevendepensjon.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                    feilmeldinger.add("Gjenlevendepensjon periode kan ikke være senere enn tiltakets periode")
+                }
+                if (søknad.gjenlevendepensjon.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                    feilmeldinger.add("Gjenlevendepensjon periode kan ikke være tidligere enn tiltakets periode")
+                }
+            }
+        }
+
+        if (søknad.alderspensjon.mottar == false) {
+            if (søknad.alderspensjon.fraDato != null) {
+                feilmeldinger.add("Alderspensjon med mottar = false kan ikke ha noen fra dato")
+            }
+        } else {
+            if (søknad.alderspensjon.fraDato == null) {
+                feilmeldinger.add("Alderspensjon med mottar = true må ha fra dato")
+            } else {
+                if (søknad.alderspensjon.fraDato.isAfter(søknad.tiltak.periode.til)) {
+                    feilmeldinger.add("Alderspensjon fra dato kan ikke være senere enn tiltakets periode")
+                }
+            }
+        }
+
+        if (søknad.supplerendestønadflyktninger.mottar == false) {
+            if (søknad.supplerendestønadflyktninger.periode != null) {
+                feilmeldinger.add("SupplerendeStønadUføreFlyktninger med mottar = false kan ikke ha noen periode")
+            }
+        } else {
+            if (søknad.supplerendestønadflyktninger.periode == null) {
+                feilmeldinger.add("SupplerendeStønadUføreFlyktninger med mottar = true må ha periode")
+            } else {
+                if (!søknad.supplerendestønadflyktninger.periode.fra.isBefore(
+                        søknad.supplerendestønadflyktninger.periode.til.plusDays(1),
+                    )
+                ) {
+                    feilmeldinger.add("SupplerendeStønadUføreFlyktninger fra dato må være tidligere eller lik til dato")
+                }
+                if (søknad.supplerendestønadflyktninger.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                    feilmeldinger.add("SupplerendeStønadUføreFlyktninger periode kan ikke være senere enn tiltakets periode")
+                }
+                if (søknad.supplerendestønadflyktninger.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                    feilmeldinger.add("SupplerendeStønadUføreFlyktninger periode kan ikke være tidligere enn tiltakets periode")
+                }
+            }
+        }
+
+        if (søknad.supplerendestønadover67.mottar == false) {
+            if (søknad.supplerendestønadover67.periode != null) {
+                feilmeldinger.add("SupplerendeStønadOver67 med mottar = false kan ikke ha noen periode")
+            }
+        } else {
+            if (søknad.supplerendestønadover67.periode == null) {
+                feilmeldinger.add("SupplerendeStønadOver67 med mottar = true må ha periode")
+            } else {
+                if (!søknad.supplerendestønadover67.periode.fra.isBefore(
+                        søknad.supplerendestønadover67.periode.til.plusDays(1),
+                    )
+                ) {
+                    feilmeldinger.add("SupplerendeStønadOver67 fra dato må være tidligere eller lik til dato")
+                }
+                if (søknad.supplerendestønadover67.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                    feilmeldinger.add("SupplerendeStønadOver67 periode kan ikke være senere enn tiltakets periode")
+                }
+                if (søknad.supplerendestønadover67.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                    feilmeldinger.add("SupplerendeStønadOver67 periode kan ikke være tidligere enn tiltakets periode")
+                }
+            }
+        }
+
+        if (søknad.jobbsjansen.mottar == false) {
+            if (søknad.jobbsjansen.periode != null) {
+                feilmeldinger.add("Jobbsjansen med mottar = false kan ikke ha noen periode")
+            }
+        } else {
+            if (søknad.jobbsjansen.periode == null) {
+                feilmeldinger.add("Jobbsjansen med mottar = true må ha periode")
+            } else {
+                if (!søknad.jobbsjansen.periode.fra.isBefore(
+                        søknad.jobbsjansen.periode.til.plusDays(1),
+                    )
+                ) {
+                    feilmeldinger.add("Jobbsjansen fra dato må være tidligere eller lik til dato")
+                }
+                if (søknad.jobbsjansen.periode.fra.isAfter(søknad.tiltak.periode.til)) {
+                    feilmeldinger.add("Jobbsjansen periode kan ikke være senere enn tiltakets periode")
+                }
+                if (søknad.jobbsjansen.periode.til.isBefore(søknad.tiltak.periode.fra)) {
+                    feilmeldinger.add("Jobbsjansen periode kan ikke være tidligere enn tiltakets periode")
+                }
+            }
+        }
+    }
+
     if (søknad.institusjonsopphold.borPåInstitusjon == false) {
         if (søknad.institusjonsopphold.periode != null) {
             feilmeldinger.add("Institusjonsopphold uten deltagelse kan ikke ha noen periode")
@@ -100,64 +231,6 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
             }
             if (søknad.institusjonsopphold.periode.til.isBefore(søknad.tiltak.periode.fra)) {
                 feilmeldinger.add("Institusjonsopphold periode kan ikke være tidligere enn tiltakets periode")
-            }
-        }
-    }
-
-    if (søknad.pensjonsordning.mottarEllerSøktPensjonsordning == false) {
-        if (søknad.pensjonsordning.periode != null) {
-            feilmeldinger.add("En som ikke mottar pensjon kan ikke ha periode")
-        }
-        if (søknad.pensjonsordning.utbetaler != null) {
-            feilmeldinger.add("En som ikke mottar pensjon kan ikke ha en utbetaler")
-        }
-    } else {
-        if (søknad.pensjonsordning.utbetaler == null) {
-            feilmeldinger.add("En som mottar pensjon må ha en utbetaler")
-        }
-        if (søknad.pensjonsordning.periode == null) {
-            feilmeldinger.add("En som mottar pensjon må ha periode")
-        } else {
-            if (!søknad.pensjonsordning.periode.fra.isBefore(
-                    søknad.pensjonsordning.periode.til.plusDays(1),
-                )
-            ) {
-                feilmeldinger.add("Pensjonsordning fra dato må være tidligere eller lik til dato")
-            }
-            if (søknad.pensjonsordning.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Pensjonsordning periode kan ikke være senere enn tiltakets periode")
-            }
-            if (søknad.pensjonsordning.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Pensjonsordning periode kan ikke være tidligere enn tiltakets periode")
-            }
-        }
-    }
-
-    if (søknad.etterlønn.mottarEllerSøktEtterlønn == false) {
-        if (søknad.etterlønn.periode != null) {
-            feilmeldinger.add("En som ikke mottar etterlønn kan ikke ha periode")
-        }
-        if (søknad.etterlønn.utbetaler != null) {
-            feilmeldinger.add("En som ikke mottar etterlønn kan ikke ha en utbetaler")
-        }
-    } else {
-        if (søknad.etterlønn.utbetaler == null) {
-            feilmeldinger.add("En som mottar etterlønn må ha en utbetaler")
-        }
-        if (søknad.etterlønn.periode == null) {
-            feilmeldinger.add("En som mottar etterlønn må ha periode")
-        } else {
-            if (!søknad.etterlønn.periode.fra.isBefore(
-                    søknad.etterlønn.periode.til.plusDays(1),
-                )
-            ) {
-                feilmeldinger.add("Etterlønn fra dato må være tidligere eller lik til dato")
-            }
-            if (søknad.etterlønn.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Etterlønn periode kan ikke være senere enn tiltakets periode")
-            }
-            if (søknad.etterlønn.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Etterlønn periode kan ikke være tidligere enn tiltakets periode")
             }
         }
     }

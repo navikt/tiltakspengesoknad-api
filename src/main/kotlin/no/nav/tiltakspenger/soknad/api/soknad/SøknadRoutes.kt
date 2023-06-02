@@ -18,6 +18,7 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
+import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
 import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
 
@@ -32,11 +33,14 @@ fun Route.søknadRoutes(
         try {
             val innsendingTidspunkt = LocalDateTime.now()
             val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
-            avService.gjørVirussjekkAvVedlegg(vedlegg)
+            println("Søknad:$søknad")
+            // avService.gjørVirussjekkAvVedlegg(vedlegg)
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"
             val subjectToken = call.token()
-            val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
+            // val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
+            val person = PersonDTO("fornavn", "mellomnavn", "etternavn", listOf())
+
             val journalpostId =
                 søknadService.opprettDokumenterOgArkiverIJoark(
                     søknad,

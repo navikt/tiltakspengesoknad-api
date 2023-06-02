@@ -55,14 +55,40 @@ data class Barnetillegg(
 )
 
 data class Pensjonsordning(
-    val mottarEllerSøktPensjonsordning: Boolean,
-    val utbetaler: String?,
-    val periode: Periode?,
+    val mottar: Boolean?,
 )
 
 data class Etterlønn(
-    val mottarEllerSøktEtterlønn: Boolean,
-    val utbetaler: String?,
+    val mottar: Boolean?,
+)
+
+data class Sykepenger(
+    val mottar: Boolean?,
+    val periode: Periode?,
+)
+
+data class Gjenlevendepensjon(
+    val mottar: Boolean?,
+    val periode: Periode?,
+)
+
+data class Alderspensjon(
+    val mottar: Boolean?,
+    val fraDato: LocalDate?,
+)
+
+data class Supplerendestønadover67(
+    val mottar: Boolean?,
+    val periode: Periode?,
+)
+
+data class Supplerendestønadflyktninger(
+    val mottar: Boolean?,
+    val periode: Periode?,
+)
+
+data class Jobbsjansen(
+    val mottar: Boolean?,
     val periode: Periode?,
 )
 
@@ -72,8 +98,15 @@ data class SpørsmålsbesvarelserDTO(
     val institusjonsopphold: Institusjonsopphold,
     val tiltak: Tiltak,
     val barnetillegg: Barnetillegg,
+    val mottarAndreUtbetalinger: Boolean,
+    val sykepenger: Sykepenger,
+    val gjenlevendepensjon: Gjenlevendepensjon,
+    val alderspensjon: Alderspensjon,
+    val supplerendestønadover67: Supplerendestønadover67,
+    val supplerendestønadflyktninger: Supplerendestønadflyktninger,
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
+    val jobbsjansen: Jobbsjansen,
     val harBekreftetAlleOpplysninger: Boolean,
     val harBekreftetÅSvareSåGodtManKan: Boolean,
 ) {
