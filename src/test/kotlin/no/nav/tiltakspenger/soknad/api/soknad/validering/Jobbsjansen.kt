@@ -181,4 +181,3 @@ internal class Jobbsjansen {
             .valider() shouldContain "Jobbsjansen med mottar = true må ha periode"
     }
 }
-

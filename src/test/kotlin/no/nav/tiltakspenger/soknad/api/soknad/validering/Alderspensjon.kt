@@ -81,7 +81,6 @@ internal class Alderspensjon {
         ).valider() shouldContain "Alderspensjon fra dato kan ikke være senere enn tiltakets periode"
     }
 
-
     @Test
     fun `Alderspensjon med mottar = true må ha en fra dato`() {
         val mottarTrueUtenPeriode = """
@@ -94,5 +93,4 @@ internal class Alderspensjon {
         deserialize<SpørsmålsbesvarelserDTO>(søknad(alderspensjon = mottarTrueUtenPeriode))
             .valider() shouldContain "Alderspensjon med mottar = true må ha fra dato"
     }
-
 }
