@@ -18,7 +18,6 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
-import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
 import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
 
