@@ -22,6 +22,7 @@ import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
+val secureLog = KotlinLogging.logger("tjenestekall")
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
@@ -32,6 +33,7 @@ fun Route.søknadRoutes(
         try {
             val innsendingTidspunkt = LocalDateTime.now()
             val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
+            secureLog.info { søknad }
             avService.gjørVirussjekkAvVedlegg(vedlegg)
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"

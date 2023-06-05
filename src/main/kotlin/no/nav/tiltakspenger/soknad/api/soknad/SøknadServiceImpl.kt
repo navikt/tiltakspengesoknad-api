@@ -4,6 +4,7 @@ import io.ktor.http.content.MultiPartData
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
+import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
@@ -17,6 +18,8 @@ class SøknadServiceImpl(
     private val pdfService: PdfService,
     private val joarkService: JoarkService,
 ) : SøknadService {
+    val secureLog = KotlinLogging.logger("tjenestekall")
+
     override suspend fun opprettDokumenterOgArkiverIJoark(
         søknad: SpørsmålsbesvarelserDTO,
         fnr: String,
@@ -27,6 +30,7 @@ class SøknadServiceImpl(
     ): String {
         val vedleggsnavn = vedlegg.stream().map { vedlegg -> vedlegg.filnavn }.toList()
         val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr, innsendingTidspunkt, vedleggsnavn)
+        secureLog.info { søknadDTO }
         val pdf = pdfService.lagPdf(søknadDTO)
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         return joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer)
