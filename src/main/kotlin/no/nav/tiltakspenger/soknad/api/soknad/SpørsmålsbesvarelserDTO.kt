@@ -48,8 +48,6 @@ data class Tiltak(
 )
 
 data class Barnetillegg(
-    val søkerOmBarnetillegg: Boolean,
-    val ønskerÅSøkeBarnetilleggForAndreBarn: Boolean?,
     val manueltRegistrerteBarnSøktBarnetilleggFor: List<ManueltRegistrertBarn>,
     val registrerteBarnSøktBarnetilleggFor: List<RegistrertBarn>,
 )

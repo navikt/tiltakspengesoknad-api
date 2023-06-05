@@ -166,8 +166,6 @@ internal class PdfClientTest {
             ),
         ),
         barnetillegg = Barnetillegg(
-            søkerOmBarnetillegg = false,
-            ønskerÅSøkeBarnetilleggForAndreBarn = null,
             manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
             registrerteBarnSøktBarnetilleggFor = emptyList(),
         ),

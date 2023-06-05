@@ -235,35 +235,15 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         }
     }
 
-    if (søknad.barnetillegg.søkerOmBarnetillegg) {
-        if (søknad.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn == null) {
-            feilmeldinger.add("Hvis man søker om barnetillegg må man velge om man skal søke for andre barn eller ikke")
-        } else {
-            if (søknad.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn == true) {
-                if (søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.isEmpty()) {
-                    feilmeldinger.add("Har sagt at man skal søke barnetillegg for andre barn, men ikke sendt inn noen barn")
-                }
-                søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.map {
-                    if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
-                        feilmeldinger.add("Kan ikke søke for manuelle barn som er mer enn 16 år når tiltaket starter")
-                    }
-                }
-            }
+    søknad.barnetillegg.registrerteBarnSøktBarnetilleggFor.map {
+        if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
+            feilmeldinger.add("Kan ikke søke for registrerte barn som er mer enn 16 år når tiltaket starter")
         }
-        søknad.barnetillegg.registrerteBarnSøktBarnetilleggFor.map {
-            if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
-                feilmeldinger.add("Kan ikke søke for registrerte barn som er mer enn 16 år når tiltaket starter")
-            }
-        }
-    } else {
-        if (søknad.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn != null) {
-            feilmeldinger.add("Kan ikke søke for andre barn når man ikke har søkt om barnetillegg")
-        }
-        if (søknad.barnetillegg.registrerteBarnSøktBarnetilleggFor.isNotEmpty()) {
-            feilmeldinger.add("Kan ikke sende inn registrerte barn når man ikke har søkt om barnetillegg")
-        }
-        if (søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.isNotEmpty()) {
-            feilmeldinger.add("Kan ikke sende inn manuelle barn når man ikke har søkt om barnetillegg")
+    }
+
+    søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.map {
+        if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
+            feilmeldinger.add("Kan ikke søke for manuelle barn som er mer enn 16 år når tiltaket starter")
         }
     }
 

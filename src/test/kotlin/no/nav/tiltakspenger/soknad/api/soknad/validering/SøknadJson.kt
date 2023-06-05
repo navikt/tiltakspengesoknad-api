@@ -23,15 +23,13 @@ private fun barnetillegg() = """
                 "fødselsdato": "2025-01-01"
               }
             ],
-            "søkerOmBarnetillegg": true,
             "registrerteBarnSøktBarnetilleggFor": [
               {
                 "fornavn": "Test",
                 "fødselsdato": "2025-01-01",
                 "etternavn": "Testesen"
               }
-            ],
-            "ønskerÅSøkeBarnetilleggForAndreBarn": true
+            ]
           }
 """.trimIndent()
 

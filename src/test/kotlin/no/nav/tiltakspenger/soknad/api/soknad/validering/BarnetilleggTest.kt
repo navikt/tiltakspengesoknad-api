@@ -24,15 +24,13 @@ internal class BarnetilleggTest {
                 "fødselsdato": "2008-12-31"
               }
             ],
-            "søkerOmBarnetillegg": true,
             "registrerteBarnSøktBarnetilleggFor": [
               {
                 "fornavn": "Test",
                 "fødselsdato": "2009-01-01",
                 "etternavn": "Testesen"
               }
-            ],
-            "ønskerÅSøkeBarnetilleggForAndreBarn": true
+            ]
           }
         """.trimIndent()
 
@@ -70,15 +68,13 @@ internal class BarnetilleggTest {
                 "fødselsdato": "2009-01-01"
               }
             ],
-            "søkerOmBarnetillegg": true,
             "registrerteBarnSøktBarnetilleggFor": [
               {
                 "fornavn": "Test",
                 "fødselsdato": "2008-12-31",
                 "etternavn": "Testesen"
               }
-            ],
-            "ønskerÅSøkeBarnetilleggForAndreBarn": true
+            ]
           }
         """.trimIndent()
 

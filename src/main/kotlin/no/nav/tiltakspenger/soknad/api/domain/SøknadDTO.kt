@@ -103,8 +103,6 @@ data class SøknadDTO(
                 ),
                 vedleggsnavn = vedleggsnavn,
                 barnetillegg = Barnetillegg(
-                    søkerOmBarnetillegg = req.barnetillegg.søkerOmBarnetillegg,
-                    ønskerÅSøkeBarnetilleggForAndreBarn = req.barnetillegg.ønskerÅSøkeBarnetilleggForAndreBarn,
                     manueltRegistrerteBarnSøktBarnetilleggFor = req.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.map {
                         ManueltRegistrertBarn(
                             fornavn = it.fornavn,

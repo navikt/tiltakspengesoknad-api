@@ -293,10 +293,8 @@ internal class JoarkClientTest {
                 ),
             ),
             barnetillegg = Barnetillegg(
-                søkerOmBarnetillegg = false,
-                ønskerÅSøkeBarnetilleggForAndreBarn = null,
                 manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
-                registrerteBarnSøktBarnetilleggFor = emptyList(),
+                registrerteBarnSøktBarnetilleggFor = emptyList()
             ),
             innsendingTidspunkt = LocalDateTime.now(),
             harBekreftetAlleOpplysninger = true,
