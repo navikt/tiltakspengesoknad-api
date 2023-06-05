@@ -294,7 +294,7 @@ internal class JoarkClientTest {
             ),
             barnetillegg = Barnetillegg(
                 manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
-                registrerteBarnSøktBarnetilleggFor = emptyList()
+                registrerteBarnSøktBarnetilleggFor = emptyList(),
             ),
             innsendingTidspunkt = LocalDateTime.now(),
             harBekreftetAlleOpplysninger = true,
