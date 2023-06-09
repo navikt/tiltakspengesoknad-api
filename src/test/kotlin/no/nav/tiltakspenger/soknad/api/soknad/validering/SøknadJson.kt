@@ -3,7 +3,6 @@ package no.nav.tiltakspenger.soknad.api.soknad.validering
 private fun tiltak() = """
         "tiltak": {
             "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
             "periode": {
               "fra": "2025-01-01",
               "til": "2025-01-01"

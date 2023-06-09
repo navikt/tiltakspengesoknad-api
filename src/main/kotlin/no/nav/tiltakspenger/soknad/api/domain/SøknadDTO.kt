@@ -95,7 +95,6 @@ data class SøknadDTO(
                             til = it.til,
                         )
                     },
-                    søkerHeleTiltaksperioden = req.tiltak.søkerHeleTiltaksperioden,
                     arrangør = req.tiltak.arrangør,
                     type = req.tiltak.type,
                     typeNavn = req.tiltak.typeNavn,

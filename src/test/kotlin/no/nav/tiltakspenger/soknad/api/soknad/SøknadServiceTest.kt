@@ -36,7 +36,6 @@ internal class SøknadServiceTest {
         {
           "tiltak": {
             "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
             "arrangør": "test",
             "type": "test",
             "typeNavn": "test",

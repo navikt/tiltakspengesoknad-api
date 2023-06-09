@@ -237,7 +237,6 @@ internal class JoarkClientTest {
                     til = LocalDate.of(2023, 1, 1),
                 ),
                 aktivitetId = "123",
-                søkerHeleTiltaksperioden = false,
                 arrangør = "test",
                 type = "test",
                 typeNavn = "test",
