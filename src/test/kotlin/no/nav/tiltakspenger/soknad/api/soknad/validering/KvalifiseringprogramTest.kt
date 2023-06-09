@@ -2,183 +2,105 @@ package no.nav.tiltakspenger.soknad.api.soknad.validering
 
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
-import no.nav.tiltakspenger.soknad.api.deserialize
-import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
+import no.nav.tiltakspenger.soknad.api.mockKvalifiseringsprogram
+import no.nav.tiltakspenger.soknad.api.mockSpørsmålsbesvarelser
+import no.nav.tiltakspenger.soknad.api.mockTiltak
+import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 internal class KvalifiseringprogramTest {
 
     @Test
-    fun `happy case`() {
-        deserialize<SpørsmålsbesvarelserDTO>(søknad()).valider() shouldBe emptyList()
+    fun `jobbsjansen med gyldig periode skal validere ok`() {
+        mockSpørsmålsbesvarelser(
+            kvalifiseringsprogram = mockKvalifiseringsprogram(
+                deltar = true,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 1),
+                ),
+            ),
+            tiltak = mockTiltak(
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 1),
+                ),
+            ),
+        ).valider() shouldBe emptyList()
     }
 
     @Test
     fun `kvalifiseringsprogram periode fra må være lik eller før fra dato`() {
-        val fraDatoEtterTil = """
-            "kvalifiseringsprogram": {
-                "deltar": true,
-                "periode": {
-                  "fra": "2025-02-01",
-                  "til": "2025-01-01"
-                }
-              }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = fraDatoEtterTil))
-            .valider() shouldContain "Kvalifisering fra dato må være tidligere eller lik til dato"
+        mockSpørsmålsbesvarelser(
+            kvalifiseringsprogram = mockKvalifiseringsprogram(
+                deltar = true,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 2, 1),
+                    til = LocalDate.of(2025, 1, 1),
+                ),
+            ),
+        ).valider() shouldContain "Perioden på KVP er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato."
     }
 
     @Test
     fun `kvalifiseringsprogram med deltar = false skal ikke ha en periode`() {
-        val periodeMedDeltarFalse = """
-            "kvalifiseringsprogram": {
-                "deltar": false,
-                "periode": {
-                  "fra": "2025-02-01",
-                  "til": "2025-01-01"
-                }
-              }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = periodeMedDeltarFalse))
-            .valider() shouldContain "Kvalifisering uten deltagelse kan ikke ha noen periode"
-    }
-
-    @Test
-    fun `kvalifiseringsprogram periode kan starte tidligere enn tiltakets periode`() {
-        val fraDatoTidligereEnnTiltakPeriode = """
-            "kvalifiseringsprogram": {
-                "deltar": true,
-                "periode": {
-                  "fra": "2024-01-01",
-                  "til": "2025-04-01"
-                }
-              }
-        """.trimIndent()
-
-        val tiltak = """
-        "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-04-01"
-            },
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test"
-          }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoTidligereEnnTiltakPeriode),
-        ).valider() shouldBe emptyList()
-    }
-
-    @Test
-    fun `kvalifiseringsprogram periode kan slutte senere enn tiltakets periode`() {
-        val tilDatoSenereEnnTiltakPeriode = """
-            "kvalifiseringsprogram": {
-                "deltar": true,
-                "periode": {
-                  "fra": "2025-01-01",
-                  "til": "2026-04-01"
-                }
-              }
-        """.trimIndent()
-
-        val tiltak = """
-        "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-04-01"
-            },
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test"
-          }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, kvalifiseringsprogram = tilDatoSenereEnnTiltakPeriode),
-        ).valider() shouldBe emptyList()
+        mockSpørsmålsbesvarelser(
+            kvalifiseringsprogram = mockKvalifiseringsprogram(
+                deltar = false,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 1),
+                ),
+            ),
+        ).valider() shouldContain "Kvalifiseringsprogram med deltar = false kan ikke ha noen periode"
     }
 
     @Test
     fun `kvalifiseringsprogram periode til kan ikke være tidligere enn tiltakets periode`() {
-        val tilDatoTidligereEnnTiltakPeriode = """
-            "kvalifiseringsprogram": {
-                "deltar": true,
-                "periode": {
-                  "fra": "2024-01-01",
-                  "til": "2024-05-01"
-                }
-              }
-        """.trimIndent()
-
-        val tiltak = """
-        "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-04-01"
-            },
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test"
-          }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, kvalifiseringsprogram = tilDatoTidligereEnnTiltakPeriode),
-        ).valider() shouldContain "Kvalifisering periode kan ikke være tidligere enn tiltakets periode"
+        mockSpørsmålsbesvarelser(
+            kvalifiseringsprogram = mockKvalifiseringsprogram(
+                deltar = true,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 2),
+                ),
+            ),
+            tiltak = mockTiltak(
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 2),
+                    til = LocalDate.of(2025, 1, 2),
+                ),
+            ),
+        ).valider() shouldContain "Perioden på KVP er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket."
     }
 
     @Test
     fun `kvalifiseringsprogram periode kan ikke være senere enn tiltakets periode`() {
-        val fraDatoSenereEnnTiltakPeriode = """
-            "kvalifiseringsprogram": {
-                "deltar": true,
-                "periode": {
-                  "fra": "2026-01-01",
-                  "til": "2026-05-01"
-                }
-              }
-        """.trimIndent()
-
-        val tiltak = """
-        "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-04-01"
-            },
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test"
-          }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, kvalifiseringsprogram = fraDatoSenereEnnTiltakPeriode),
-        ).valider() shouldContain "Kvalifisering periode kan ikke være senere enn tiltakets periode"
+        mockSpørsmålsbesvarelser(
+            kvalifiseringsprogram = mockKvalifiseringsprogram(
+                deltar = true,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 2),
+                    til = LocalDate.of(2025, 1, 3),
+                ),
+            ),
+            tiltak = mockTiltak(
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 2),
+                ),
+            ),
+        ).valider() shouldContain "Perioden på KVP er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket."
     }
 
     @Test
     fun `kvalifiseringsprogram med deltar = true må ha en periode`() {
-        val deltarTrueUtenPeriode = """
-            "kvalifiseringsprogram": {
-                "deltar": true,
-                "periode": null
-              }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(kvalifiseringsprogram = deltarTrueUtenPeriode))
-            .valider() shouldContain "Kvalifisering med deltagelse må ha periode"
+        mockSpørsmålsbesvarelser(
+            kvalifiseringsprogram = mockKvalifiseringsprogram(
+                deltar = true,
+                periode = null,
+            ),
+        ).valider() shouldContain "Kvalifisering med deltagelse må ha periode"
     }
 }

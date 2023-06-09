@@ -36,7 +36,6 @@ internal class SøknadServiceTest {
         {
           "tiltak": {
             "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
             "arrangør": "test",
             "type": "test",
             "typeNavn": "test",
@@ -50,7 +49,7 @@ internal class SøknadServiceTest {
               {
                 "fornavn": "Test",
                 "etternavn": "Test",
-                "fødselsdato": "2025-01-01"
+                "fødselsdato": "2023-01-01"
               }
             ],
             "registrerteBarnSøktBarnetilleggFor": [

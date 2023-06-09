@@ -1,12 +1,25 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
+import no.nav.tiltakspenger.soknad.api.isSameOrAfter
+import no.nav.tiltakspenger.soknad.api.isSameOrBefore
 import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import java.time.LocalDate
 
 data class Periode(
     val fra: LocalDate,
     val til: LocalDate,
-)
+) {
+    fun erGyldig(): Boolean {
+        return fra.isSameOrBefore(til)
+    }
+
+    fun erInnenfor(periode: Periode): Boolean {
+        return fra.isSameOrAfter(periode.fra) &&
+            fra.isSameOrBefore(periode.til) &&
+            til.isSameOrAfter(periode.fra) &&
+            til.isSameOrBefore(periode.til)
+    }
+}
 
 data class ManueltRegistrertBarn(
     val fornavn: String,
@@ -41,11 +54,35 @@ data class Tiltak(
     val aktivitetId: String,
     val periode: Periode,
     val arenaRegistrertPeriode: Deltakelsesperiode?,
-    val søkerHeleTiltaksperioden: Boolean?,
     val arrangør: String,
     val type: String,
     val typeNavn: String,
-)
+) {
+    fun harKunFradatoIArena(): Boolean {
+        return arenaRegistrertPeriode?.fra != null && arenaRegistrertPeriode.til == null
+    }
+
+    fun harFullstendigPeriodeIArena(): Boolean {
+        return arenaRegistrertPeriode?.fra != null && arenaRegistrertPeriode.til != null
+    }
+
+    fun søktPeriodeErInnenforArenaRegistrertPeriode(): Boolean {
+        val fraDatoIArena = arenaRegistrertPeriode?.fra
+        val tilDatoIArena = arenaRegistrertPeriode?.til
+        if (harKunFradatoIArena()) {
+            return periode.fra.isSameOrAfter(fraDatoIArena!!) && periode.til.isSameOrAfter(fraDatoIArena)
+        }
+        if (harFullstendigPeriodeIArena()) {
+            return periode.fra.isSameOrAfter(fraDatoIArena!!) &&
+                periode.fra.isSameOrBefore(tilDatoIArena!!) &&
+                periode.til.isSameOrAfter(fraDatoIArena) &&
+                periode.til.isSameOrBefore(tilDatoIArena)
+        }
+
+        // todo: hvordan validere tiltak som ikke har noen periode i Arena?
+        return true
+    }
+}
 
 data class Barnetillegg(
     val manueltRegistrerteBarnSøktBarnetilleggFor: List<ManueltRegistrertBarn>,

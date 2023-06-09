@@ -3,6 +3,9 @@ package no.nav.tiltakspenger.soknad.api.soknad
 import io.ktor.server.plugins.requestvalidation.RequestValidationConfig
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.plugins.requestvalidation.ValidationResult
+import no.nav.tiltakspenger.soknad.api.isSameOrAfter
+import no.nav.tiltakspenger.soknad.api.isSameOrBefore
+import java.time.LocalDate
 
 fun RequestValidationConfig.validateSøknad() {
     validate<SpørsmålsbesvarelserDTO> { søknad ->
@@ -24,6 +27,241 @@ fun SpørsmålsbesvarelserDTO.validerRequest(): SpørsmålsbesvarelserDTO {
     return this
 }
 
+fun validerTiltak(tiltak: Tiltak): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    val tiltaksperiode = tiltak.periode
+    if (!tiltaksperiode.erGyldig()) {
+        feilmeldinger.add("Perioden på tiltaket er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+    }
+    if (!tiltak.søktPeriodeErInnenforArenaRegistrertPeriode()) {
+        feilmeldinger.add("Bruker kan ikke søke utenfor den registrerte tiltaksperioden")
+    }
+    return feilmeldinger
+}
+
+fun validerKvalifiseringsprogram(kvalifiseringsprogram: Kvalifiseringsprogram, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (kvalifiseringsprogram.deltar) {
+        if (kvalifiseringsprogram.periode == null) {
+            feilmeldinger.add("Kvalifisering med deltagelse må ha periode")
+        } else {
+            if (!kvalifiseringsprogram.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på KVP er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!kvalifiseringsprogram.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på KVP er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    } else if (kvalifiseringsprogram.periode != null) {
+        feilmeldinger.add("Kvalifiseringsprogram med deltar = false kan ikke ha noen periode")
+    }
+    return feilmeldinger
+}
+
+fun validerIntroduksjonsprogram(introduksjonsprogram: Introduksjonsprogram, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (introduksjonsprogram.deltar) {
+        if (introduksjonsprogram.periode == null) {
+            feilmeldinger.add("Introduksjonsprogram med deltagelse må ha periode")
+        } else {
+            if (!introduksjonsprogram.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på introduksjonsprogram er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!introduksjonsprogram.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på introduksjonsprogram er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    } else if (introduksjonsprogram.periode != null) {
+        feilmeldinger.add("Introduksjonsprogram med deltar = false kan ikke ha noen periode")
+    }
+    return feilmeldinger
+}
+
+fun validerInstitusjonsopphold(institusjonsopphold: Institusjonsopphold, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (institusjonsopphold.borPåInstitusjon) {
+        if (institusjonsopphold.periode == null) {
+            feilmeldinger.add("Institusjonsopphold med deltagelse må ha periode")
+        } else {
+            if (!institusjonsopphold.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på institusjonsopphold er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!institusjonsopphold.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på institusjonsopphold er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    } else if (institusjonsopphold.periode != null) {
+        feilmeldinger.add("Institusjonsopphold med borPåInstitusjon = false kan ikke ha noen periode")
+    }
+    return feilmeldinger
+}
+
+fun validerSykepenger(sykepenger: Sykepenger, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (sykepenger.mottar == false) {
+        if (sykepenger.periode != null) {
+            feilmeldinger.add("Sykepenger med mottar = false kan ikke ha noen periode")
+        }
+    } else {
+        if (sykepenger.periode == null) {
+            feilmeldinger.add("Sykepenger med mottar = true må ha periode")
+        } else {
+            if (!sykepenger.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på sykepenger er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!sykepenger.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på sykepenger er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    }
+    return feilmeldinger
+}
+
+fun validerGjenlevendepensjon(gjenlevendepensjon: Gjenlevendepensjon, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (gjenlevendepensjon.mottar == false) {
+        if (gjenlevendepensjon.periode != null) {
+            feilmeldinger.add("Gjenlevendepensjon med mottar = false kan ikke ha noen periode")
+        }
+    } else {
+        if (gjenlevendepensjon.periode == null) {
+            feilmeldinger.add("Gjenlevendepensjon med mottar = true må ha periode")
+        } else {
+            if (!gjenlevendepensjon.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på gjenlevendepensjon er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!gjenlevendepensjon.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på gjenlevendepensjon er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    }
+    return feilmeldinger
+}
+
+fun validerAlderspensjon(alderspensjon: Alderspensjon, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (alderspensjon.mottar == false) {
+        if (alderspensjon.fraDato != null) {
+            feilmeldinger.add("Alderspensjon med mottar = false kan ikke ha noen fra dato")
+        }
+    } else {
+        if (alderspensjon.fraDato == null) {
+            feilmeldinger.add("Alderspensjon med mottar = true må ha fra dato")
+        } else {
+            if (!alderspensjon.fraDato.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Alderspensjon fra dato kan ikke være senere enn tiltakets periode")
+            }
+        }
+    }
+    return feilmeldinger
+}
+
+fun validerSupplerendeStønadFlyktninger(supplerendestønadflyktninger: Supplerendestønadflyktninger, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (supplerendestønadflyktninger.mottar == false) {
+        if (supplerendestønadflyktninger.periode != null) {
+            feilmeldinger.add("SupplerendeStønadUføreFlyktninger med mottar = false kan ikke ha noen periode")
+        }
+    } else {
+        if (supplerendestønadflyktninger.periode == null) {
+            feilmeldinger.add("SupplerendeStønadUføreFlyktninger med mottar = true må ha periode")
+        } else {
+            if (!supplerendestønadflyktninger.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på SupplerendeStønadUføreFlyktninger er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!supplerendestønadflyktninger.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på SupplerendeStønadUføreFlyktninger er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    }
+    return feilmeldinger
+}
+
+fun validerSupplerendeStønadOver67(supplerendestønadover67: Supplerendestønadover67, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (supplerendestønadover67.mottar == false) {
+        if (supplerendestønadover67.periode != null) {
+            feilmeldinger.add("SupplerendeStønadOver67 med mottar = false kan ikke ha noen periode")
+        }
+    } else {
+        if (supplerendestønadover67.periode == null) {
+            feilmeldinger.add("SupplerendeStønadOver67 med mottar = true må ha periode")
+        } else {
+            if (!supplerendestønadover67.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på SupplerendeStønadOver67 er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!supplerendestønadover67.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på SupplerendeStønadOver67 er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    }
+    return feilmeldinger
+}
+
+fun validerJobbsjansen(jobbsjansen: Jobbsjansen, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (jobbsjansen.mottar == false) {
+        if (jobbsjansen.periode != null) {
+            feilmeldinger.add("Jobbsjansen med mottar = false kan ikke ha noen periode")
+        }
+    } else {
+        if (jobbsjansen.periode == null) {
+            feilmeldinger.add("Jobbsjansen med mottar = true må ha periode")
+        } else {
+            if (!jobbsjansen.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på Jobbsjansen er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!jobbsjansen.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på Jobbsjansen er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    }
+    return feilmeldinger
+}
+
+fun Periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode: Periode): Boolean {
+    return this.erInnenfor(tiltaksperiode)
+}
+
+fun LocalDate.erGyldigIForholdTilTiltaksperiode(tiltaksperiode: Periode): Boolean {
+    return this.isSameOrAfter(tiltaksperiode.fra) && this.isSameOrBefore(tiltaksperiode.til)
+}
+
+fun validerAndreUtbetalinger(søknad: SpørsmålsbesvarelserDTO, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+
+    if (søknad.mottarAndreUtbetalinger == true) {
+        feilmeldinger.addAll(validerSykepenger(søknad.sykepenger, tiltaksperiode))
+        feilmeldinger.addAll(validerGjenlevendepensjon(søknad.gjenlevendepensjon, tiltaksperiode))
+        feilmeldinger.addAll(validerAlderspensjon(søknad.alderspensjon, tiltaksperiode))
+        feilmeldinger.addAll(validerSupplerendeStønadFlyktninger(søknad.supplerendestønadflyktninger, tiltaksperiode))
+        feilmeldinger.addAll(validerSupplerendeStønadOver67(søknad.supplerendestønadover67, tiltaksperiode))
+        feilmeldinger.addAll(validerJobbsjansen(søknad.jobbsjansen, tiltaksperiode))
+    }
+
+    return feilmeldinger
+}
+
+val navnMaxLength = 25
+
+fun validerBarnetillegg(barnetillegg: Barnetillegg): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    val manueltRegistrerteBarn = barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor
+
+    val harEtBarnMedForLangtNavn = manueltRegistrerteBarn.any {
+        (it.fornavn.length > navnMaxLength) || (it.etternavn.length > navnMaxLength) || ((it.mellomnavn != null) && (it.mellomnavn.length > navnMaxLength))
+    }
+    val harEtBarnMedFødselsdatoFramITid = manueltRegistrerteBarn.any { it.fødselsdato.isSameOrAfter(LocalDate.now().plusDays(1)) }
+    if (harEtBarnMedForLangtNavn) {
+        feilmeldinger.add("Manuelt registrert barn er ugyldig: fornavn, mellomnavn eller etternavn overskrider maksgrense på 25 tegn")
+    }
+    if (harEtBarnMedFødselsdatoFramITid) {
+        feilmeldinger.add("Manuelt registrert barn er ugyldig: fødselsdato kan ikke registreres fram i tid")
+    }
+
+    return feilmeldinger
+}
+
 fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
     val feilmeldinger = mutableListOf<String>()
 
@@ -35,221 +273,13 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
         feilmeldinger.add("Bruker må bekrefte å svare så godt man kan")
     }
 
-    if (søknad.kvalifiseringsprogram.deltar == false) {
-        if (søknad.kvalifiseringsprogram.periode != null) {
-            feilmeldinger.add("Kvalifisering uten deltagelse kan ikke ha noen periode")
-        }
-    } else {
-        if (søknad.kvalifiseringsprogram.periode == null) {
-            feilmeldinger.add("Kvalifisering med deltagelse må ha periode")
-        } else {
-            if (!søknad.kvalifiseringsprogram.periode.fra.isBefore(
-                    søknad.kvalifiseringsprogram.periode.til.plusDays(1),
-                )
-            ) {
-                feilmeldinger.add("Kvalifisering fra dato må være tidligere eller lik til dato")
-            }
-            if (søknad.kvalifiseringsprogram.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Kvalifisering periode kan ikke være senere enn tiltakets periode")
-            }
-            if (søknad.kvalifiseringsprogram.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Kvalifisering periode kan ikke være tidligere enn tiltakets periode")
-            }
-        }
-    }
-
-    if (søknad.introduksjonsprogram.deltar == false) {
-        if (søknad.introduksjonsprogram.periode != null) {
-            feilmeldinger.add("Introduksjonsprogram uten deltagelse kan ikke ha noen periode")
-        }
-    } else {
-        if (søknad.introduksjonsprogram.periode == null) {
-            feilmeldinger.add("Introduksjonsprogram med deltagelse må ha periode")
-        } else {
-            if (!søknad.introduksjonsprogram.periode.fra.isBefore(
-                    søknad.introduksjonsprogram.periode.til.plusDays(1),
-                )
-            ) {
-                feilmeldinger.add("Introduksjonsprogram fra dato må være tidligere eller lik til dato")
-            }
-            if (søknad.introduksjonsprogram.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Introduksjonsprogram periode kan ikke være senere enn tiltakets periode")
-            }
-            if (søknad.introduksjonsprogram.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Introduksjonsprogram periode kan ikke være tidligere enn tiltakets periode")
-            }
-        }
-    }
-
-    if (søknad.mottarAndreUtbetalinger == true) {
-        if (søknad.sykepenger.mottar == false) {
-            if (søknad.sykepenger.periode != null) {
-                feilmeldinger.add("Sykepenger med mottar = false kan ikke ha noen periode")
-            }
-        } else {
-            if (søknad.sykepenger.periode == null) {
-                feilmeldinger.add("Sykepenger med mottar = true må ha periode")
-            } else {
-                if (!søknad.sykepenger.periode.fra.isBefore(
-                        søknad.sykepenger.periode.til.plusDays(1),
-                    )
-                ) {
-                    feilmeldinger.add("Sykepenger fra dato må være tidligere eller lik til dato")
-                }
-                if (søknad.sykepenger.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                    feilmeldinger.add("Sykepenger periode kan ikke være senere enn tiltakets periode")
-                }
-                if (søknad.sykepenger.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                    feilmeldinger.add("sykepenger periode kan ikke være tidligere enn tiltakets periode")
-                }
-            }
-        }
-
-        if (søknad.gjenlevendepensjon.mottar == false) {
-            if (søknad.gjenlevendepensjon.periode != null) {
-                feilmeldinger.add("Gjenlevendepensjon med mottar = false kan ikke ha noen periode")
-            }
-        } else {
-            if (søknad.gjenlevendepensjon.periode == null) {
-                feilmeldinger.add("Gjenlevendepensjon med mottar = true må ha periode")
-            } else {
-                if (!søknad.gjenlevendepensjon.periode.fra.isBefore(
-                        søknad.gjenlevendepensjon.periode.til.plusDays(1),
-                    )
-                ) {
-                    feilmeldinger.add("Gjenlevendepensjon fra dato må være tidligere eller lik til dato")
-                }
-                if (søknad.gjenlevendepensjon.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                    feilmeldinger.add("Gjenlevendepensjon periode kan ikke være senere enn tiltakets periode")
-                }
-                if (søknad.gjenlevendepensjon.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                    feilmeldinger.add("Gjenlevendepensjon periode kan ikke være tidligere enn tiltakets periode")
-                }
-            }
-        }
-
-        if (søknad.alderspensjon.mottar == false) {
-            if (søknad.alderspensjon.fraDato != null) {
-                feilmeldinger.add("Alderspensjon med mottar = false kan ikke ha noen fra dato")
-            }
-        } else {
-            if (søknad.alderspensjon.fraDato == null) {
-                feilmeldinger.add("Alderspensjon med mottar = true må ha fra dato")
-            } else {
-                if (søknad.alderspensjon.fraDato.isAfter(søknad.tiltak.periode.til)) {
-                    feilmeldinger.add("Alderspensjon fra dato kan ikke være senere enn tiltakets periode")
-                }
-            }
-        }
-
-        if (søknad.supplerendestønadflyktninger.mottar == false) {
-            if (søknad.supplerendestønadflyktninger.periode != null) {
-                feilmeldinger.add("SupplerendeStønadUføreFlyktninger med mottar = false kan ikke ha noen periode")
-            }
-        } else {
-            if (søknad.supplerendestønadflyktninger.periode == null) {
-                feilmeldinger.add("SupplerendeStønadUføreFlyktninger med mottar = true må ha periode")
-            } else {
-                if (!søknad.supplerendestønadflyktninger.periode.fra.isBefore(
-                        søknad.supplerendestønadflyktninger.periode.til.plusDays(1),
-                    )
-                ) {
-                    feilmeldinger.add("SupplerendeStønadUføreFlyktninger fra dato må være tidligere eller lik til dato")
-                }
-                if (søknad.supplerendestønadflyktninger.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                    feilmeldinger.add("SupplerendeStønadUføreFlyktninger periode kan ikke være senere enn tiltakets periode")
-                }
-                if (søknad.supplerendestønadflyktninger.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                    feilmeldinger.add("SupplerendeStønadUføreFlyktninger periode kan ikke være tidligere enn tiltakets periode")
-                }
-            }
-        }
-
-        if (søknad.supplerendestønadover67.mottar == false) {
-            if (søknad.supplerendestønadover67.periode != null) {
-                feilmeldinger.add("SupplerendeStønadOver67 med mottar = false kan ikke ha noen periode")
-            }
-        } else {
-            if (søknad.supplerendestønadover67.periode == null) {
-                feilmeldinger.add("SupplerendeStønadOver67 med mottar = true må ha periode")
-            } else {
-                if (!søknad.supplerendestønadover67.periode.fra.isBefore(
-                        søknad.supplerendestønadover67.periode.til.plusDays(1),
-                    )
-                ) {
-                    feilmeldinger.add("SupplerendeStønadOver67 fra dato må være tidligere eller lik til dato")
-                }
-                if (søknad.supplerendestønadover67.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                    feilmeldinger.add("SupplerendeStønadOver67 periode kan ikke være senere enn tiltakets periode")
-                }
-                if (søknad.supplerendestønadover67.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                    feilmeldinger.add("SupplerendeStønadOver67 periode kan ikke være tidligere enn tiltakets periode")
-                }
-            }
-        }
-
-        if (søknad.jobbsjansen.mottar == false) {
-            if (søknad.jobbsjansen.periode != null) {
-                feilmeldinger.add("Jobbsjansen med mottar = false kan ikke ha noen periode")
-            }
-        } else {
-            if (søknad.jobbsjansen.periode == null) {
-                feilmeldinger.add("Jobbsjansen med mottar = true må ha periode")
-            } else {
-                if (!søknad.jobbsjansen.periode.fra.isBefore(
-                        søknad.jobbsjansen.periode.til.plusDays(1),
-                    )
-                ) {
-                    feilmeldinger.add("Jobbsjansen fra dato må være tidligere eller lik til dato")
-                }
-                if (søknad.jobbsjansen.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                    feilmeldinger.add("Jobbsjansen periode kan ikke være senere enn tiltakets periode")
-                }
-                if (søknad.jobbsjansen.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                    feilmeldinger.add("Jobbsjansen periode kan ikke være tidligere enn tiltakets periode")
-                }
-            }
-        }
-    }
-
-    if (søknad.institusjonsopphold.borPåInstitusjon == false) {
-        if (søknad.institusjonsopphold.periode != null) {
-            feilmeldinger.add("Institusjonsopphold uten deltagelse kan ikke ha noen periode")
-        }
-    } else {
-        if (søknad.institusjonsopphold.periode == null) {
-            feilmeldinger.add("Institusjonsopphold med deltagelse må ha periode")
-        } else {
-            if (!søknad.institusjonsopphold.periode.fra.isBefore(
-                    søknad.institusjonsopphold.periode.til.plusDays(1),
-                )
-            ) {
-                feilmeldinger.add("Institusjonsopphold fra dato må være tidligere eller lik til dato")
-            }
-            if (søknad.institusjonsopphold.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-                feilmeldinger.add("Institusjonsopphold periode kan ikke være senere enn tiltakets periode")
-            }
-            if (søknad.institusjonsopphold.periode.til.isBefore(søknad.tiltak.periode.fra)) {
-                feilmeldinger.add("Institusjonsopphold periode kan ikke være tidligere enn tiltakets periode")
-            }
-        }
-    }
-
-    søknad.barnetillegg.registrerteBarnSøktBarnetilleggFor.map {
-        if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
-            feilmeldinger.add("Kan ikke søke for registrerte barn som er mer enn 16 år når tiltaket starter")
-        }
-    }
-
-    søknad.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.map {
-        if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
-            feilmeldinger.add("Kan ikke søke for manuelle barn som er mer enn 16 år når tiltaket starter")
-        }
-    }
-
-    if (søknad.tiltak.periode.fra.isAfter(søknad.tiltak.periode.til)) {
-        feilmeldinger.add("Tiltak fra dato kan ikke være etter til dato")
-    }
+    val tiltaksperiode = søknad.tiltak.periode
+    feilmeldinger.addAll(validerTiltak(søknad.tiltak))
+    feilmeldinger.addAll(validerKvalifiseringsprogram(søknad.kvalifiseringsprogram, tiltaksperiode))
+    feilmeldinger.addAll(validerIntroduksjonsprogram(søknad.introduksjonsprogram, tiltaksperiode))
+    feilmeldinger.addAll(validerInstitusjonsopphold(søknad.institusjonsopphold, tiltaksperiode))
+    feilmeldinger.addAll(validerAndreUtbetalinger(søknad, tiltaksperiode))
+    feilmeldinger.addAll(validerBarnetillegg(søknad.barnetillegg))
 
     return feilmeldinger
 }

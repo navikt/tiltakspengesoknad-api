@@ -110,7 +110,6 @@ internal class PdfClientTest {
                 til = LocalDate.of(2023, 1, 31),
             ),
             aktivitetId = "123",
-            søkerHeleTiltaksperioden = false,
             arrangør = "test",
             type = "test",
             typeNavn = "test",

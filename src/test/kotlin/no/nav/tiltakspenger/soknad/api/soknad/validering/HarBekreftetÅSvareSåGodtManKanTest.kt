@@ -5,17 +5,17 @@ import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.soknad.api.mockSpørsmålsbesvarelser
 import org.junit.jupiter.api.Test
 
-internal class HarBekreftetAlleOpplysningerTest {
+internal class HarBekreftetÅSvareSåGodtManKanTest {
 
     @Test
-    fun `hvis bruker ikke har bekreftet alle opplysninger, skal vi ikke godta søknaden`() {
-        mockSpørsmålsbesvarelser(harBekreftetAlleOpplysninger = false)
-            .valider() shouldContain "Bruker må bekrefte å ha oppgitt riktige opplysninger"
+    fun `hvis bruker ikke har bekreftet at man vil svare så godt man kan, skal vi ikke godta søknaden`() {
+        mockSpørsmålsbesvarelser(harBekreftetÅSvareSåGodtManKan = false)
+            .valider() shouldContain "Bruker må bekrefte å svare så godt man kan"
     }
 
     @Test
     fun `hvis bruker har bekreftet alle opplysninger, skal vi godta søknaden`() {
-        mockSpørsmålsbesvarelser(harBekreftetAlleOpplysninger = true)
+        mockSpørsmålsbesvarelser(harBekreftetÅSvareSåGodtManKan = true)
             .valider() shouldBe emptyList()
     }
 }

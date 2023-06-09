@@ -2,182 +2,110 @@ package no.nav.tiltakspenger.soknad.api.soknad.validering
 
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
-import no.nav.tiltakspenger.soknad.api.deserialize
-import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
+import no.nav.tiltakspenger.soknad.api.mockSpørsmålsbesvarelser
+import no.nav.tiltakspenger.soknad.api.mockSykepenger
+import no.nav.tiltakspenger.soknad.api.mockTiltak
+import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 internal class Sykepenger {
     @Test
-    fun `happy case`() {
-        deserialize<SpørsmålsbesvarelserDTO>(søknad()).valider() shouldBe emptyList()
+    fun `Sykepenger med gyldig periode skal validere ok`() {
+        mockSpørsmålsbesvarelser(
+            sykepenger = mockSykepenger(
+                mottar = true,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 1),
+                ),
+            ),
+            tiltak = mockTiltak(
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 1),
+                ),
+            ),
+            mottarAndreUtbetalinger = true,
+        ).valider() shouldBe emptyList()
     }
 
     @Test
     fun `Sykepenger periode fra må være lik eller før fra dato`() {
-        val fraDatoEtterTil = """
-            "sykepenger": {
-                "mottar": true,
-                "periode": {
-                  "fra": "2025-02-01",
-                  "til": "2025-01-01"
-                }
-              }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(sykepenger = fraDatoEtterTil))
-            .valider() shouldContain "Sykepenger fra dato må være tidligere eller lik til dato"
+        mockSpørsmålsbesvarelser(
+            sykepenger = mockSykepenger(
+                mottar = true,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 2),
+                    til = LocalDate.of(2025, 1, 1),
+                ),
+            ),
+            mottarAndreUtbetalinger = true,
+        ).valider() shouldContain "Perioden på sykepenger er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato."
     }
 
     @Test
     fun `Sykepenger med mottar = false skal ikke ha en periode`() {
-        val periodeMedMottarFalse = """
-            "sykepenger": {
-                "mottar": false,
-                "periode": {
-                  "fra": "2025-02-01",
-                  "til": "2025-01-01"
-                }
-              }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(sykepenger = periodeMedMottarFalse))
-            .valider() shouldContain "Sykepenger med mottar = false kan ikke ha noen periode"
-    }
-
-    @Test
-    fun `sykepenger periode kan starte tidligere enn tiltakets periode`() {
-        val fraDatoTidligereEnnTiltakPeriode = """
-            "sykepenger": {
-                "mottar": true,
-                "periode": {
-                  "fra": "2024-01-01",
-                  "til": "2025-04-01"
-                }
-              }
-        """.trimIndent()
-
-        val tiltak = """
-        "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-04-01"
-            },
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test"
-          }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, sykepenger = fraDatoTidligereEnnTiltakPeriode),
-        ).valider() shouldBe emptyList()
-    }
-
-    @Test
-    fun `sykepenger periode kan slutte senere enn tiltakets periode`() {
-        val tilDatoSenereEnnTiltakPeriode = """
-            "sykepenger": {
-                "mottar": true,
-                "periode": {
-                  "fra": "2025-01-01",
-                  "til": "2026-04-01"
-                }
-              }
-        """.trimIndent()
-
-        val tiltak = """
-        "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-04-01"
-            },
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test"
-          }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, sykepenger = tilDatoSenereEnnTiltakPeriode),
-        ).valider() shouldBe emptyList()
+        mockSpørsmålsbesvarelser(
+            sykepenger = mockSykepenger(
+                mottar = false,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 1),
+                ),
+            ),
+            mottarAndreUtbetalinger = true,
+        ).valider() shouldContain "Sykepenger med mottar = false kan ikke ha noen periode"
     }
 
     @Test
     fun `Sykepenger periode til kan ikke være tidligere enn tiltakets periode`() {
-        val tilDatoTidligereEnnTiltakPeriode = """
-            "sykepenger": {
-                "mottar": true,
-                "periode": {
-                  "fra": "2024-01-01",
-                  "til": "2024-05-01"
-                }
-              }
-        """.trimIndent()
-
-        val tiltak = """
-        "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-04-01"
-            },
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test"
-          }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, sykepenger = tilDatoTidligereEnnTiltakPeriode),
-        ).valider() shouldContain "sykepenger periode kan ikke være tidligere enn tiltakets periode"
+        mockSpørsmålsbesvarelser(
+            sykepenger = mockSykepenger(
+                mottar = true,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 2),
+                ),
+            ),
+            tiltak = mockTiltak(
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 2),
+                    til = LocalDate.of(2025, 1, 3),
+                ),
+            ),
+            mottarAndreUtbetalinger = true,
+        ).valider() shouldContain "Perioden på sykepenger er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket."
     }
 
     @Test
     fun `sykepenger periode kan ikke være senere enn tiltakets periode`() {
-        val fraDatoSenereEnnTiltakPeriode = """
-            "sykepenger": {
-                "mottar": true,
-                "periode": {
-                  "fra": "2026-01-01",
-                  "til": "2026-05-01"
-                }
-              }
-        """.trimIndent()
-
-        val tiltak = """
-        "tiltak": {
-            "aktivitetId": "123",
-            "søkerHeleTiltaksperioden": false,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-04-01"
-            },
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test"
-          }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(
-            søknad(tiltak = tiltak, sykepenger = fraDatoSenereEnnTiltakPeriode),
-        ).valider() shouldContain "Sykepenger periode kan ikke være senere enn tiltakets periode"
+        mockSpørsmålsbesvarelser(
+            sykepenger = mockSykepenger(
+                mottar = true,
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 2),
+                    til = LocalDate.of(2025, 1, 3),
+                ),
+            ),
+            tiltak = mockTiltak(
+                periode = Periode(
+                    fra = LocalDate.of(2025, 1, 1),
+                    til = LocalDate.of(2025, 1, 2),
+                ),
+            ),
+            mottarAndreUtbetalinger = true,
+        ).valider() shouldContain "Perioden på sykepenger er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket."
     }
 
     @Test
     fun `Sykepenger med mottar = true må ha en periode`() {
-        val mottarTrueUtenPeriode = """
-            "sykepenger": {
-                "mottar": true,
-                "periode": null
-              }
-        """.trimIndent()
-
-        deserialize<SpørsmålsbesvarelserDTO>(søknad(sykepenger = mottarTrueUtenPeriode))
-            .valider() shouldContain "Sykepenger med mottar = true må ha periode"
+        mockSpørsmålsbesvarelser(
+            sykepenger = mockSykepenger(
+                mottar = true,
+                periode = null,
+            ),
+            mottarAndreUtbetalinger = true,
+        ).valider() shouldContain "Sykepenger med mottar = true må ha periode"
     }
 }
