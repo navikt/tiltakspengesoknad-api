@@ -55,7 +55,7 @@ internal class PdlServiceTest {
     fun mockFødsel(
         fødselsdato: LocalDate = LocalDate.now(),
         metadata: EndringsMetadata = mockEndringsMetadata(),
-        folkeregisterMetadata: FolkeregisterMetadata = mockFolkeregisterMetadata()
+        folkeregisterMetadata: FolkeregisterMetadata = mockFolkeregisterMetadata(),
     ): Fødsel {
         return Fødsel(
             foedselsdato = fødselsdato,
@@ -67,7 +67,7 @@ internal class PdlServiceTest {
     fun mockAdressebeskyttelse(
         gradering: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
         metadata: EndringsMetadata = mockEndringsMetadata(),
-        folkeregisterMetadata: FolkeregisterMetadata = mockFolkeregisterMetadata()
+        folkeregisterMetadata: FolkeregisterMetadata = mockFolkeregisterMetadata(),
     ): Adressebeskyttelse = Adressebeskyttelse(
         gradering = gradering,
         metadata = metadata,
@@ -103,7 +103,7 @@ internal class PdlServiceTest {
         navn: List<Navn> = listOf(mockNavn()),
         adressebeskyttelse: List<Adressebeskyttelse> = listOf(mockAdressebeskyttelse()),
         fødsel: List<Fødsel> = listOf(mockFødsel()),
-        dødsfall: List<Dødsfall> = emptyList()
+        dødsfall: List<Dødsfall> = emptyList(),
     ): SøkersBarnRespons =
         SøkersBarnRespons(
             data = SøkersBarnFraPDLRespons(
@@ -112,36 +112,36 @@ internal class PdlServiceTest {
                     adressebeskyttelse = adressebeskyttelse,
                     foedsel = fødsel,
                     doedsfall = dødsfall,
-                )
-            )
+                ),
+            ),
         )
 
     private val søkersBarnDefaultMock: SøkersBarnRespons = mockSøkersBarn()
 
     private val fødselsdatoUnder16År = LocalDate.now().minusYears(16).plusDays(1)
-    private val søkersBarnUnder16År : SøkersBarnRespons = mockSøkersBarn(
-        fødsel = listOf(mockFødsel(fødselsdato = fødselsdatoUnder16År))
+    private val søkersBarnUnder16År: SøkersBarnRespons = mockSøkersBarn(
+        fødsel = listOf(mockFødsel(fødselsdato = fødselsdatoUnder16År)),
     )
 
     private val fødselsdatoOver16År = LocalDate.now().minusYears(16)
-    private val søkersBarnOver16År : SøkersBarnRespons = mockSøkersBarn(
-        fødsel = listOf(mockFødsel(fødselsdato = fødselsdatoOver16År))
+    private val søkersBarnOver16År: SøkersBarnRespons = mockSøkersBarn(
+        fødsel = listOf(mockFødsel(fødselsdato = fødselsdatoOver16År)),
     )
 
     private val barnMedStrengtFortrolig: SøkersBarnRespons = mockSøkersBarn(
-        adressebeskyttelse = listOf(mockAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG))
+        adressebeskyttelse = listOf(mockAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
     )
 
     private val barnMedFortrolig: SøkersBarnRespons = mockSøkersBarn(
-        adressebeskyttelse = listOf(mockAdressebeskyttelse(gradering = AdressebeskyttelseGradering.FORTROLIG))
+        adressebeskyttelse = listOf(mockAdressebeskyttelse(gradering = AdressebeskyttelseGradering.FORTROLIG)),
     )
 
     private val barnMedStrengtFortroligUtland: SøkersBarnRespons = mockSøkersBarn(
-        adressebeskyttelse = listOf(mockAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND))
+        adressebeskyttelse = listOf(mockAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND)),
     )
 
     private val barnMedUgradert: SøkersBarnRespons = mockSøkersBarn(
-        adressebeskyttelse = listOf(mockAdressebeskyttelse(gradering = AdressebeskyttelseGradering.UGRADERT))
+        adressebeskyttelse = listOf(mockAdressebeskyttelse(gradering = AdressebeskyttelseGradering.UGRADERT)),
     )
 
     private val mockedTokenXClient = mockk<PdlClientTokenX>()
@@ -217,11 +217,13 @@ internal class PdlServiceTest {
         val token = "token"
         runBlocking {
             mockedTokenXClient.also { mock ->
-                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(mockSøkerRespons(
-                    forelderBarnRelasjon = listOf(
-                        mockForelderBarnRelasjon(),
+                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(
+                    mockSøkerRespons(
+                        forelderBarnRelasjon = listOf(
+                            mockForelderBarnRelasjon(),
+                        ),
                     ),
-                ))
+                )
             }
             mockedCredentialsClient.also { mock ->
                 coEvery { mock.fetchBarn(any()) } returns Result.success(søkersBarnOver16År)
@@ -239,11 +241,13 @@ internal class PdlServiceTest {
         val token = "token"
         runBlocking {
             mockedTokenXClient.also { mock ->
-                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(mockSøkerRespons(
-                    forelderBarnRelasjon = listOf(
-                        mockForelderBarnRelasjon(),
+                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(
+                    mockSøkerRespons(
+                        forelderBarnRelasjon = listOf(
+                            mockForelderBarnRelasjon(),
+                        ),
                     ),
-                ))
+                )
             }
             mockedCredentialsClient.also { mock ->
                 coEvery { mock.fetchBarn(any()) } returns Result.success(søkersBarnUnder16År)
@@ -262,11 +266,13 @@ internal class PdlServiceTest {
         val token = "token"
         runBlocking {
             mockedTokenXClient.also { mock ->
-                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(mockSøkerRespons(
-                    forelderBarnRelasjon = listOf(
-                        mockForelderBarnRelasjon(),
+                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(
+                    mockSøkerRespons(
+                        forelderBarnRelasjon = listOf(
+                            mockForelderBarnRelasjon(),
+                        ),
                     ),
-                ))
+                )
             }
             mockedCredentialsClient.also { mock ->
                 coEvery { mock.fetchBarn(any()) } returns Result.success(barnMedStrengtFortrolig)
@@ -290,11 +296,13 @@ internal class PdlServiceTest {
         val token = "token"
         runBlocking {
             mockedTokenXClient.also { mock ->
-                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(mockSøkerRespons(
-                    forelderBarnRelasjon = listOf(
-                        mockForelderBarnRelasjon(),
+                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(
+                    mockSøkerRespons(
+                        forelderBarnRelasjon = listOf(
+                            mockForelderBarnRelasjon(),
+                        ),
                     ),
-                ))
+                )
             }
             mockedCredentialsClient.also { mock ->
                 coEvery { mock.fetchBarn(any()) } returns Result.success(barnMedFortrolig)
@@ -318,11 +326,13 @@ internal class PdlServiceTest {
         val token = "token"
         runBlocking {
             mockedTokenXClient.also { mock ->
-                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(mockSøkerRespons(
-                    forelderBarnRelasjon = listOf(
-                        mockForelderBarnRelasjon(),
+                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(
+                    mockSøkerRespons(
+                        forelderBarnRelasjon = listOf(
+                            mockForelderBarnRelasjon(),
+                        ),
                     ),
-                ))
+                )
             }
             mockedCredentialsClient.also { mock ->
                 coEvery { mock.fetchBarn(any()) } returns Result.success(barnMedStrengtFortroligUtland)
@@ -346,11 +356,13 @@ internal class PdlServiceTest {
         val token = "token"
         runBlocking {
             mockedTokenXClient.also { mock ->
-                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(mockSøkerRespons(
-                    forelderBarnRelasjon = listOf(
-                        mockForelderBarnRelasjon(),
+                coEvery { mock.fetchSøker(any(), any()) } returns Result.success(
+                    mockSøkerRespons(
+                        forelderBarnRelasjon = listOf(
+                            mockForelderBarnRelasjon(),
+                        ),
                     ),
-                ))
+                )
             }
             mockedCredentialsClient.also { mock ->
                 coEvery { mock.fetchBarn(any()) } returns Result.success(barnMedUgradert)
