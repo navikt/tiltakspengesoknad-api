@@ -49,7 +49,7 @@ internal class SøknadServiceTest {
               {
                 "fornavn": "Test",
                 "etternavn": "Test",
-                "fødselsdato": "2025-01-01"
+                "fødselsdato": "2023-01-01"
               }
             ],
             "registrerteBarnSøktBarnetilleggFor": [

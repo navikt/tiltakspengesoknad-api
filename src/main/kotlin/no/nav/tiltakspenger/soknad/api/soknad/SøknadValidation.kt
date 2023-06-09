@@ -242,15 +242,21 @@ fun validerAndreUtbetalinger(søknad: SpørsmålsbesvarelserDTO, tiltaksperiode:
     return feilmeldinger
 }
 
+val navnMaxLength = 25
+
 fun validerBarnetillegg(barnetillegg: Barnetillegg): List<String> {
     val feilmeldinger = mutableListOf<String>()
     val manueltRegistrerteBarn = barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor
 
-    val harEtBarnMedForLangtNavn = manueltRegistrerteBarn.find {
-        (it.fornavn.length > 25) || (it.etternavn.length > 25) || ((it.mellomnavn != null) && (it.mellomnavn.length > 25))
-    } != null
+    val harEtBarnMedForLangtNavn = manueltRegistrerteBarn.any {
+        (it.fornavn.length > navnMaxLength) || (it.etternavn.length > navnMaxLength) || ((it.mellomnavn != null) && (it.mellomnavn.length > navnMaxLength))
+    }
+    val harEtBarnMedFødselsdatoFramITid = manueltRegistrerteBarn.any { it.fødselsdato.isSameOrAfter(LocalDate.now().plusDays(1)) }
     if (harEtBarnMedForLangtNavn) {
         feilmeldinger.add("Manuelt registrert barn er ugyldig: fornavn, mellomnavn eller etternavn overskrider maksgrense på 25 tegn")
+    }
+    if (harEtBarnMedFødselsdatoFramITid) {
+        feilmeldinger.add("Manuelt registrert barn er ugyldig: fødselsdato kan ikke registreres fram i tid")
     }
 
     return feilmeldinger
@@ -274,12 +280,6 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
     feilmeldinger.addAll(validerInstitusjonsopphold(søknad.institusjonsopphold, tiltaksperiode))
     feilmeldinger.addAll(validerAndreUtbetalinger(søknad, tiltaksperiode))
     feilmeldinger.addAll(validerBarnetillegg(søknad.barnetillegg))
-
-    søknad.barnetillegg.registrerteBarnSøktBarnetilleggFor.map {
-        if (it.fødselsdato.isBefore(søknad.tiltak.periode.fra.minusYears(16))) {
-            feilmeldinger.add("Kan ikke søke for registrerte barn som er mer enn 16 år når tiltaket starter")
-        }
-    }
 
     return feilmeldinger
 }
