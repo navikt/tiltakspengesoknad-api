@@ -62,7 +62,7 @@ internal class BarnetilleggTest {
                         fornavn = "Test",
                         mellomnavn = "Test",
                         etternavn = "Test",
-                        fødselsdato = LocalDate.now().plusDays(1)
+                        fødselsdato = LocalDate.now().plusDays(1),
                     ),
                 ),
             ),
