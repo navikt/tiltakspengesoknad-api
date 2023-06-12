@@ -49,14 +49,16 @@ internal class SøknadServiceTest {
               {
                 "fornavn": "Test",
                 "etternavn": "Test",
-                "fødselsdato": "2023-01-01"
+                "fødselsdato": "2023-01-01",
+                "oppholdInnenforEøs": true
               }
             ],
             "registrerteBarnSøktBarnetilleggFor": [
               {
                 "fornavn": "Test",
                 "fødselsdato": "2025-01-01",
-                "etternavn": "Testesen"
+                "etternavn": "Testesen",
+                "oppholdInnenforEøs": true
               }
             ]
           },

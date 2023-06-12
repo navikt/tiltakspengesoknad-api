@@ -26,6 +26,7 @@ data class ManueltRegistrertBarn(
     val mellomnavn: String?,
     val etternavn: String,
     val fødselsdato: LocalDate,
+    val oppholdInnenforEøs: Boolean,
 )
 
 data class RegistrertBarn(
@@ -33,6 +34,7 @@ data class RegistrertBarn(
     val mellomnavn: String?,
     val etternavn: String,
     val fødselsdato: LocalDate,
+    val oppholdInnenforEøs: Boolean,
 )
 
 data class Kvalifiseringsprogram(

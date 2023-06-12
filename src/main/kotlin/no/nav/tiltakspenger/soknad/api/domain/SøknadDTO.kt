@@ -108,6 +108,7 @@ data class SøknadDTO(
                             mellomnavn = it.mellomnavn,
                             etternavn = it.etternavn,
                             fødselsdato = it.fødselsdato,
+                            oppholdInnenforEøs = it.oppholdInnenforEøs,
                         )
                     },
                     registrerteBarnSøktBarnetilleggFor = req.barnetillegg.registrerteBarnSøktBarnetilleggFor.map {
@@ -116,6 +117,7 @@ data class SøknadDTO(
                             mellomnavn = it.mellomnavn,
                             etternavn = it.etternavn,
                             fødselsdato = it.fødselsdato,
+                            oppholdInnenforEøs = it.oppholdInnenforEøs,
                         )
                     },
                 ), // fylle ut barn fra person her?
