@@ -38,6 +38,13 @@ data class Person(
             .mapNotNull { it.relatertPersonsIdent }
             .distinct()
     }
+
+    fun erUnder16År(): Boolean {
+        val datoFor16ÅrSiden = LocalDate.now().minusYears(16)
+        return this.fødselsdato?.let {
+            return it.isAfter(datoFor16ÅrSiden)
+        } ?: throw IllegalStateException("Barn mangler fødselsdato")
+    }
 }
 
 data class BarnDTO(

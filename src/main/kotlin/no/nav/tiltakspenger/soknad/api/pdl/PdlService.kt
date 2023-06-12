@@ -12,9 +12,10 @@ class PdlService(
         if (result.isSuccess) {
             val person = result.getOrNull()!!.toPerson()
             val barnsIdenter = person.barnsIdenter()
-            val barn = barnsIdenter.map { barnsIdent ->
-                pdlClientCredentials.fetchBarn(barnsIdent).getOrNull()?.toPerson()
-            }.mapNotNull { it }
+            val barn = barnsIdenter
+                .map { barnsIdent -> pdlClientCredentials.fetchBarn(barnsIdent).getOrNull()?.toPerson() }
+                .mapNotNull { it }
+                .filter { it.erUnder16År() }
             return person.toPersonDTO(barn)
         }
 
