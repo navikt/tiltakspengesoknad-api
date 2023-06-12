@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 data class SøkerFraPDL(
     val navn: List<Navn>,
     val adressebeskyttelse: List<Adressebeskyttelse>,
+    val foedsel: List<Fødsel>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
     val doedsfall: List<Dødsfall>,
 )
@@ -28,6 +29,7 @@ data class SøkerRespons(
     fun toPerson(): Person {
         val person = extractPerson() ?: throw IllegalStateException("Fant ikke personen")
         val navn = avklarNavn(person.navn)
+        val fødsel = avklarFødsel(person.foedsel)
         if (person.doedsfall.isNotEmpty()) {
             throw IllegalStateException("Søker er registrert som død i PDL")
         }
@@ -36,6 +38,7 @@ data class SøkerRespons(
             fornavn = navn.fornavn,
             mellomnavn = navn.mellomnavn,
             etternavn = navn.etternavn,
+            fødselsdato = fødsel.foedselsdato,
             forelderBarnRelasjon = person.forelderBarnRelasjon,
             adressebeskyttelseGradering = adressebeskyttelseGradering,
             erDød = false,

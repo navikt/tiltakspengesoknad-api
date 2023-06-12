@@ -1,5 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.pdl
 
+import no.nav.tiltakspenger.soknad.api.isSameOrBefore
 import java.time.LocalDate
 
 data class Person(
@@ -29,6 +30,7 @@ data class Person(
                     BarnDTO(fødselsdato = it.fødselsdato!!)
                 }
             },
+            harFylt18År = fødselsdato?.isSameOrBefore(LocalDate.now().minusYears(18)) ?: throw IllegalStateException("Søker mangler fødselsdato"),
         )
     }
 
@@ -59,4 +61,5 @@ data class PersonDTO(
     val mellomnavn: String?,
     val etternavn: String,
     val barn: List<BarnDTO> = emptyList(),
+    val harFylt18År: Boolean?,
 )
