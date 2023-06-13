@@ -30,6 +30,7 @@ data class Personopplysninger(
 data class SøknadDTO(
     val id: UUID = UUID.randomUUID(),
     val acr: String,
+    val versjon: String = "3", // Husk å bumpe denne og map i mottak hvis du gjør endringer på json
     val kvalifiseringsprogram: Kvalifiseringsprogram,
     val introduksjonsprogram: Introduksjonsprogram,
     val institusjonsopphold: Institusjonsopphold,
