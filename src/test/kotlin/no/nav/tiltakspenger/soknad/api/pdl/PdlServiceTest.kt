@@ -82,6 +82,7 @@ internal class PdlServiceTest {
                     adressebeskyttelse = emptyList(),
                     forelderBarnRelasjon = forelderBarnRelasjon,
                     doedsfall = emptyList(),
+                    foedsel = listOf(mockFødsel()),
                 ),
             ),
         )

@@ -31,6 +31,7 @@ internal class SøknadRoutesTest {
             mellomnavn = null,
             etternavn = "etternavn",
             barn = emptyList(),
+            harFylt18År = true,
         )
     }
     private val avServiceMock = mockk<AvService>().also { mock ->

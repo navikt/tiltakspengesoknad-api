@@ -4,6 +4,7 @@ import io.mockk.mockkClass
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -23,13 +24,14 @@ internal class PersonTest {
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
         erDød: Boolean = false,
         fornavn: String = "foo",
+        fødselsdato: LocalDate = LocalDate.MAX,
     ): Person {
         return Person(
             fornavn = fornavn,
             mellomnavn = "baz",
             etternavn = "bar",
             adressebeskyttelseGradering = gradering,
-            fødselsdato = LocalDate.MAX,
+            fødselsdato = fødselsdato,
             forelderBarnRelasjon = forelderBarnRelasjon,
             erDød = erDød,
         )
@@ -120,5 +122,21 @@ internal class PersonTest {
         assertEquals(personDTO.barn.size, 1)
         val barn = personDTO.barn[0]
         assertNotEquals(barn.fornavn, "Død")
+    }
+
+    @Test
+    fun `toPersonDTO skal sette harFylt18År = false hvis fødselsdato på personen er mindre enn 18 år tilbake i tid`() {
+        val fødselsdatoUnder18År = LocalDate.now().minusYears(18).plusDays(1)
+        val personSomIkkeHarFylt18År = mockPerson(fødselsdato = fødselsdatoUnder18År)
+        val harFylt18År = personSomIkkeHarFylt18År.toPersonDTO().harFylt18År
+        assertFalse(harFylt18År!!)
+    }
+
+    @Test
+    fun `toPersonDTO skal sette harFylt18År = true hvis fødselsdato på personen 18 år tilbake i tid`() {
+        val fødselsdato18År = LocalDate.now().minusYears(18)
+        val personSomHarFylt18År = mockPerson(fødselsdato = fødselsdato18År)
+        val harFylt18År = personSomHarFylt18År.toPersonDTO().harFylt18År
+        assertTrue(harFylt18År!!)
     }
 }
