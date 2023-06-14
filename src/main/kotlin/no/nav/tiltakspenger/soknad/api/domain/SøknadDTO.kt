@@ -20,6 +20,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Sykepenger
 import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 
 data class Personopplysninger(
     val ident: String,
@@ -44,6 +45,7 @@ data class SøknadDTO(
     val supplerendestønadflyktninger: Supplerendestønadflyktninger,
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
+    val lønnetArbeid: LønnetArbeid,
     val jobbsjansen: Jobbsjansen,
     val personopplysninger: Personopplysninger,
     val harBekreftetAlleOpplysninger: Boolean,
@@ -124,6 +126,15 @@ data class SøknadDTO(
                 mottarAndreUtbetalinger = req.mottarAndreUtbetalinger,
                 pensjonsordning = Pensjonsordning(
                     mottar = req.pensjonsordning.mottar,
+                    periode = req.pensjonsordning.periode?.let {
+                        Periode(
+                            fra = it.fra,
+                            til = it.til,
+                        )
+                    },
+                ),
+                lønnetArbeid = LønnetArbeid(
+                    erILønnetArbeid = req.lønnetArbeid.erILønnetArbeid,
                 ),
                 etterlønn = Etterlønn(
                     mottar = req.etterlønn.mottar,

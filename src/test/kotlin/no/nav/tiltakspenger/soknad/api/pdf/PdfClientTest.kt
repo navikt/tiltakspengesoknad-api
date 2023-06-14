@@ -32,6 +32,7 @@ import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
+import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 
 internal class PdfClientTest {
 
@@ -153,9 +154,16 @@ internal class PdfClientTest {
         ),
         pensjonsordning = Pensjonsordning(
             mottar = false,
+            periode = Periode(
+                fra = LocalDate.of(2023, 1, 1),
+                til = LocalDate.of(2023, 1, 31),
+            ),
         ),
         etterlønn = Etterlønn(
             mottar = false,
+        ),
+        lønnetArbeid = LønnetArbeid(
+            erILønnetArbeid = false,
         ),
         jobbsjansen = Jobbsjansen(
             mottar = false,

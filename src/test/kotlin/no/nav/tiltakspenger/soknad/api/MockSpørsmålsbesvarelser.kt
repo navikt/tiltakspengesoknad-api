@@ -19,6 +19,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Sykepenger
 import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
 import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import java.time.LocalDate
+import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 
 fun mockTiltak(
     aktivitetId: String = "123",
@@ -93,13 +94,19 @@ fun mockSupplerendestønadflyktninger(
 
 fun mockPensjonsordning(
     mottar: Boolean = false,
+    periode: Periode? = null,
 ): Pensjonsordning =
-    Pensjonsordning(mottar)
+    Pensjonsordning(mottar, periode)
 
 fun mockEtterlønn(
     mottar: Boolean = false,
 ): Etterlønn =
     Etterlønn(mottar)
+
+fun mockLønnetArbeid(
+    erILønnetArbeid: Boolean = false,
+): LønnetArbeid =
+    LønnetArbeid(erILønnetArbeid)
 
 fun mockJobbsjansen(
     mottar: Boolean = false,
@@ -162,6 +169,7 @@ fun mockSpørsmålsbesvarelser(
     supplerendestønadflyktninger: Supplerendestønadflyktninger = mockSupplerendestønadflyktninger(),
     pensjonsordning: Pensjonsordning = mockPensjonsordning(),
     etterlønn: Etterlønn = mockEtterlønn(),
+    lønnetArbeid: LønnetArbeid = mockLønnetArbeid(),
     jobbsjansen: Jobbsjansen = mockJobbsjansen(),
     harBekreftetAlleOpplysninger: Boolean = true,
     harBekreftetÅSvareSåGodtManKan: Boolean = true,
@@ -179,6 +187,7 @@ fun mockSpørsmålsbesvarelser(
     supplerendestønadflyktninger = supplerendestønadflyktninger,
     pensjonsordning = pensjonsordning,
     etterlønn = etterlønn,
+    lønnetArbeid = lønnetArbeid,
     jobbsjansen = jobbsjansen,
     harBekreftetAlleOpplysninger = harBekreftetAlleOpplysninger,
     harBekreftetÅSvareSåGodtManKan = harBekreftetÅSvareSåGodtManKan,

@@ -117,6 +117,28 @@ fun validerSykepenger(sykepenger: Sykepenger, tiltaksperiode: Periode): List<Str
     return feilmeldinger
 }
 
+fun validerPensjonsordning(pensjonsordning: Pensjonsordning, tiltaksperiode: Periode): List<String> {
+    val feilmeldinger = mutableListOf<String>()
+    if (pensjonsordning.mottar == false) {
+        if (pensjonsordning.periode != null) {
+            feilmeldinger.add("Pensjonsordning med mottar = false kan ikke ha noen periode")
+        }
+    } else {
+        if (pensjonsordning.periode == null) {
+            feilmeldinger.add("Pensjonsordning med mottar = true må ha periode")
+        } else {
+            if (!pensjonsordning.periode.erGyldig()) {
+                feilmeldinger.add("Perioden på pensjonsordning er ugyldig. Fra-dato må være tidligere enn, eller lik, til-dato.")
+            }
+            if (!pensjonsordning.periode.erGyldigIForholdTilTiltaksperiode(tiltaksperiode)) {
+                feilmeldinger.add("Perioden på pensjonsordning er ugyldig. Perioden kan ikke gå utenfor perioden på tiltaket.")
+            }
+        }
+    }
+    return feilmeldinger
+}
+
+
 fun validerGjenlevendepensjon(gjenlevendepensjon: Gjenlevendepensjon, tiltaksperiode: Periode): List<String> {
     val feilmeldinger = mutableListOf<String>()
     if (gjenlevendepensjon.mottar == false) {
@@ -231,7 +253,7 @@ fun validerAndreUtbetalinger(søknad: SpørsmålsbesvarelserDTO, tiltaksperiode:
     val feilmeldinger = mutableListOf<String>()
 
     if (søknad.mottarAndreUtbetalinger == true) {
-        feilmeldinger.addAll(validerSykepenger(søknad.sykepenger, tiltaksperiode))
+        feilmeldinger.addAll(validerPensjonsordning(søknad.pensjonsordning, tiltaksperiode))
         feilmeldinger.addAll(validerGjenlevendepensjon(søknad.gjenlevendepensjon, tiltaksperiode))
         feilmeldinger.addAll(validerAlderspensjon(søknad.alderspensjon, tiltaksperiode))
         feilmeldinger.addAll(validerSupplerendeStønadFlyktninger(søknad.supplerendestønadflyktninger, tiltaksperiode))
@@ -278,6 +300,7 @@ fun valider(søknad: SpørsmålsbesvarelserDTO): List<String> {
     feilmeldinger.addAll(validerKvalifiseringsprogram(søknad.kvalifiseringsprogram, tiltaksperiode))
     feilmeldinger.addAll(validerIntroduksjonsprogram(søknad.introduksjonsprogram, tiltaksperiode))
     feilmeldinger.addAll(validerInstitusjonsopphold(søknad.institusjonsopphold, tiltaksperiode))
+    feilmeldinger.addAll(validerSykepenger(søknad.sykepenger, tiltaksperiode))
     feilmeldinger.addAll(validerAndreUtbetalinger(søknad, tiltaksperiode))
     feilmeldinger.addAll(validerBarnetillegg(søknad.barnetillegg))
 
