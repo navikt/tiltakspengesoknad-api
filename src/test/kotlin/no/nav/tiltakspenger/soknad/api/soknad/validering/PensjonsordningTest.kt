@@ -2,12 +2,12 @@ package no.nav.tiltakspenger.soknad.api.soknad.validering
 
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
+import no.nav.tiltakspenger.soknad.api.mockPensjonsordning
 import no.nav.tiltakspenger.soknad.api.mockSpørsmålsbesvarelser
 import no.nav.tiltakspenger.soknad.api.mockTiltak
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import no.nav.tiltakspenger.soknad.api.mockPensjonsordning
 
 internal class PensjonsordningTest {
     @Test

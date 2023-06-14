@@ -24,6 +24,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
 import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
 import no.nav.tiltakspenger.soknad.api.soknad.Jobbsjansen
 import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadflyktninger
@@ -35,7 +36,6 @@ import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
-import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 
 internal class JoarkClientTest {
     private val journalpostId = "1"

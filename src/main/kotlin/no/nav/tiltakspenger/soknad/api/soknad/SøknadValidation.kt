@@ -138,7 +138,6 @@ fun validerPensjonsordning(pensjonsordning: Pensjonsordning, tiltaksperiode: Per
     return feilmeldinger
 }
 
-
 fun validerGjenlevendepensjon(gjenlevendepensjon: Gjenlevendepensjon, tiltaksperiode: Periode): List<String> {
     val feilmeldinger = mutableListOf<String>()
     if (gjenlevendepensjon.mottar == false) {
