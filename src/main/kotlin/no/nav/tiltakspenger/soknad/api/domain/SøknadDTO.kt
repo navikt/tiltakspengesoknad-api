@@ -9,6 +9,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
 import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
 import no.nav.tiltakspenger.soknad.api.soknad.Jobbsjansen
 import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 import no.nav.tiltakspenger.soknad.api.soknad.ManueltRegistrertBarn
 import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
@@ -30,7 +31,7 @@ data class Personopplysninger(
 data class SøknadDTO(
     val id: UUID = UUID.randomUUID(),
     val acr: String,
-    val versjon: String = "3", // Husk å bumpe denne og map i mottak hvis du gjør endringer på json
+    val versjon: String = "4", // Husk å bumpe denne og map i mottak hvis du gjør endringer på json
     val kvalifiseringsprogram: Kvalifiseringsprogram,
     val introduksjonsprogram: Introduksjonsprogram,
     val institusjonsopphold: Institusjonsopphold,
@@ -45,6 +46,7 @@ data class SøknadDTO(
     val supplerendestønadflyktninger: Supplerendestønadflyktninger,
     val pensjonsordning: Pensjonsordning,
     val etterlønn: Etterlønn,
+    val lønnetArbeid: LønnetArbeid,
     val jobbsjansen: Jobbsjansen,
     val personopplysninger: Personopplysninger,
     val harBekreftetAlleOpplysninger: Boolean,
@@ -125,6 +127,15 @@ data class SøknadDTO(
                 mottarAndreUtbetalinger = req.mottarAndreUtbetalinger,
                 pensjonsordning = Pensjonsordning(
                     mottar = req.pensjonsordning.mottar,
+                    periode = req.pensjonsordning.periode?.let {
+                        Periode(
+                            fra = it.fra,
+                            til = it.til,
+                        )
+                    },
+                ),
+                lønnetArbeid = LønnetArbeid(
+                    erILønnetArbeid = req.lønnetArbeid.erILønnetArbeid,
                 ),
                 etterlønn = Etterlønn(
                     mottar = req.etterlønn.mottar,

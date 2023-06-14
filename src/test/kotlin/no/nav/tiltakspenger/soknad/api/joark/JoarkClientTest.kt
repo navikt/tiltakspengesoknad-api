@@ -24,6 +24,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
 import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
 import no.nav.tiltakspenger.soknad.api.soknad.Jobbsjansen
 import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
 import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadflyktninger
@@ -280,9 +281,16 @@ internal class JoarkClientTest {
             ),
             pensjonsordning = Pensjonsordning(
                 mottar = false,
+                periode = Periode(
+                    fra = LocalDate.of(2023, 1, 1),
+                    til = LocalDate.of(2023, 1, 31),
+                ),
             ),
             etterlønn = Etterlønn(
                 mottar = false,
+            ),
+            lønnetArbeid = LønnetArbeid(
+                erILønnetArbeid = false,
             ),
             jobbsjansen = Jobbsjansen(
                 mottar = false,

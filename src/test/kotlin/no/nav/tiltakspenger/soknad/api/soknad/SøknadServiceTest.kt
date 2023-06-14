@@ -125,8 +125,15 @@ internal class SøknadServiceTest {
           "etterlønn": {
             "mottar": true
           },
+          "lønnetArbeid": {
+            "erILønnetArbeid": true
+          },
           "pensjonsordning": {
-            "mottar": true
+            "mottar": true,
+            "periode": {
+                "fra": "2025-01-01",
+                "til": "2025-01-01"
+             }
           },
           "mottarAndreUtbetalinger": true,
           "harBekreftetAlleOpplysninger": true,

@@ -40,6 +40,12 @@ private fun etterlønn() = """
         }
 """.trimIndent()
 
+private fun lønnetarbeid() = """
+        "lønnetArbeid": {
+            "erILønnetArbeid": true
+        }
+""".trimIndent()
+
 private fun institusjonsopphold() = """
         "institusjonsopphold": {
             "borPåInstitusjon": true,
@@ -129,7 +135,11 @@ private fun alderspensjon() = """
 
 private fun pensjonsordning() = """
         "pensjonsordning": {
-            "mottar": true
+            "mottar": true,
+            "periode": {
+              "fra": "2025-01-01",
+              "til": "2025-01-01"
+            }
         }
 """.trimIndent()
 
@@ -159,6 +169,7 @@ fun søknad(
     supplerendestønadover67: String = supplerendestønadover67år(),
     supplerendestønadflyktninger: String = supplerendestønadflyktninger(),
     etterlønn: String = etterlønn(),
+    lønnetArbeid: String = lønnetarbeid(),
     jobbsjansen: String = jobbsjansen(),
     harBekreftetAlleOpplysningerSvar: Boolean = true,
     harBekreftetÅSvareSåGodtManKanSvar: Boolean = true,
@@ -177,6 +188,7 @@ fun søknad(
           $supplerendestønadflyktninger,
           $pensjonsordning,
           $etterlønn,
+          $lønnetArbeid,
           $jobbsjansen,
           ${harBekreftetAlleOpplysninger(harBekreftetAlleOpplysningerSvar)},
           ${harBekreftetÅSvareSåGodtManKan(harBekreftetÅSvareSåGodtManKanSvar)}
