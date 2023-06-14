@@ -21,6 +21,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import kotlin.test.assertEquals
 
 internal class PdlRoutesTest {
@@ -36,6 +37,7 @@ internal class PdlRoutesTest {
         fornavn = "foo",
         etternavn = "bar",
         mellomnavn = "baz",
+        fødselsdato = LocalDate.MAX,
         adressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
         erDød = false,
     )
