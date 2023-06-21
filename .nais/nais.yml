@@ -22,7 +22,7 @@ spec:
   ingresses:
     - {{ ingress.url }}
   prometheus:
-    enabled: false
+    enabled: true
     path: /metrics
   replicas:
     min: 2
