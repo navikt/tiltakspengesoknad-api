@@ -27,6 +27,7 @@ import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
 import no.nav.tiltakspenger.soknad.api.joark.JoarkServiceImpl
 import no.nav.tiltakspenger.soknad.api.joark.TokenServiceImpl
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
+import no.nav.tiltakspenger.soknad.api.metrics.metricRoutes
 import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
 import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
@@ -139,6 +140,7 @@ internal fun Application.setupRouting(
             tiltakRoutes(tiltakService = tiltakService)
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
+        metricRoutes()
     }
 }
 
