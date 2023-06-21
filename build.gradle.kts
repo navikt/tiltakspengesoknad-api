@@ -5,6 +5,7 @@ val kotestVersion = "5.6.1"
 val jacksonVersion = "2.15.0"
 val kotlinxCoroutinesVersion = "1.6.4"
 val tokenSupportVersion = "3.0.8"
+val prometheusVersion = "0.16.0"
 
 plugins {
     application
@@ -48,6 +49,12 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
+
+    // Prometheus
+    implementation("io.prometheus:simpleclient:$prometheusVersion")
+    implementation("io.prometheus:simpleclient_common:$prometheusVersion")
+    implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
+
     // Jackson
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")

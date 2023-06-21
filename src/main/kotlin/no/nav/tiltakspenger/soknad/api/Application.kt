@@ -15,6 +15,7 @@ import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.request.httpMethod
 import io.ktor.server.request.path
 import io.ktor.server.routing.routing
+import io.prometheus.client.hotspot.DefaultExports
 import mu.KotlinLogging
 import no.nav.security.token.support.v2.asIssuerProps
 import no.nav.tiltakspenger.soknad.api.antivirus.AvClient
@@ -25,6 +26,7 @@ import no.nav.tiltakspenger.soknad.api.health.healthRoutes
 import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
 import no.nav.tiltakspenger.soknad.api.joark.JoarkServiceImpl
 import no.nav.tiltakspenger.soknad.api.joark.TokenServiceImpl
+import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
 import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
@@ -45,6 +47,8 @@ fun main(args: Array<String>) {
         log.error { "Uncaught exception logget i securelog" }
         securelog.error(e) { e.message }
     }
+
+    DefaultExports.initialize()
 
     io.ktor.server.netty.EngineMain.main(args)
 }
@@ -73,6 +77,7 @@ fun Application.soknadApi(
         ),
     ),
     tiltakService: TiltakService = TiltakService(environment.config),
+    metricsCollector: MetricsCollector = MetricsCollector(),
 ) {
     val log = KotlinLogging.logger {}
     log.info { "starting server" }
@@ -98,6 +103,7 @@ fun Application.soknadApi(
         søknadService = søknadService,
         tiltakService = tiltakService,
         avService = avService,
+        metricsCollector = metricsCollector,
     )
     installJacksonFeature()
 
@@ -118,6 +124,7 @@ internal fun Application.setupRouting(
     søknadService: SøknadService,
     tiltakService: TiltakService,
     avService: AvService,
+    metricsCollector: MetricsCollector,
 ) {
     val issuers = environment.config.asIssuerProps().keys
     routing {
@@ -127,6 +134,7 @@ internal fun Application.setupRouting(
                 søknadService = søknadService,
                 avService = avService,
                 pdlService = pdlService,
+                metricsCollector = metricsCollector,
             )
             tiltakRoutes(tiltakService = tiltakService)
         }

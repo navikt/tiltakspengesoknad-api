@@ -17,6 +17,7 @@ import no.nav.tiltakspenger.soknad.api.acr
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
+import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
@@ -28,8 +29,11 @@ fun Route.søknadRoutes(
     søknadService: SøknadService,
     avService: AvService,
     pdlService: PdlService,
+    metricsCollector: MetricsCollector,
 ) {
     post(SØKNAD_PATH) {
+        val requestTimer = metricsCollector.SØKNADSMOTTAK_LATENCY_SECONDS.startTimer()
+        metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.inc()
         try {
             val innsendingTidspunkt = LocalDateTime.now()
             val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
@@ -53,8 +57,12 @@ fun Route.søknadRoutes(
                 journalpostId = journalpostId,
                 innsendingTidspunkt = innsendingTidspunkt,
             )
+            metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
+            metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
+            requestTimer.observeDuration()
             call.respond(status = HttpStatusCode.Created, message = søknadResponse)
         } catch (exception: Exception) {
+            metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
             when (exception) {
                 is CannotTransformContentToTypeException,
                 is BadRequestException,
@@ -65,6 +73,8 @@ fun Route.søknadRoutes(
                 is RequestValidationException,
                 -> {
                     LOG.error("Ugyldig søknad ${exception.message}", exception)
+                    metricsCollector.ANTALL_UGYLDIGE_SØKNADER_COUNTER.inc()
+                    requestTimer.observeDuration()
                     call.respondText(
                         text = "Bad Request",
                         contentType = ContentType.Text.Plain,
@@ -74,6 +84,8 @@ fun Route.søknadRoutes(
 
                 else -> {
                     LOG.error("Noe gikk galt ved post av søknad ${exception.message}", exception)
+                    metricsCollector.ANTALL_FEILEDE_INNSENDINGER_COUNTER.inc()
+                    requestTimer.observeDuration()
                     call.respondText(
                         text = "Internal server error",
                         contentType = ContentType.Text.Plain,
