@@ -15,7 +15,15 @@ spec:
           for: 1m
           annotations:
             consequence: "tiltakspenger-soknad-api har utilgjengelige podder i dev-gcp"
-            action: "`kubectl describe pod -l app=tiltakspenger-soknad-api -n tpts` -> `kubectl get pods -l app=tiltakspenger-soknad-api -n tpts` -> `kubectl logs <pod>`"
+            action: "Se `kubectl describe pod -l app=tiltakspenger-soknad-api -n tpts` for events, og `kubectl get pods -l app=tiltakspenger-soknad-api -n tpts` -> `kubectl logs <pod>` for logger"
           labels:
             namespace: tpts
+            severity: critical
+        - alert: IntancesRestarting
+          expr: sum(increase(kube_pod_container_status_restarts_total{container=~"tiltakspenger-soknad-api"}[5m])) by (container) > 2
+          for: 2m
+          annotations:
+            consequence: "tiltakspenger-soknad-api har restartet flere ganger de siste 5 minuttene!"
+            action: "Se `kubectl describe pod -l app=tiltakspenger-soknad-api -n tpts` for events, og `kubectl get pods -l app=tiltakspenger-soknad-api -n tpts` -> `kubectl logs <pod>` for logger"
+          labels:
             severity: critical
