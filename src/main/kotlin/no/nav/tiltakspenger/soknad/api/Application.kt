@@ -60,13 +60,13 @@ fun Application.soknadApi(
         pdfService = PdfServiceImpl(
             PdfClient(
                 config = environment.config,
-                client = httpClientCIO(),
+                client = httpClientCIO(timeout = 10L),
             ),
         ),
         joarkService = JoarkServiceImpl(
             joark = JoarkClient(
                 config = environment.config,
-                client = httpClientCIO(),
+                client = httpClientCIO(timeout = 30L),
                 tokenService = TokenServiceImpl(),
             ),
         ),
@@ -74,7 +74,7 @@ fun Application.soknadApi(
     avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
-            client = httpClientCIO(),
+            client = httpClientCIO(timeout = 30L),
         ),
     ),
     tiltakService: TiltakService = TiltakService(environment.config),

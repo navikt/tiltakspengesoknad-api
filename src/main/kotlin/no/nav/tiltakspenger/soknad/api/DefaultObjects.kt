@@ -21,11 +21,10 @@ private val LOG = KotlinLogging.logger {}
 private val SECURELOG = KotlinLogging.logger("tjenestekall")
 
 private const val SIXTY_SECONDS = 60L
+fun httpClientCIO(timeout: Long = SIXTY_SECONDS) = HttpClient(CIO).config(timeout)
+fun httpClientGeneric(engine: HttpClientEngine, timeout: Long = SIXTY_SECONDS) = HttpClient(engine).config(timeout)
 
-fun httpClientCIO() = HttpClient(CIO).medDefaultConfig()
-fun httpClientGeneric(engine: HttpClientEngine) = HttpClient(engine).medDefaultConfig()
-
-private fun HttpClient.medDefaultConfig() = this.config {
+private fun HttpClient.config(timeout: Long) = this.config {
     install(ContentNegotiation) {
         jackson {
             registerModule(KotlinModule.Builder().build())
@@ -40,9 +39,9 @@ private fun HttpClient.medDefaultConfig() = this.config {
         }
     }
     install(HttpTimeout) {
-        connectTimeoutMillis = Duration.ofSeconds(SIXTY_SECONDS).toMillis()
-        requestTimeoutMillis = Duration.ofSeconds(SIXTY_SECONDS).toMillis()
-        socketTimeoutMillis = Duration.ofSeconds(SIXTY_SECONDS).toMillis()
+        connectTimeoutMillis = Duration.ofSeconds(timeout).toMillis()
+        requestTimeoutMillis = Duration.ofSeconds(timeout).toMillis()
+        socketTimeoutMillis = Duration.ofSeconds(timeout).toMillis()
     }
 
     install(Logging) {

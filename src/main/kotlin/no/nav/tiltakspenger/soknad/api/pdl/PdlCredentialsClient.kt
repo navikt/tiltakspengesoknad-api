@@ -15,7 +15,7 @@ import no.nav.tiltakspenger.soknad.api.httpClientCIO
 
 class PdlCredentialsClient(
     config: ApplicationConfig,
-    private val httpClient: HttpClient = httpClientCIO(),
+    private val httpClient: HttpClient = httpClientCIO(timeout = 10L),
 ) {
     private val pdlEndpoint = config.property("endpoints.pdl").getString()
     private val pdlScope = config.property("scope.pdl").getString()

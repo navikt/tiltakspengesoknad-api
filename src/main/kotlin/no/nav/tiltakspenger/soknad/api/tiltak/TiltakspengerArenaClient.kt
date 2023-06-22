@@ -14,7 +14,7 @@ import no.nav.tiltakspenger.soknad.api.httpClientCIO
 
 class TiltakspengerArenaClient(
     config: ApplicationConfig,
-    private val httpClient: HttpClient = httpClientCIO(),
+    private val httpClient: HttpClient = httpClientCIO(timeout = 10L),
 ) {
     private val tiltakspengerArenaEndpoint = config.property("endpoints.tiltakspengerarena").getString()
     private val tiltakspengerArenaAudience = config.property("audience.tiltakspengerarena").getString()

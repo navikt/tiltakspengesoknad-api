@@ -32,22 +32,6 @@ class JoarkClient(
     ): String {
         try {
             val token = tokenService.getToken(config = config)
-            log.info("$token")
-            val bodyUtenDokumenterFordiViSkalLoggeLitt = objectMapper.writeValueAsString(
-                JournalpostRequest(
-                    tittel = dokumentInnhold.tittel,
-                    journalpostType = dokumentInnhold.journalpostType,
-                    tema = dokumentInnhold.tema,
-                    kanal = dokumentInnhold.kanal,
-                    behandlingstema = dokumentInnhold.behandlingstema,
-                    // journalfoerendeEnhet = dokumentInnhold.journalfoerendeEnhet,
-                    avsenderMottaker = dokumentInnhold.avsenderMottaker,
-                    bruker = dokumentInnhold.bruker,
-                    // sak = dokumentInnhold.sak,
-                    dokumenter = emptyList(),
-                ),
-            )
-            log.info("$bodyUtenDokumenterFordiViSkalLoggeLitt")
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)

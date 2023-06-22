@@ -17,7 +17,7 @@ const val INDIVIDSTONAD = "IND"
 
 class PdlClientTokenX(
     config: ApplicationConfig,
-    private val httpClient: HttpClient = httpClientCIO(),
+    private val httpClient: HttpClient = httpClientCIO(timeout = 10L),
 ) {
     private val pdlEndpoint = config.property("endpoints.pdl").getString()
     private val pdlAudience = config.property("audience.pdl").getString()
