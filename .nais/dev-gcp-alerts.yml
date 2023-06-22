@@ -11,7 +11,7 @@ spec:
     - name: tiltakspenger-soknad-api-alerts
       rules:
         - alert: InstanceDown
-          expr: kube_deployment_status_replicas_available{namespace="tpts", deployment="tiltakspenger-soknad-api"} == 0
+          expr: kube_deployment_status_replicas_available{namespace="tpts", deployment="tiltakspenger-soknad-api"} != 0
           for: 1m
           annotations:
             consequence: "tiltakspenger-soknad-api har utilgjengelige podder i dev-gcp"
