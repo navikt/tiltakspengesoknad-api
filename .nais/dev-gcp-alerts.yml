@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: tiltakspenger-soknad-api-alerts
+  namespace: tpts
+  labels:
+    team: tpts
+    app: tiltakspenger-soknad-api
+spec:
+  groups:
+    - name: tiltakspenger-soknad-api-alerts
+      rules:
+        - alert: InstanceDown
+          expr: kube_deployment_status_replicas_available{namespace="tpts", deployment="tiltakspenger-soknad-api"} == 0
+          for: 5m
+          annotations:
+            consequence: "tiltakspenger-soknad-api har utilgjengelige podder i dev-gcp"
+            action: "`kubectl describe pod -l app=tiltakspenger-soknad-api -n tpts` -> `kubectl get pods -l app=tiltakspenger-soknad-api -n tpts` -> `kubectl logs <pod>`"
+          labels:
+            namespace: tpts
+            severity: critical
