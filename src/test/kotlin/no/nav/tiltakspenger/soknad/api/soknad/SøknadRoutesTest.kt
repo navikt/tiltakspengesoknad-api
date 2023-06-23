@@ -53,7 +53,7 @@ internal class SøknadRoutesTest {
                 "acr" to "$acr",
                 "pid" to "123",
             ),
-            expiry = expiry
+            expiry = expiry,
         )
     }
 
