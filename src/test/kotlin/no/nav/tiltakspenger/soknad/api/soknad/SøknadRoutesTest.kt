@@ -14,7 +14,6 @@ import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
@@ -46,18 +45,86 @@ internal class SøknadRoutesTest {
     @AfterAll
     fun after() = mockOAuth2Server.shutdown()
 
-    fun issueTestToken(): SignedJWT {
+    fun issueTestToken(acr: String = "Level4", expiry: Long = 3600): SignedJWT {
         return mockOAuth2Server.issueToken(
-            "tokendings",
-            "testClientId",
-            DefaultOAuth2TokenCallback(
-                audience = listOf("audience"),
-                claims = mapOf(
-                    "acr" to "Level4",
-                    "pid" to "123",
-                ),
+            issuerId = "tokendings",
+            audience = "audience",
+            claims = mapOf(
+                "acr" to "$acr",
+                "pid" to "123",
             ),
+            expiry = expiry
         )
+    }
+
+    @Test
+    fun `post med ugyldig token skal gi 401`() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
+        }
+
+        testApplication {
+            configureTestApplication(søknadService = søknadServiceMock)
+            val response = client.post("/soknad") {
+                header("Authorization", "Bearer ugyldigtoken")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {},
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
+                )
+            }
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
+        }
+    }
+
+    @Test
+    fun `post med token som har ugyldig acr claim skal gi 401`() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
+        }
+
+        val token = issueTestToken(acr = "Level3")
+
+        testApplication {
+            configureTestApplication(søknadService = søknadServiceMock)
+            val response = client.post("/soknad") {
+                header("Authorization", "Bearer ${token.serialize()}")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {},
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
+                )
+            }
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
+        }
+    }
+
+    @Test
+    fun `post med token som har expiret utenfor leeway skal gi 401`() {
+        val søknadServiceMock = mockk<SøknadService>().also { mock ->
+            coEvery { mock.taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
+        }
+
+        val token = issueTestToken(expiry = -60L)
+
+        testApplication {
+            configureTestApplication(søknadService = søknadServiceMock)
+            val response = client.post("/soknad") {
+                header("Authorization", "Bearer ${token.serialize()}")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {},
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
+                )
+            }
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
+        }
     }
 
     @Test
@@ -70,19 +137,17 @@ internal class SøknadRoutesTest {
 
         testApplication {
             configureTestApplication(søknadService = søknadServiceMock)
-            kotlin.runCatching {
-                val response = client.post("/soknad") {
-                    header("Authorization", "Bearer ${token.serialize()}")
-                    setBody(
-                        MultiPartFormDataContent(
-                            formData {},
-                            "WebAppBoundary",
-                            ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
-                        ),
-                    )
-                }
-                assertEquals(HttpStatusCode.BadRequest, response.status)
+            val response = client.post("/soknad") {
+                header("Authorization", "Bearer ${token.serialize()}")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {},
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
+                )
             }
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
     }
 
@@ -99,19 +164,17 @@ internal class SøknadRoutesTest {
 
         testApplication {
             configureTestApplication(søknadService = søknadServiceMock)
-            kotlin.runCatching {
-                val response = client.post("/soknad") {
-                    header("Authorization", "Bearer ${token.serialize()}")
-                    setBody(
-                        MultiPartFormDataContent(
-                            formData {},
-                            "WebAppBoundary",
-                            ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
-                        ),
-                    )
-                }
-                assertEquals(HttpStatusCode.BadRequest, response.status)
+            val response = client.post("/soknad") {
+                header("Authorization", "Bearer ${token.serialize()}")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {},
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
+                )
             }
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
     }
 
@@ -151,19 +214,17 @@ internal class SøknadRoutesTest {
 
         testApplication {
             configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
-            kotlin.runCatching {
-                val response = client.post("/soknad") {
-                    header("Authorization", "Bearer ${token.serialize()}")
-                    setBody(
-                        MultiPartFormDataContent(
-                            formData {},
-                            "WebAppBoundary",
-                            ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
-                        ),
-                    )
-                }
-                assertEquals(HttpStatusCode.InternalServerError, response.status)
+            val response = client.post("/soknad") {
+                header("Authorization", "Bearer ${token.serialize()}")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {},
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
+                )
             }
+            assertEquals(HttpStatusCode.InternalServerError, response.status)
         }
     }
 
@@ -182,19 +243,17 @@ internal class SøknadRoutesTest {
 
         testApplication {
             configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
-            kotlin.runCatching {
-                val response = client.post("/soknad") {
-                    header("Authorization", "Bearer ${token.serialize()}")
-                    setBody(
-                        MultiPartFormDataContent(
-                            formData {},
-                            "WebAppBoundary",
-                            ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
-                        ),
-                    )
-                }
-                assertEquals(HttpStatusCode.InternalServerError, response.status)
+            val response = client.post("/soknad") {
+                header("Authorization", "Bearer ${token.serialize()}")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {},
+                        "WebAppBoundary",
+                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
+                    ),
+                )
             }
+            assertEquals(HttpStatusCode.InternalServerError, response.status)
         }
     }
 }
