@@ -130,14 +130,20 @@ internal fun Application.setupRouting(
     val issuers = environment.config.asIssuerProps().keys
     routing {
         authenticate(*issuers.toTypedArray()) {
-            pdlRoutes(pdlService = pdlService)
+            pdlRoutes(
+                pdlService = pdlService,
+                metricsCollector = metricsCollector,
+            )
             søknadRoutes(
                 søknadService = søknadService,
                 avService = avService,
                 pdlService = pdlService,
                 metricsCollector = metricsCollector,
             )
-            tiltakRoutes(tiltakService = tiltakService)
+            tiltakRoutes(
+                tiltakService = tiltakService,
+                metricsCollector = metricsCollector,
+            )
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
         metricRoutes()

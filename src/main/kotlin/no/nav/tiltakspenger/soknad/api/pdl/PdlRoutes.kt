@@ -9,11 +9,12 @@ import io.ktor.server.routing.get
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.PERSONALIA_PATH
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
+import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.token
 
 val secureLog = KotlinLogging.logger("tjenestekall")
 
-fun Route.pdlRoutes(pdlService: PdlService) {
+fun Route.pdlRoutes(pdlService: PdlService, metricsCollector: MetricsCollector) {
     get(PERSONALIA_PATH) {
         try {
             val fødselsnummer = call.fødselsnummer()
@@ -25,6 +26,7 @@ fun Route.pdlRoutes(pdlService: PdlService) {
             val personDTO = pdlService.hentPersonaliaMedBarn(fødselsnummer = fødselsnummer, subjectToken = subjectToken)
             call.respond(personDTO)
         } catch (e: Exception) {
+            metricsCollector.ANTALL_FEIL_VED_HENT_PERSONALIA.inc()
             secureLog.error("Feil under kall mot PDL", e)
             call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
         }

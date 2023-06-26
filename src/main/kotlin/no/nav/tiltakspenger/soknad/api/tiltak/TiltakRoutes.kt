@@ -9,9 +9,10 @@ import io.ktor.server.routing.get
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.TILTAK_PATH
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
+import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.token
 
-fun Route.tiltakRoutes(tiltakService: TiltakService) {
+fun Route.tiltakRoutes(tiltakService: TiltakService, metricsCollector: MetricsCollector) {
     val secureLog = KotlinLogging.logger("tjenestekall")
 
     get(TILTAK_PATH) {
@@ -25,6 +26,7 @@ fun Route.tiltakRoutes(tiltakService: TiltakService) {
             call.respond(tiltakDto)
         } catch (e: Exception) {
             secureLog.error { e.stackTraceToString() }
+            metricsCollector.ANTALL_FEIL_VED_HENT_TILTAK.inc()
             call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
         }
     }
