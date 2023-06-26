@@ -30,7 +30,6 @@ class SøknadServiceImpl(
     ): String {
         val vedleggsnavn = vedlegg.stream().map { vedlegg -> vedlegg.filnavn }.toList()
         val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr, innsendingTidspunkt, vedleggsnavn)
-        secureLog.info { søknadDTO }
         val pdf = pdfService.lagPdf(søknadDTO)
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         return joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer)

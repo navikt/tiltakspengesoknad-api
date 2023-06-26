@@ -30,9 +30,9 @@ data class ManueltRegistrertBarn(
 )
 
 data class RegistrertBarn(
-    val fornavn: String,
+    val fornavn: String?,
     val mellomnavn: String?,
-    val etternavn: String,
+    val etternavn: String?,
     val fødselsdato: LocalDate,
     val oppholdInnenforEøs: Boolean,
 )
