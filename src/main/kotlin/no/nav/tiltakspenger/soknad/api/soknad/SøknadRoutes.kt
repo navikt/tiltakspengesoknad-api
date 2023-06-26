@@ -43,7 +43,6 @@ fun Route.søknadRoutes(
             val acr = call.acr() ?: "Ingen Level"
             val subjectToken = call.token()
             val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
-
             val journalpostId =
                 søknadService.opprettDokumenterOgArkiverIJoark(
                     søknad,

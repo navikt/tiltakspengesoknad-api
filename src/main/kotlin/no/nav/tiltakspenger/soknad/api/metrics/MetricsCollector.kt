@@ -25,6 +25,18 @@ class MetricsCollector {
         .help("Antall feilede søknadsinnsendinger")
         .register()
 
+    val ANTALL_FEIL_VED_HENT_PERSONALIA = Counter.build()
+        .name("tiltakspenger_soknad_antall_feil_ved_hent_personalia")
+        .namespace(NAMESPACE)
+        .help("Antall ganger personalia-kall har feilet")
+        .register()
+
+    val ANTALL_FEIL_VED_HENT_TILTAK = Counter.build()
+        .name("tiltakspenger_soknad_antall_feil_ved_hent_tiltak")
+        .namespace(NAMESPACE)
+        .help("Antall ganger tiltak-kall har feilet")
+        .register()
+
     val ANTALL_SØKNADER_SOM_PROSESSERES = Gauge.build()
         .name("tiltakspenger_soknad_antall_soknader_som_prosesseres")
         .namespace(NAMESPACE)
