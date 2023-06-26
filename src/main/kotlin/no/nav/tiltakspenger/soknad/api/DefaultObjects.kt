@@ -48,11 +48,10 @@ private fun HttpClient.config(timeout: Long) = this.config {
         logger = object : Logger {
             override fun log(message: String) {
                 LOG.info("HttpClient detaljer logget til securelog")
-                // LOG.info(message)
                 SECURELOG.info(message)
             }
         }
-        level = LogLevel.ALL
+        level = LogLevel.INFO
     }
     expectSuccess = true
 }
