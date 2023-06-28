@@ -8,6 +8,9 @@ object StringSanitizer {
         escapedString = escapedString.replace("&aelig;", "æ")
         escapedString = escapedString.replace("&oslash;", "ø")
         escapedString = escapedString.replace("&aring;", "å")
+        escapedString = escapedString.replace("&AElig;", "Æ")
+        escapedString = escapedString.replace("&Oslash;", "Ø")
+        escapedString = escapedString.replace("&Aring;", "Å")
         return escapedString
     }
 }

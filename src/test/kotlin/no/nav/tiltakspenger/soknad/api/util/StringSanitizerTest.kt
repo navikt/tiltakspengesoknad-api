@@ -13,8 +13,8 @@ internal class StringSanitizerTest {
 
     @Test
     fun `sanitize skal ikke escape æ, ø eller å`() {
-        val testString = "<script>æ ø å</script>"
+        val testString = "<script>æ ø å Æ Ø Å</script>"
         val escapedTestString = StringSanitizer.sanitize(testString)
-        assertEquals(escapedTestString, "&lt;script&gt;æ ø å&lt;/script&gt;")
+        assertEquals(escapedTestString, "&lt;script&gt;æ ø å Æ Ø Å&lt;/script&gt;")
     }
 }
