@@ -3,6 +3,7 @@ package no.nav.tiltakspenger.soknad.api.soknad
 import no.nav.tiltakspenger.soknad.api.isSameOrAfter
 import no.nav.tiltakspenger.soknad.api.isSameOrBefore
 import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
+import no.nav.tiltakspenger.soknad.api.util.StringSanitizer
 import java.time.LocalDate
 
 data class Periode(
@@ -21,21 +22,33 @@ data class Periode(
     }
 }
 
-data class ManueltRegistrertBarn(
-    val fornavn: String,
-    val mellomnavn: String?,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-    val oppholdInnenforEøs: Boolean,
-)
+class ManueltRegistrertBarn(
+    fornavn: String,
+    mellomnavn: String?,
+    etternavn: String,
+    fødselsdato: LocalDate,
+    oppholdInnenforEøs: Boolean,
+) {
+    val fornavn: String = StringSanitizer.sanitize(fornavn)
+    val mellomnavn: String? = mellomnavn?.let { StringSanitizer.sanitize(mellomnavn) }
+    val etternavn: String = StringSanitizer.sanitize(etternavn)
+    val fødselsdato: LocalDate = fødselsdato
+    val oppholdInnenforEøs = oppholdInnenforEøs
+}
 
-data class RegistrertBarn(
-    val fornavn: String?,
-    val mellomnavn: String?,
-    val etternavn: String?,
-    val fødselsdato: LocalDate,
-    val oppholdInnenforEøs: Boolean,
-)
+class RegistrertBarn(
+    fornavn: String?,
+    mellomnavn: String?,
+    etternavn: String?,
+    fødselsdato: LocalDate,
+    oppholdInnenforEøs: Boolean,
+) {
+    val fornavn: String? = fornavn?.let { StringSanitizer.sanitize(fornavn) }
+    val mellomnavn: String? = mellomnavn?.let { StringSanitizer.sanitize(mellomnavn) }
+    val etternavn: String? = etternavn?.let { StringSanitizer.sanitize(etternavn) }
+    val fødselsdato: LocalDate = fødselsdato
+    val oppholdInnenforEøs = oppholdInnenforEøs
+}
 
 data class Kvalifiseringsprogram(
     val deltar: Boolean,
@@ -52,14 +65,21 @@ data class Institusjonsopphold(
     val periode: Periode?,
 )
 
-data class Tiltak(
-    val aktivitetId: String,
-    val periode: Periode,
-    val arenaRegistrertPeriode: Deltakelsesperiode?,
-    val arrangør: String,
-    val type: String,
-    val typeNavn: String,
+class Tiltak(
+    aktivitetId: String,
+    periode: Periode,
+    arenaRegistrertPeriode: Deltakelsesperiode?,
+    arrangør: String,
+    type: String,
+    typeNavn: String,
 ) {
+    val aktivitetId: String = StringSanitizer.sanitize(aktivitetId)
+    val arrangør: String = StringSanitizer.sanitize(arrangør)
+    val type: String = StringSanitizer.sanitize(type)
+    val typeNavn: String = StringSanitizer.sanitize(typeNavn)
+    val arenaRegistrertPeriode: Deltakelsesperiode? = arenaRegistrertPeriode
+    val periode: Periode = periode
+
     fun harKunFradatoIArena(): Boolean {
         return arenaRegistrertPeriode?.fra != null && arenaRegistrertPeriode.til == null
     }

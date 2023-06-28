@@ -19,14 +19,14 @@ private fun barnetillegg() = """
               {
                 "fornavn": "Test",
                 "etternavn": "Test",
-                "fødselsdato": "2025-01-01",
+                "fødselsdato": "2023-01-01",
                 "oppholdInnenforEøs": true
               }
             ],
             "registrerteBarnSøktBarnetilleggFor": [
               {
                 "fornavn": "Test",
-                "fødselsdato": "2025-01-01",
+                "fødselsdato": "2023-01-01",
                 "etternavn": "Testesen",
                 "oppholdInnenforEøs": true
               }
@@ -157,7 +157,7 @@ private fun harBekreftetÅSvareSåGodtManKan(svar: Boolean) = """
 
 fun søknad(
     tiltak: String = tiltak(),
-    barneTillegg: String = barnetillegg(),
+    barnetillegg: String = barnetillegg(),
     institusjonsopphold: String = institusjonsopphold(),
     introduksjonsprogram: String = introduksjonsprogram(),
     kvalifiseringsprogram: String = kvalifiseringsprogram(),
@@ -176,7 +176,7 @@ fun søknad(
 ) = """
         {
           $tiltak,
-          $barneTillegg,
+          $barnetillegg,
           $institusjonsopphold,
           $introduksjonsprogram,
           $kvalifiseringsprogram,
