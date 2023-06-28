@@ -6,6 +6,7 @@ val jacksonVersion = "2.15.0"
 val kotlinxCoroutinesVersion = "1.6.4"
 val tokenSupportVersion = "3.0.8"
 val prometheusVersion = "0.16.0"
+val apacheCommonsTextVersion = "1.10.0"
 
 plugins {
     application
@@ -31,6 +32,8 @@ dependencies {
     implementation("org.jetbrains:annotations:24.0.1")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("com.github.navikt.tiltakspenger-libs:arenatiltak-dtos:0.0.32")
+    implementation("org.apache.commons:commons-text:$apacheCommonsTextVersion")
+
     // Ktor
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")

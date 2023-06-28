@@ -243,4 +243,80 @@ internal class SøknadServiceTest {
             assertThrows<RequestValidationException> { søknadService.taInnSøknadSomMultipart(mockMultiPartData) }
         }
     }
+
+    @Test
+    fun `taInnSøknadSomMultipart escaper potensiell XSS`() {
+        val mockedTiltak = """
+            "tiltak": {
+                "aktivitetId": "<script>blabla</script>",
+                "periode": {
+                  "fra": "2025-01-01",
+                  "til": "2025-01-01"
+                },
+                "arenaRegistrertPeriode": {
+                  "fra": "2025-01-01",
+                  "til": "2025-01-01"
+                },
+                "arrangør": "<script>arrangør</script>",
+                "typeNavn": "<script>typeNavn</script>",
+                "type": "<script>type</script>"
+            }
+        """.trimIndent()
+
+        val mockedBarnetillegg = """
+            "barnetillegg": {
+                "manueltRegistrerteBarnSøktBarnetilleggFor": [
+                  {
+                    "fornavn": "<script>a",
+                    "mellomnavn": "<script>b",
+                    "etternavn": "<script>c",
+                    "fødselsdato": "2023-01-01",
+                    "oppholdInnenforEøs": true
+                  }
+                ],
+                "registrerteBarnSøktBarnetilleggFor": [
+                  {
+                    "fornavn": "<script>a",
+                    "mellomnavn": "<script>b",
+                    "fødselsdato": "2025-01-01",
+                    "etternavn": "<script>c",
+                    "oppholdInnenforEøs": true
+                  }
+                ]
+            }
+        """.trimIndent()
+
+        val mockMultiPartData = MockMultiPartData(
+            mutableListOf(
+                PartData.FormItem(
+                    søknad(tiltak = mockedTiltak, barnetillegg = mockedBarnetillegg),
+                    {},
+                    Headers.build {
+                        append(HttpHeaders.ContentType, "application/json")
+                        append(
+                            HttpHeaders.ContentDisposition,
+                            ContentDisposition("søknad", listOf(HeaderValueParam("name", "søknad"))),
+                        )
+                    },
+                ),
+            ),
+        )
+
+        runBlocking {
+            val (spørsmålsbesvarelser) = søknadService.taInnSøknadSomMultipart(mockMultiPartData)
+            assertEquals(spørsmålsbesvarelser.tiltak.arrangør, "&lt;script&gt;arrangør&lt;/script&gt;")
+            assertEquals(spørsmålsbesvarelser.tiltak.type, "&lt;script&gt;type&lt;/script&gt;")
+            assertEquals(spørsmålsbesvarelser.tiltak.typeNavn, "&lt;script&gt;typeNavn&lt;/script&gt;")
+
+            val manueltRegistrertBarn = spørsmålsbesvarelser.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.get(0)
+            assertEquals(manueltRegistrertBarn.fornavn, "&lt;script&gt;a")
+            assertEquals(manueltRegistrertBarn.mellomnavn, "&lt;script&gt;b")
+            assertEquals(manueltRegistrertBarn.etternavn, "&lt;script&gt;c")
+
+            val registrertBarn = spørsmålsbesvarelser.barnetillegg.registrerteBarnSøktBarnetilleggFor.get(0)
+            assertEquals(registrertBarn.fornavn, "&lt;script&gt;a")
+            assertEquals(registrertBarn.mellomnavn, "&lt;script&gt;b")
+            assertEquals(registrertBarn.etternavn, "&lt;script&gt;c")
+        }
+    }
 }
