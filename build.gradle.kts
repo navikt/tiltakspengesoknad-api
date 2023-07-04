@@ -73,7 +73,7 @@ dependencies {
     // Apache Tika
     implementation("org.apache.tika:tika-core:2.7.0")
 
-    testImplementation(platform("org.junit:junit-bom:5.9.2"))
+    testImplementation(platform("org.junit:junit-bom:5.9.3"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.21")
     testImplementation("org.junit.jupiter:junit-jupiter")
