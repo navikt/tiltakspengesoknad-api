@@ -75,7 +75,7 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:5.9.3"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.21")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.22")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.mockk:mockk-dsl-jvm:$mockkVersion")
