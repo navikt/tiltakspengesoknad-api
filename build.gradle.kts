@@ -3,7 +3,7 @@ val mockkVersion = "1.13.5"
 val ktorVersion = "2.3.2"
 val kotestVersion = "5.6.1"
 val jacksonVersion = "2.15.2"
-val kotlinxCoroutinesVersion = "1.6.4"
+val kotlinxCoroutinesVersion = "1.7.2"
 val tokenSupportVersion = "3.0.8"
 val prometheusVersion = "0.16.0"
 val apacheCommonsTextVersion = "1.10.0"
@@ -73,7 +73,7 @@ dependencies {
     // Apache Tika
     implementation("org.apache.tika:tika-core:2.7.0")
 
-    testImplementation(platform("org.junit:junit-bom:5.9.2"))
+    testImplementation(platform("org.junit:junit-bom:5.9.3"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.21")
     testImplementation("org.junit.jupiter:junit-jupiter")
