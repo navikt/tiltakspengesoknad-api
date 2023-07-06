@@ -165,7 +165,6 @@ internal fun Application.setupRouting(
                 call.respondText("Login failed")
             }
         }
-
     }
 }
 
