@@ -3,6 +3,7 @@ package no.nav.tiltakspenger.soknad.api
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStarted
@@ -16,7 +17,9 @@ import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.request.httpMethod
 import io.ktor.server.request.path
 import io.ktor.server.request.receiveParameters
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import io.prometheus.client.hotspot.DefaultExports
@@ -42,6 +45,9 @@ import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.ResultSet
 
 fun main(args: Array<String>) {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
@@ -151,6 +157,24 @@ internal fun Application.setupRouting(
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
         metricRoutes()
+
+        // Testkode for å feile CodeQL
+        get("/user/{id}") {
+            val id = call.parameters["id"]
+            val conn: Connection = DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;")
+            val stmt = conn.createStatement()
+            val sql = "SELECT * FROM users WHERE id = $id" // Skal feile på SQL-injeksjon
+            val rs: ResultSet = stmt.executeQuery(sql)
+            var user: String? = null
+            while (rs.next()) {
+                user = rs.getInt("id").toString() + rs.getString("name")
+            }
+            if (user != null) {
+                call.respond(user)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
 
         // Testkode for å feile CodeQL
         post("/testcodeql") {
