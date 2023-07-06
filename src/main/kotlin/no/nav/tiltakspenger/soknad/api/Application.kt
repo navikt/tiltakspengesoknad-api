@@ -7,6 +7,7 @@ import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStarted
 import io.ktor.server.application.ApplicationStopped
+import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.callloging.CallLogging
@@ -14,6 +15,9 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.request.httpMethod
 import io.ktor.server.request.path
+import io.ktor.server.request.receiveParameters
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import io.prometheus.client.hotspot.DefaultExports
 import mu.KotlinLogging
@@ -147,7 +151,33 @@ internal fun Application.setupRouting(
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
         metricRoutes()
+
+        // Testkode for å feile CodeQL
+        post("/testcodeql") {
+            val username = call.receiveParameters()["username"]
+            val password = call.receiveParameters()["password"]
+
+            val loginSuccessful = loginUser(username, password)
+
+            if (loginSuccessful) {
+                call.respondText("Login successful")
+            } else {
+                call.respondText("Login failed")
+            }
+        }
+
     }
+}
+
+// Testkode for å feile CodeQL
+fun loginUser(username: String?, password: String?): Boolean {
+    // Ingen sanitering/validering
+    if (username != null && password != null) {
+        if (username == "admin" && password == "password") {
+            return true
+        }
+    }
+    return false
 }
 
 internal fun Application.installJacksonFeature() {
