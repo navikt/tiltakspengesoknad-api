@@ -4,7 +4,7 @@ val ktorVersion = "2.3.2"
 val kotestVersion = "5.6.1"
 val jacksonVersion = "2.15.2"
 val kotlinxCoroutinesVersion = "1.7.2"
-val tokenSupportVersion = "3.0.8"
+val tokenSupportVersion = "3.1.0"
 val prometheusVersion = "0.16.0"
 val apacheCommonsTextVersion = "1.10.0"
 
