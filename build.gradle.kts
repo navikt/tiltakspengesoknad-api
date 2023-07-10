@@ -11,7 +11,7 @@ val apacheCommonsTextVersion = "1.10.0"
 plugins {
     application
     distribution
-    kotlin("jvm") version "1.8.22"
+    kotlin("jvm") version "1.9.0"
     id("ca.cutterslade.analyze") version "1.9.1"
     id("com.diffplug.spotless") version "6.19.0"
 }
