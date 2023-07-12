@@ -71,7 +71,7 @@ dependencies {
     implementation("org.apache.pdfbox:pdfbox:2.0.28")
 
     // Apache Tika
-    implementation("org.apache.tika:tika-core:2.7.0")
+    implementation("org.apache.tika:tika-core:2.8.0")
 
     testImplementation(platform("org.junit:junit-bom:5.9.3"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
