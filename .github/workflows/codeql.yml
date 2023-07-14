@@ -36,11 +36,3 @@ jobs:
         uses: github/codeql-action/analyze@v2
         with:
           category: "/language:${{matrix.language}}"
-      - name: Download sarifs
-        uses: actions/download-artifact@v3
-        with:
-          path: ../results
-      - name: Upload sarifs
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: ../results
