@@ -65,7 +65,7 @@ class JoarkClient(
 
                     val journalpostId = if (response.journalpostId.isNullOrEmpty()) {
                         log.error("Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark")
-                        throw IllegalStateException("Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark. response=$response")
+                        throw IllegalStateException("Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark")
                     } else {
                         response.journalpostId
                     }
@@ -81,7 +81,7 @@ class JoarkClient(
 
                 else -> {
                     log.error("Kallet til joark feilet ${res.status} ${res.status.description}")
-                    throw RuntimeException("Feil i kallet til joark $res")
+                    throw RuntimeException("Feil i kallet til joark")
                 }
             }
         } catch (throwable: Throwable) {

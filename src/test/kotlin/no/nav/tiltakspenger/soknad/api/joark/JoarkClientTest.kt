@@ -212,7 +212,7 @@ internal class JoarkClientTest {
                     dokumentInnhold = dokument,
                     callId = "test",
                 )
-            }.message shouldBe "Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark. response=$joarkResonse"
+            }.message shouldBe "Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark"
         }
     }
 

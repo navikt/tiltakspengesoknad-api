@@ -49,7 +49,6 @@ class SøknadServiceImpl(
 
                 is PartData.FileItem -> {
                     vedleggListe.add(part.toVedlegg())
-                    LOG.info { part.originalFileName }
                 }
 
                 else -> {}
