@@ -38,6 +38,7 @@ class PdfClient(
 
     override suspend fun genererPdf(søknadDTO: SøknadDTO): ByteArray {
         try {
+            log.info("Starter generering av søknadspdf")
             return client.post("$pdfEndpoint/$pdfgenPath/$SOKNAD_TEMPLATE") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", UUID.randomUUID())
@@ -51,12 +52,14 @@ class PdfClient(
     }
 
     override suspend fun konverterVedlegg(vedlegg: List<Vedlegg>): List<Vedlegg> {
-        return vedlegg.map { it ->
-            LOG.info("Konverterer vedlegg: ${it.filnavn}")
+        return vedlegg.map {
+            LOG.info("Starter konvertering av vedlegg: ${it.filnavn}")
             val contentType = it.dokument.detect()
             when (contentType) {
                 APPLICATON_PDF -> {
+                    LOG.info("Oppdaget PDF-vedlegg, konverterer til bilde")
                     val bilder = PdfTools.konverterPdfTilBilder(it.dokument)
+                    LOG.info("Konverterer bilder tilbake til PDF")
                     val enkeltsider = bilder.map { bilde ->
                         genererPdfFraBilde(Bilde(ContentType.Image.PNG, bilde.data))
                     }
@@ -64,10 +67,12 @@ class PdfClient(
                     Vedlegg(it.filnavn, "application/pdf", resultatPdf)
                 }
                 IMAGE_PNG -> {
+                    LOG.info("Oppdaget PNG-vedlegg, konverterer til PDF")
                     val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.PNG, it.dokument))
                     Vedlegg("$${it.filnavn}-konvertert.pdf", "application/pdf", pdfFraBilde)
                 }
                 IMAGE_JPEG -> {
+                    LOG.info("Oppdaget JPEG-vedlegg, konverterer til PDF")
                     val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.JPEG, it.dokument))
                     Vedlegg("$${it.filnavn}-konvertert.pdf", "application/pdf", pdfFraBilde)
                 }

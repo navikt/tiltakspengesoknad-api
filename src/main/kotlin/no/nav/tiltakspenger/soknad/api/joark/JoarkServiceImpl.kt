@@ -6,7 +6,13 @@ import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 class JoarkServiceImpl(
     private val joark: Joark,
 ) : JoarkService {
-    override suspend fun sendPdfTilJoark(pdf: ByteArray, søknadDTO: SøknadDTO, fnr: String, vedlegg: List<Vedlegg>): String {
+    override suspend fun sendPdfTilJoark(
+        pdf: ByteArray,
+        søknadDTO: SøknadDTO,
+        fnr: String,
+        vedlegg: List<Vedlegg>,
+        callId: String,
+    ): String {
         val journalpost = Journalpost.Søknadspost.from(
             fnr = fnr,
 //            saksnummer = "",
@@ -14,6 +20,6 @@ class JoarkServiceImpl(
             pdf = pdf,
             vedlegg = vedlegg,
         )
-        return joark.opprettJournalpost(journalpost)
+        return joark.opprettJournalpost(journalpost, callId)
     }
 }

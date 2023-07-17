@@ -1,6 +1,10 @@
 package no.nav.tiltakspenger.soknad.api
 
+import io.ktor.server.application.install
 import io.ktor.server.config.ApplicationConfig
+import io.ktor.server.plugins.callid.CallId
+import io.ktor.server.plugins.callid.callIdMdc
+import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
@@ -9,6 +13,8 @@ import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
+import java.util.*
+import java.util.UUID.randomUUID
 
 fun ApplicationTestBuilder.configureTestApplication(
     pdlService: PdlService = mockk(),
@@ -22,6 +28,12 @@ fun ApplicationTestBuilder.configureTestApplication(
     }
 
     application {
+        install(CallId) {
+            generate { randomUUID().toString() }
+        }
+        install(CallLogging) {
+            callIdMdc("call-id")
+        }
         installAuthentication()
         setupRouting(
             pdlService = pdlService,

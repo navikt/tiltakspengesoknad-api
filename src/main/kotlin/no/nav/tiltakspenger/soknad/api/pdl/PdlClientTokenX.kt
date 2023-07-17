@@ -23,13 +23,14 @@ class PdlClientTokenX(
     private val pdlAudience = config.property("audience.pdl").getString()
     private val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
 
-    suspend fun fetchSøker(fødselsnummer: String, subjectToken: String): Result<SøkerRespons> {
+    suspend fun fetchSøker(fødselsnummer: String, subjectToken: String, callId: String): Result<SøkerRespons> {
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
         val token = tokenResponse.accessToken
         val pdlResponse: Result<SøkerRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)
                 header("Tema", INDIVIDSTONAD)
+                header("Nav-Call-Id", callId)
                 header("behandlingsnummer", "B470")
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
