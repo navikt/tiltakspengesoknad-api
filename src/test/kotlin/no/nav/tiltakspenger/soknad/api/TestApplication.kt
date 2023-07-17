@@ -14,6 +14,7 @@ import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import java.util.*
+import java.util.UUID.randomUUID
 
 fun ApplicationTestBuilder.configureTestApplication(
     pdlService: PdlService = mockk(),
@@ -28,7 +29,7 @@ fun ApplicationTestBuilder.configureTestApplication(
 
     application {
         install(CallId) {
-            generate { UUID.randomUUID().toString() }
+            generate { randomUUID().toString() }
         }
         install(CallLogging) {
             callIdMdc("call-id")
