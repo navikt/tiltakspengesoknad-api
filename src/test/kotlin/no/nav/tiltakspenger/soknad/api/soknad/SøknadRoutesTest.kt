@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test
 
 internal class SøknadRoutesTest {
     private val pdlServiceMock = mockk<PdlService>().also { mock ->
-        coEvery { mock.hentPersonaliaMedBarn(any(), any()) } returns PersonDTO(
+        coEvery { mock.hentPersonaliaMedBarn(any(), any(), any()) } returns PersonDTO(
             fornavn = "fornavn",
             mellomnavn = null,
             etternavn = "etternavn",
@@ -182,7 +182,7 @@ internal class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
         val søknadServiceMock = mockk<SøknadService>().also { mock ->
             coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any()) } returns "123"
+            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any()) } returns "123"
         }
 
         val token = issueTestToken()
@@ -207,7 +207,7 @@ internal class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 500 hvis journalføringen feiler`() {
         val søknadServiceMock = mockk<SøknadService>().also { mock ->
             coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any()) } throws IllegalStateException("blabla")
+            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any()) } throws IllegalStateException("blabla")
         }
 
         val token = issueTestToken()
@@ -232,11 +232,11 @@ internal class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 500 hvis man ikke får hentet personalia fra PDL`() {
         val søknadServiceMock = mockk<SøknadService>().also { mock ->
             coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any()) } returns "123"
+            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any()) } returns "123"
         }
 
         val pdlServiceMock = mockk<PdlService>().also { mock ->
-            coEvery { mock.hentPersonaliaMedBarn(any(), any()) } throws IllegalStateException("blabla")
+            coEvery { mock.hentPersonaliaMedBarn(any(), any(), any()) } throws IllegalStateException("blabla")
         }
 
         val token = issueTestToken()

@@ -21,13 +21,14 @@ class PdlCredentialsClient(
     private val pdlScope = config.property("scope.pdl").getString()
     private val oauth2CredentialsClient = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
 
-    suspend fun fetchBarn(ident: String): Result<SøkersBarnRespons> {
+    suspend fun fetchBarn(ident: String, callId: String): Result<SøkersBarnRespons> {
         val clientCredentialsGrant = oauth2CredentialsClient.clientCredentials(pdlScope)
         val token = clientCredentialsGrant.accessToken
         return kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)
                 header("Tema", INDIVIDSTONAD)
+                header("Nav-Call-Id", callId)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(hentBarnQuery(ident))

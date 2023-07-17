@@ -2,6 +2,7 @@ package no.nav.tiltakspenger.soknad.api.pdl
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
+import io.ktor.server.plugins.callid.callId
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
@@ -23,7 +24,7 @@ fun Route.pdlRoutes(pdlService: PdlService, metricsCollector: MetricsCollector) 
             if (fødselsnummer == null) {
                 throw IllegalStateException("Mangler fødselsnummer")
             }
-            val personDTO = pdlService.hentPersonaliaMedBarn(fødselsnummer = fødselsnummer, subjectToken = subjectToken)
+            val personDTO = pdlService.hentPersonaliaMedBarn(fødselsnummer = fødselsnummer, subjectToken = subjectToken, callId = call.callId!!)
             call.respond(personDTO)
         } catch (e: Exception) {
             metricsCollector.ANTALL_FEIL_VED_HENT_PERSONALIA.inc()

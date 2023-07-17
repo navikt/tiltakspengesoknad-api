@@ -29,12 +29,15 @@ class JoarkClient(
 
     override suspend fun opprettJournalpost(
         dokumentInnhold: Journalpost,
+        callId: String,
     ): String {
         try {
+            log.info("Starter journalføring av søknad")
             val token = tokenService.getToken(config = config)
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
+                header("Nav-Callid", callId)
                 parameter("forsoekFerdigstill", false)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)

@@ -64,6 +64,7 @@ internal class JoarkClientTest {
         runTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
+                callId = "test",
             )
 
             resp shouldBe journalpostId
@@ -100,6 +101,7 @@ internal class JoarkClientTest {
         runTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
+                callId = "test",
             )
 
             resp shouldBe journalpostId
@@ -132,6 +134,7 @@ internal class JoarkClientTest {
             shouldThrow<RuntimeException> {
                 joarkClient.opprettJournalpost(
                     dokumentInnhold = dokument,
+                    callId = "test",
                 )
             }
         }
@@ -168,6 +171,7 @@ internal class JoarkClientTest {
         runTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
+                callId = "test",
             )
 
             resp shouldBe journalpostId
@@ -206,6 +210,7 @@ internal class JoarkClientTest {
             shouldThrow<IllegalStateException> {
                 joarkClient.opprettJournalpost(
                     dokumentInnhold = dokument,
+                    callId = "test",
                 )
             }.message shouldBe "Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark. response=$joarkResonse"
         }
