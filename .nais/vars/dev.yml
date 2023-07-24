@@ -17,3 +17,6 @@ audience:
 scope:
   pdl: api://dev-fss.pdl.pdl-api/.default
   joark: api://dev-fss.teamdokumenthandtering.dokarkiv/.default
+
+unleash:
+  environment: development
