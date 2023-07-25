@@ -6,10 +6,11 @@ import io.ktor.server.application.ApplicationEnvironment
 
 fun setupUnleash(environment: ApplicationEnvironment): DefaultUnleash {
     val appName = "tiltakspenger-soknad-api"
+    val unleashApiUrl = "${environment.config.property("unleash.unleash_server_api_url").getString()}/api"
     val config = UnleashConfig.builder()
         .appName(appName)
         .instanceId(appName)
-        .unleashAPI(environment.config.property("unleash.unleash_server_api_url").getString())
+        .unleashAPI(unleashApiUrl)
         .apiKey(environment.config.property("unleash.unleash_server_api_token").getString())
         .build()
     return DefaultUnleash(config)
