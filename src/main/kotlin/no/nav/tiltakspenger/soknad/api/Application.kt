@@ -70,6 +70,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     }
 
     val unleash = setupUnleash(environment = environment)
+    log.info { "Unleash server url er: ${environment.config.property("unleash.unleash_server_api_url")}" }
     log.info { "Redirect feature er enabled: ${unleash.isEnabled("REDIRECT_TIL_GAMMEL_SOKNAD")}" }
 
     val pdlService = PdlService(environment.config)
