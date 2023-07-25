@@ -8,9 +8,10 @@ fun setupUnleash(environment: ApplicationEnvironment): DefaultUnleash {
     val appName = "tiltakspenger-soknad-api"
     val unleashApiUrl = "${environment.config.property("unleash.unleash_server_api_url").getString()}/api"
     val unleashApiKey = environment.config.property("unleash.unleash_server_api_token").getString()
+    val unleashEnvironment = environment.config.property("unleash.environment").getString()
     val config = UnleashConfig.builder()
         .appName(appName)
-        .environment("development")
+        .environment(unleashEnvironment)
         .instanceId(appName)
         .unleashAPI(unleashApiUrl)
         .apiKey(unleashApiKey)
