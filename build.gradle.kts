@@ -7,6 +7,7 @@ val kotlinxCoroutinesVersion = "1.7.2"
 val tokenSupportVersion = "3.1.0"
 val prometheusVersion = "0.16.0"
 val apacheCommonsTextVersion = "1.10.0"
+val unleashVersion = "8.2.0"
 
 plugins {
     application
@@ -33,6 +34,7 @@ dependencies {
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("com.github.navikt.tiltakspenger-libs:arenatiltak-dtos:0.0.32")
     implementation("org.apache.commons:commons-text:$apacheCommonsTextVersion")
+    implementation("io.getunleash:unleash-client-java:$unleashVersion")
 
     // Ktor
     implementation("io.ktor:ktor-client-core:$ktorVersion")

@@ -13,7 +13,6 @@ import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
-import java.util.*
 import java.util.UUID.randomUUID
 
 fun ApplicationTestBuilder.configureTestApplication(

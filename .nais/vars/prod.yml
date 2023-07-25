@@ -12,3 +12,6 @@ audience:
 scope:
   pdl: api://prod-fss.pdl.pdl-api/.default
   joark: api://prod-fss.teamdokumenthandtering.dokarkiv/.default
+
+unleash:
+  environment: production

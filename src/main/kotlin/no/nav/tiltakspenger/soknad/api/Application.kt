@@ -24,6 +24,7 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvClient
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
+import no.nav.tiltakspenger.soknad.api.featuretoggling.setupUnleash
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
 import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
 import no.nav.tiltakspenger.soknad.api.joark.JoarkServiceImpl
@@ -57,9 +58,22 @@ fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
-fun Application.soknadApi(
-    pdlService: PdlService = PdlService(environment.config),
-    søknadService: SøknadService = SøknadServiceImpl(
+fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector()) {
+    val log = KotlinLogging.logger {}
+    log.info { "starting server" }
+
+    installCallLogging()
+    installAuthentication()
+    installJacksonFeature()
+    install(RequestValidation) {
+        validateSøknad()
+    }
+
+    val unleash = setupUnleash(environment = environment)
+    log.info { "Redirect feature er enabled: ${unleash.isEnabled("REDIRECT_TIL_GAMMEL_SOKNAD")}" }
+
+    val pdlService = PdlService(environment.config)
+    val søknadService: SøknadService = SøknadServiceImpl(
         pdfService = PdfServiceImpl(
             PdfClient(
                 config = environment.config,
@@ -73,38 +87,15 @@ fun Application.soknadApi(
                 tokenService = TokenServiceImpl(),
             ),
         ),
-    ),
-    avService: AvService = AvServiceImpl(
+    )
+    val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
             client = httpClientCIO(timeout = 30L),
         ),
-    ),
-    tiltakService: TiltakService = TiltakService(environment.config),
-    metricsCollector: MetricsCollector = MetricsCollector(),
-) {
-    val log = KotlinLogging.logger {}
-    log.info { "starting server" }
+    )
+    val tiltakService = TiltakService(environment.config)
 
-    install(CallId) {
-        generate { randomUUID().toString() }
-    }
-    install(CallLogging) {
-        callIdMdc("call-id")
-        filter { call ->
-            call.request.path().startsWith("/$SØKNAD_PATH")
-            call.request.path().startsWith("/$PERSONALIA_PATH")
-        }
-        format { call ->
-            val status = call.response.status()
-            val httpMethod = call.request.httpMethod.value
-            val req = call.request
-            val userAgent = call.request.headers["User-Agent"]
-            "Status: $status, HTTP method: $httpMethod, User agent: $userAgent req: $req"
-        }
-    }
-
-    installAuthentication()
     setupRouting(
         pdlService = pdlService,
         søknadService = søknadService,
@@ -112,11 +103,6 @@ fun Application.soknadApi(
         avService = avService,
         metricsCollector = metricsCollector,
     )
-    installJacksonFeature()
-
-    install(RequestValidation) {
-        validateSøknad()
-    }
 
     environment.monitor.subscribe(ApplicationStarted) {
         log.info { "Starter server" }
@@ -162,6 +148,26 @@ internal fun Application.installJacksonFeature() {
             configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             registerModule(JavaTimeModule())
             registerModule(KotlinModule.Builder().build())
+        }
+    }
+}
+
+internal fun Application.installCallLogging() {
+    install(CallId) {
+        generate { randomUUID().toString() }
+    }
+    install(CallLogging) {
+        callIdMdc("call-id")
+        filter { call ->
+            call.request.path().startsWith("/$SØKNAD_PATH")
+            call.request.path().startsWith("/$PERSONALIA_PATH")
+        }
+        format { call ->
+            val status = call.response.status()
+            val httpMethod = call.request.httpMethod.value
+            val req = call.request
+            val userAgent = call.request.headers["User-Agent"]
+            "Status: $status, HTTP method: $httpMethod, User agent: $userAgent req: $req"
         }
     }
 }
