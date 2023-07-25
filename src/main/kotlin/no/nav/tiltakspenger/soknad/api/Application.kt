@@ -60,6 +60,7 @@ fun main(args: Array<String>) {
 
 fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector()) {
     val log = KotlinLogging.logger {}
+    val secureLog = KotlinLogging.logger("tjenestekall")
     log.info { "starting server" }
 
     installCallLogging()
@@ -70,7 +71,8 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     }
 
     val unleash = setupUnleash(environment = environment)
-    log.info { "Unleash server url er: ${environment.config.property("unleash.unleash_server_api_url")}" }
+    log.info { "Unleash server url er: ${environment.config.property("unleash.unleash_server_api_url").getString()}" }
+    secureLog.info { "Unleash apiToken er ${environment.config.property("unleash.unleash_server_api_token").getString()}" }
     log.info { "Redirect feature er enabled: ${unleash.isEnabled("REDIRECT_TIL_GAMMEL_SOKNAD")}" }
 
     val pdlService = PdlService(environment.config)
