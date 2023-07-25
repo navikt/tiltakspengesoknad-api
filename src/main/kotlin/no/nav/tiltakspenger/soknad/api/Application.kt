@@ -9,6 +9,7 @@ import io.ktor.server.application.ApplicationStarted
 import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
+import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.requestvalidation.RequestValidation
@@ -39,6 +40,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
+import java.util.UUID.randomUUID
 
 fun main(args: Array<String>) {
     System.setProperty("logback.configurationFile", "egenLogback.xml")
@@ -150,6 +152,9 @@ internal fun Application.installJacksonFeature() {
 }
 
 internal fun Application.installCallLogging() {
+    install(CallId) {
+        generate { randomUUID().toString() }
+    }
     install(CallLogging) {
         filter { call ->
             call.request.path().startsWith("/$SØKNAD_PATH")

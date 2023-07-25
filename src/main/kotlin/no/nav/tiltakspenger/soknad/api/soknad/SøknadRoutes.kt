@@ -5,6 +5,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
+import io.ktor.server.plugins.callid.callId
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -23,7 +24,6 @@ import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
-val secureLog = KotlinLogging.logger("tjenestekall")
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
@@ -41,7 +41,7 @@ fun Route.søknadRoutes(
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"
             val subjectToken = call.token()
-            val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken)
+            val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken, call.callId!!)
             val journalpostId =
                 søknadService.opprettDokumenterOgArkiverIJoark(
                     søknad,
@@ -50,6 +50,7 @@ fun Route.søknadRoutes(
                     vedlegg,
                     acr,
                     innsendingTidspunkt,
+                    call.callId!!,
                 )
             val søknadResponse = SøknadResponse(
                 journalpostId = journalpostId,

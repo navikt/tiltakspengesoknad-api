@@ -14,12 +14,12 @@ import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.time.LocalDateTime
 
+val log = KotlinLogging.logger { }
+
 class SøknadServiceImpl(
     private val pdfService: PdfService,
     private val joarkService: JoarkService,
 ) : SøknadService {
-    val secureLog = KotlinLogging.logger("tjenestekall")
-
     override suspend fun opprettDokumenterOgArkiverIJoark(
         søknad: SpørsmålsbesvarelserDTO,
         fnr: String,
@@ -27,12 +27,15 @@ class SøknadServiceImpl(
         vedlegg: List<Vedlegg>,
         acr: String,
         innsendingTidspunkt: LocalDateTime,
+        callId: String,
     ): String {
         val vedleggsnavn = vedlegg.stream().map { vedlegg -> vedlegg.filnavn }.toList()
         val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr, innsendingTidspunkt, vedleggsnavn)
         val pdf = pdfService.lagPdf(søknadDTO)
+        log.info { "Generering av søknadsPDF OK" }
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
-        return joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer)
+        log.info { "Vedleggskonvertering OK" }
+        return joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer, callId = callId)
     }
 
     override suspend fun taInnSøknadSomMultipart(søknadSomMultipart: MultiPartData): Pair<SpørsmålsbesvarelserDTO, List<Vedlegg>> {
@@ -46,7 +49,6 @@ class SøknadServiceImpl(
 
                 is PartData.FileItem -> {
                     vedleggListe.add(part.toVedlegg())
-                    LOG.info { part.originalFileName }
                 }
 
                 else -> {}

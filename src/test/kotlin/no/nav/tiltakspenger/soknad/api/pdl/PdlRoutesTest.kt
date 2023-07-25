@@ -43,7 +43,7 @@ internal class PdlRoutesTest {
     )
 
     private val mockedPdlService = mockk<PdlService>().also { mock ->
-        coEvery { mock.hentPersonaliaMedBarn(any(), any()) } returns mockedPerson.toPersonDTO()
+        coEvery { mock.hentPersonaliaMedBarn(any(), any(), any()) } returns mockedPerson.toPersonDTO()
     }
 
     val testFødselsnummer = "123"
@@ -109,7 +109,7 @@ internal class PdlRoutesTest {
                     contentType(type = ContentType.Application.Json)
                     header("Authorization", "Bearer ${token.serialize()}")
                 }
-                coVerify { mockedPdlService.hentPersonaliaMedBarn(testFødselsnummer, any()) }
+                coVerify { mockedPdlService.hentPersonaliaMedBarn(testFødselsnummer, any(), any()) }
             }
         }
     }
