@@ -10,6 +10,7 @@ import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.callid.CallId
+import io.ktor.server.plugins.callid.callIdMdc
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.requestvalidation.RequestValidation
@@ -156,6 +157,7 @@ internal fun Application.installCallLogging() {
         generate { randomUUID().toString() }
     }
     install(CallLogging) {
+        callIdMdc("call-id")
         filter { call ->
             call.request.path().startsWith("/$SØKNAD_PATH")
             call.request.path().startsWith("/$PERSONALIA_PATH")
