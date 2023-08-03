@@ -219,8 +219,8 @@ internal class SøknadServiceTest {
         val introduksjonsprogram = Introduksjonsprogram(
             deltar = true,
             periode = Periode(
-                fra= LocalDate.of(2025,1, 2),
-                til= LocalDate.of(2025,1, 1)
+                fra = LocalDate.of(2025, 1, 2),
+                til = LocalDate.of(2025, 1, 1),
             ),
         )
 
@@ -252,7 +252,7 @@ internal class SøknadServiceTest {
             periode = defaultPeriode(),
             arenaRegistrertPeriode = Deltakelsesperiode(
                 fra = LocalDate.of(2025, 1, 1),
-                til = LocalDate.of(2025, 1, 1)
+                til = LocalDate.of(2025, 1, 1),
             ),
             arrangør = "<script>arrangør</script>",
             typeNavn = "<script>typeNavn</script>",
