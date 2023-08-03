@@ -117,15 +117,15 @@ data class Pensjonsordning(
 )
 
 data class LønnetArbeid(
-    val erILønnetArbeid: Boolean?,
+    val erILønnetArbeid: Boolean,
 )
 
 data class Etterlønn(
-    val mottar: Boolean?,
+    val mottar: Boolean,
 )
 
 data class Sykepenger(
-    val mottar: Boolean?,
+    val mottar: Boolean,
     val periode: Periode?,
 )
 
