@@ -46,7 +46,7 @@ UNLEASH_SERVER_API_URL=<url til unleash api>
 ```
 
 Hva de ulike miljøvariablene skal settes til avhenger av hva man er ute etter å teste. Hvis man kun
-er ute etter å få kjørt opp appen lokalt, kan man sette placeholder-verdier på det meste (f.eks. http://localhost:et eller annet portnummer) 
+er ute etter å få kjørt opp appen lokalt, kan man sette placeholder-verdier på det meste (f.eks. http://localhost på et eller annet portnummer) 
 frem til man trenger å sette noe annet.
 
 ## Bygging og denslags
