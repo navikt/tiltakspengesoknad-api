@@ -18,7 +18,8 @@ import kotlinx.coroutines.runBlocking
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.pdf.PdfService
 import no.nav.tiltakspenger.soknad.api.soknad.validering.defaultPeriode
-import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
+import no.nav.tiltakspenger.soknad.api.soknad.validering.spørsmålsbesvarelser
+import no.nav.tiltakspenger.soknad.api.soknad.validering.toJsonString
 import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import no.nav.tiltakspenger.soknad.api.util.Detect
 import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
@@ -35,114 +36,7 @@ internal class SøknadServiceTest {
         coEvery { mock.sendPdfTilJoark(any(), any(), any(), any(), any()) }
     }
 
-    private val gyldigSøknad = """
-        {
-          "tiltak": {
-            "aktivitetId": "123",
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test",
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "barnetillegg": {
-            "manueltRegistrerteBarnSøktBarnetilleggFor": [
-              {
-                "fornavn": "Test",
-                "etternavn": "Test",
-                "fødselsdato": "2023-01-01",
-                "oppholdInnenforEøs": true
-              }
-            ],
-            "registrerteBarnSøktBarnetilleggFor": [
-              {
-                "fornavn": "Test",
-                "fødselsdato": "2025-01-01",
-                "etternavn": "Testesen",
-                "oppholdInnenforEøs": true
-              }
-            ]
-          },
-          "institusjonsopphold": {
-            "borPåInstitusjon": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "introduksjonsprogram": {
-            "deltar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "kvalifiseringsprogram": {
-            "deltar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "sykepenger": {
-            "mottar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "gjenlevendepensjon": {
-            "mottar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "alderspensjon": {
-            "mottar": true,
-            "fraDato": "2025-01-01"
-          },
-          "supplerendestønadover67": {
-            "mottar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "supplerendestønadflyktninger": {
-            "mottar": true,
-            "periode": {
-               "fra": "2025-01-01",
-               "til": "2025-01-01"
-            }
-          },   
-          "jobbsjansen": {
-             "mottar": true,
-             "periode": {
-                "fra": "2025-01-01",
-                "til": "2025-01-01"
-             }
-          },
-          "etterlønn": {
-            "mottar": true
-          },
-          "lønnetArbeid": {
-            "erILønnetArbeid": true
-          },
-          "pensjonsordning": {
-            "mottar": true,
-            "periode": {
-                "fra": "2025-01-01",
-                "til": "2025-01-01"
-             }
-          },
-          "mottarAndreUtbetalinger": true,
-          "harBekreftetAlleOpplysninger": true,
-          "harBekreftetÅSvareSåGodtManKan": true
-        }
-    """.trimMargin()
+    private val gyldigSpørsmålsbesvarelser = spørsmålsbesvarelser()
 
     class MockMultiPartData(private val partDataList: MutableList<PartData>) : MultiPartData {
         override suspend fun readPart(): PartData? {
@@ -166,7 +60,7 @@ internal class SøknadServiceTest {
         val mockMultiPartData = MockMultiPartData(
             mutableListOf(
                 PartData.FormItem(
-                    gyldigSøknad,
+                    gyldigSpørsmålsbesvarelser.toJsonString(),
                     {},
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
@@ -227,7 +121,7 @@ internal class SøknadServiceTest {
         val mockMultiPartData = MockMultiPartData(
             mutableListOf(
                 PartData.FormItem(
-                    søknad(introduksjonsprogram = introduksjonsprogram),
+                    spørsmålsbesvarelser(introduksjonsprogram = introduksjonsprogram).toJsonString(),
                     {},
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
@@ -284,7 +178,7 @@ internal class SøknadServiceTest {
         val mockMultiPartData = MockMultiPartData(
             mutableListOf(
                 PartData.FormItem(
-                    søknad(tiltak = mockedTiltak, barnetillegg = mockedBarnetillegg),
+                    spørsmålsbesvarelser(tiltak = mockedTiltak, barnetillegg = mockedBarnetillegg).toJsonString(),
                     {},
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
