@@ -14,6 +14,7 @@ data class Personopplysninger(
 data class SøknadDTO(
     val id: UUID = UUID.randomUUID(),
     val acr: String,
+    val versjon: String,
     val spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
     val vedleggsnavn: List<String>,
     val personopplysninger: Personopplysninger,
@@ -21,22 +22,23 @@ data class SøknadDTO(
 ) {
     companion object {
         fun toDTO(
+            acr: String,
             spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
+            vedleggsnavn: List<String>,
             fnr: String,
             person: PersonDTO,
-            acr: String,
             innsendingTidspunkt: LocalDateTime,
-            vedleggsnavn: List<String>,
         ): SøknadDTO {
             return SøknadDTO(
-                vedleggsnavn = vedleggsnavn,
+                acr = acr,
+                versjon = "4",
                 spørsmålsbesvarelser = spørsmålsbesvarelser,
+                vedleggsnavn = vedleggsnavn,
                 personopplysninger = Personopplysninger(
                     ident = fnr,
                     fornavn = person.fornavn,
                     etternavn = person.etternavn,
                 ),
-                acr = acr,
                 innsendingTidspunkt = innsendingTidspunkt,
             )
         }

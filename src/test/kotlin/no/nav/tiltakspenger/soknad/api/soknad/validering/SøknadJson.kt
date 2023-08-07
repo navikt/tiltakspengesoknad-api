@@ -11,6 +11,7 @@ fun søknad(
     personopplysninger: Personopplysninger = personopplysninger(),
 ) = SøknadDTO(
     id = UUID.randomUUID(),
+    versjon = "4",
     acr = "Level4",
     spørsmålsbesvarelser = spørsmålsbesvarelser,
     vedleggsnavn = listOf("test.pdf"),
