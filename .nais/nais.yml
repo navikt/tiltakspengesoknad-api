@@ -45,9 +45,9 @@ spec:
         - application: clamav
           namespace: nais-system
       external:
-        - host: "pdl-api.dev-fss-pub.nais.io"
-        - host: "dokarkiv.dev-fss-pub.nais.io"
-        - host: "tiltakspenger-arena.dev-fss-pub.nais.io"
+        - host: {{outboundExternalUrls.pdl}}
+        - host: {{outboundExternalUrls.dokarkiv}}
+        - host: {{outboundExternalUrls.tiltakspengerarena}}
         - host: "tiltakspenger-unleash-api.nav.cloud.nais.io"
   env:
     - name: PDL_ENDPOINT_URL
