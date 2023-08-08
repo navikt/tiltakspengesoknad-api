@@ -17,12 +17,16 @@ import io.mockk.mockkStatic
 import kotlinx.coroutines.runBlocking
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.pdf.PdfService
-import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
+import no.nav.tiltakspenger.soknad.api.soknad.validering.defaultPeriode
+import no.nav.tiltakspenger.soknad.api.soknad.validering.spørsmålsbesvarelser
+import no.nav.tiltakspenger.soknad.api.soknad.validering.toJsonString
+import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import no.nav.tiltakspenger.soknad.api.util.Detect
 import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
 
 internal class SøknadServiceTest {
     private val mockPdfService = mockk<PdfService>().also { mock ->
@@ -32,114 +36,7 @@ internal class SøknadServiceTest {
         coEvery { mock.sendPdfTilJoark(any(), any(), any(), any(), any()) }
     }
 
-    private val gyldigSøknad = """
-        {
-          "tiltak": {
-            "aktivitetId": "123",
-            "arrangør": "test",
-            "type": "test",
-            "typeNavn": "test",
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "barnetillegg": {
-            "manueltRegistrerteBarnSøktBarnetilleggFor": [
-              {
-                "fornavn": "Test",
-                "etternavn": "Test",
-                "fødselsdato": "2023-01-01",
-                "oppholdInnenforEøs": true
-              }
-            ],
-            "registrerteBarnSøktBarnetilleggFor": [
-              {
-                "fornavn": "Test",
-                "fødselsdato": "2025-01-01",
-                "etternavn": "Testesen",
-                "oppholdInnenforEøs": true
-              }
-            ]
-          },
-          "institusjonsopphold": {
-            "borPåInstitusjon": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "introduksjonsprogram": {
-            "deltar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "kvalifiseringsprogram": {
-            "deltar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "sykepenger": {
-            "mottar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "gjenlevendepensjon": {
-            "mottar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "alderspensjon": {
-            "mottar": true,
-            "fraDato": "2025-01-01"
-          },
-          "supplerendestønadover67": {
-            "mottar": true,
-            "periode": {
-              "fra": "2025-01-01",
-              "til": "2025-01-01"
-            }
-          },
-          "supplerendestønadflyktninger": {
-            "mottar": true,
-            "periode": {
-               "fra": "2025-01-01",
-               "til": "2025-01-01"
-            }
-          },   
-          "jobbsjansen": {
-             "mottar": true,
-             "periode": {
-                "fra": "2025-01-01",
-                "til": "2025-01-01"
-             }
-          },
-          "etterlønn": {
-            "mottar": true
-          },
-          "lønnetArbeid": {
-            "erILønnetArbeid": true
-          },
-          "pensjonsordning": {
-            "mottar": true,
-            "periode": {
-                "fra": "2025-01-01",
-                "til": "2025-01-01"
-             }
-          },
-          "mottarAndreUtbetalinger": true,
-          "harBekreftetAlleOpplysninger": true,
-          "harBekreftetÅSvareSåGodtManKan": true
-        }
-    """.trimMargin()
+    private val gyldigSpørsmålsbesvarelser = spørsmålsbesvarelser()
 
     class MockMultiPartData(private val partDataList: MutableList<PartData>) : MultiPartData {
         override suspend fun readPart(): PartData? {
@@ -163,7 +60,7 @@ internal class SøknadServiceTest {
         val mockMultiPartData = MockMultiPartData(
             mutableListOf(
                 PartData.FormItem(
-                    gyldigSøknad,
+                    gyldigSpørsmålsbesvarelser.toJsonString(),
                     {},
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
@@ -213,20 +110,18 @@ internal class SøknadServiceTest {
         mockkStatic("no.nav.tiltakspenger.soknad.api.util.DetectKt")
         every { sjekkContentType(any()) } returns Detect.APPLICATON_PDF
 
-        val introduksjonsprogram = """
-            "introduksjonsprogram": {
-                "deltar": true,
-                "periode": {
-                  "fra": "2025-02-01",
-                  "til": "2025-01-01"
-                }
-              }
-        """.trimIndent()
+        val introduksjonsprogram = Introduksjonsprogram(
+            deltar = true,
+            periode = Periode(
+                fra = LocalDate.of(2025, 1, 2),
+                til = LocalDate.of(2025, 1, 1),
+            ),
+        )
 
         val mockMultiPartData = MockMultiPartData(
             mutableListOf(
                 PartData.FormItem(
-                    søknad(introduksjonsprogram = introduksjonsprogram),
+                    spørsmålsbesvarelser(introduksjonsprogram = introduksjonsprogram).toJsonString(),
                     {},
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
@@ -246,50 +141,44 @@ internal class SøknadServiceTest {
 
     @Test
     fun `taInnSøknadSomMultipart escaper potensiell XSS`() {
-        val mockedTiltak = """
-            "tiltak": {
-                "aktivitetId": "<script>blabla</script>",
-                "periode": {
-                  "fra": "2025-01-01",
-                  "til": "2025-01-01"
-                },
-                "arenaRegistrertPeriode": {
-                  "fra": "2025-01-01",
-                  "til": "2025-01-01"
-                },
-                "arrangør": "<script>arrangør</script>",
-                "typeNavn": "<script>typeNavn</script>",
-                "type": "<script>type</script>"
-            }
-        """.trimIndent()
+        val mockedTiltak = Tiltak(
+            aktivitetId = "<script>blabla</script>",
+            periode = defaultPeriode(),
+            arenaRegistrertPeriode = Deltakelsesperiode(
+                fra = LocalDate.of(2025, 1, 1),
+                til = LocalDate.of(2025, 1, 1),
+            ),
+            arrangør = "<script>arrangør</script>",
+            typeNavn = "<script>typeNavn</script>",
+            type = "<script>type</script>",
+        )
 
-        val mockedBarnetillegg = """
-            "barnetillegg": {
-                "manueltRegistrerteBarnSøktBarnetilleggFor": [
-                  {
-                    "fornavn": "<script>a",
-                    "mellomnavn": "<script>b",
-                    "etternavn": "<script>c",
-                    "fødselsdato": "2023-01-01",
-                    "oppholdInnenforEøs": true
-                  }
-                ],
-                "registrerteBarnSøktBarnetilleggFor": [
-                  {
-                    "fornavn": "<script>a",
-                    "mellomnavn": "<script>b",
-                    "fødselsdato": "2025-01-01",
-                    "etternavn": "<script>c",
-                    "oppholdInnenforEøs": true
-                  }
-                ]
-            }
-        """.trimIndent()
+        val mockedBarnetillegg =
+            Barnetillegg(
+                manueltRegistrerteBarnSøktBarnetilleggFor = listOf(
+                    ManueltRegistrertBarn(
+                        fornavn = "<script>a",
+                        mellomnavn = "<script>b",
+                        etternavn = "<script>c",
+                        fødselsdato = LocalDate.of(2023, 1, 1),
+                        oppholdInnenforEøs = true,
+                    ),
+                ),
+                registrerteBarnSøktBarnetilleggFor = listOf(
+                    RegistrertBarn(
+                        fornavn = "<script>a",
+                        mellomnavn = "<script>b",
+                        fødselsdato = LocalDate.of(2023, 1, 1),
+                        etternavn = "<script>c",
+                        oppholdInnenforEøs = true,
+                    ),
+                ),
+            )
 
         val mockMultiPartData = MockMultiPartData(
             mutableListOf(
                 PartData.FormItem(
-                    søknad(tiltak = mockedTiltak, barnetillegg = mockedBarnetillegg),
+                    spørsmålsbesvarelser(tiltak = mockedTiltak, barnetillegg = mockedBarnetillegg).toJsonString(),
                     {},
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
@@ -304,19 +193,19 @@ internal class SøknadServiceTest {
 
         runBlocking {
             val (spørsmålsbesvarelser) = søknadService.taInnSøknadSomMultipart(mockMultiPartData)
-            assertEquals(spørsmålsbesvarelser.tiltak.arrangør, "&lt;script&gt;arrangør&lt;/script&gt;")
-            assertEquals(spørsmålsbesvarelser.tiltak.type, "&lt;script&gt;type&lt;/script&gt;")
-            assertEquals(spørsmålsbesvarelser.tiltak.typeNavn, "&lt;script&gt;typeNavn&lt;/script&gt;")
+            assertEquals(spørsmålsbesvarelser.tiltak.arrangør, "&amp;lt;script&amp;gt;arrangør&amp;lt;/script&amp;gt;")
+            assertEquals(spørsmålsbesvarelser.tiltak.type, "&amp;lt;script&amp;gt;type&amp;lt;/script&amp;gt;")
+            assertEquals(spørsmålsbesvarelser.tiltak.typeNavn, "&amp;lt;script&amp;gt;typeNavn&amp;lt;/script&amp;gt;")
 
             val manueltRegistrertBarn = spørsmålsbesvarelser.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.get(0)
-            assertEquals(manueltRegistrertBarn.fornavn, "&lt;script&gt;a")
-            assertEquals(manueltRegistrertBarn.mellomnavn, "&lt;script&gt;b")
-            assertEquals(manueltRegistrertBarn.etternavn, "&lt;script&gt;c")
+            assertEquals(manueltRegistrertBarn.fornavn, "&amp;lt;script&amp;gt;a")
+            assertEquals(manueltRegistrertBarn.mellomnavn, "&amp;lt;script&amp;gt;b")
+            assertEquals(manueltRegistrertBarn.etternavn, "&amp;lt;script&amp;gt;c")
 
             val registrertBarn = spørsmålsbesvarelser.barnetillegg.registrerteBarnSøktBarnetilleggFor.get(0)
-            assertEquals(registrertBarn.fornavn, "&lt;script&gt;a")
-            assertEquals(registrertBarn.mellomnavn, "&lt;script&gt;b")
-            assertEquals(registrertBarn.etternavn, "&lt;script&gt;c")
+            assertEquals(registrertBarn.fornavn, "&amp;lt;script&amp;gt;a")
+            assertEquals(registrertBarn.mellomnavn, "&amp;lt;script&amp;gt;b")
+            assertEquals(registrertBarn.etternavn, "&amp;lt;script&amp;gt;c")
         }
     }
 }

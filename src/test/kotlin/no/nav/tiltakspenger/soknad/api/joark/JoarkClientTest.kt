@@ -13,29 +13,10 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
-import no.nav.tiltakspenger.soknad.api.soknad.Alderspensjon
-import no.nav.tiltakspenger.soknad.api.soknad.Barnetillegg
-import no.nav.tiltakspenger.soknad.api.soknad.Etterlønn
-import no.nav.tiltakspenger.soknad.api.soknad.Gjenlevendepensjon
-import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
-import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
-import no.nav.tiltakspenger.soknad.api.soknad.Jobbsjansen
-import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
-import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
-import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
-import no.nav.tiltakspenger.soknad.api.soknad.Periode
-import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadflyktninger
-import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadover67
-import no.nav.tiltakspenger.soknad.api.soknad.Sykepenger
-import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
-import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
+import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 internal class JoarkClientTest {
     private val journalpostId = "1"
@@ -218,101 +199,7 @@ internal class JoarkClientTest {
 
     private val dokument = Journalpost.Søknadspost.from(
         fnr = "ident",
-        søknadDTO = SøknadDTO(
-            acr = "Level4",
-            personopplysninger = Personopplysninger(
-                ident = "12345678901",
-                fornavn = "fornavn",
-                etternavn = "etternavn",
-            ),
-            kvalifiseringsprogram = Kvalifiseringsprogram(
-                deltar = false,
-                periode = null,
-            ),
-            introduksjonsprogram = Introduksjonsprogram(
-                deltar = false,
-                periode = null,
-            ),
-            institusjonsopphold = Institusjonsopphold(
-                borPåInstitusjon = false,
-                periode = null,
-            ),
-            tiltak = Tiltak(
-                periode = Periode(
-                    fra = LocalDate.of(2023, 1, 1),
-                    til = LocalDate.of(2023, 1, 1),
-                ),
-                aktivitetId = "123",
-                arrangør = "test",
-                type = "test",
-                typeNavn = "test",
-                arenaRegistrertPeriode = Deltakelsesperiode(
-                    fra = LocalDate.MAX,
-                    til = LocalDate.MAX,
-                ),
-            ),
-            mottarAndreUtbetalinger = false,
-            sykepenger = Sykepenger(
-                mottar = true,
-                periode = Periode(
-                    fra = LocalDate.of(2023, 1, 1),
-                    til = LocalDate.of(2023, 1, 31),
-                ),
-            ),
-            gjenlevendepensjon = Gjenlevendepensjon(
-                mottar = false,
-                periode = Periode(
-                    fra = LocalDate.of(2023, 1, 1),
-                    til = LocalDate.of(2023, 1, 31),
-                ),
-            ),
-            alderspensjon = Alderspensjon(
-                mottar = false,
-                fraDato = LocalDate.of(2023, 1, 1),
-            ),
-            supplerendestønadover67 = Supplerendestønadover67(
-                mottar = false,
-                periode = Periode(
-                    fra = LocalDate.of(2023, 1, 1),
-                    til = LocalDate.of(2023, 1, 31),
-                ),
-            ),
-            supplerendestønadflyktninger = Supplerendestønadflyktninger(
-                mottar = false,
-                periode = Periode(
-                    fra = LocalDate.of(2023, 1, 1),
-                    til = LocalDate.of(2023, 1, 31),
-                ),
-            ),
-            pensjonsordning = Pensjonsordning(
-                mottar = false,
-                periode = Periode(
-                    fra = LocalDate.of(2023, 1, 1),
-                    til = LocalDate.of(2023, 1, 31),
-                ),
-            ),
-            etterlønn = Etterlønn(
-                mottar = false,
-            ),
-            lønnetArbeid = LønnetArbeid(
-                erILønnetArbeid = false,
-            ),
-            jobbsjansen = Jobbsjansen(
-                mottar = false,
-                periode = Periode(
-                    fra = LocalDate.of(2023, 1, 1),
-                    til = LocalDate.of(2023, 1, 31),
-                ),
-            ),
-            barnetillegg = Barnetillegg(
-                manueltRegistrerteBarnSøktBarnetilleggFor = emptyList(),
-                registrerteBarnSøktBarnetilleggFor = emptyList(),
-            ),
-            innsendingTidspunkt = LocalDateTime.now(),
-            harBekreftetAlleOpplysninger = true,
-            harBekreftetÅSvareSåGodtManKan = true,
-            vedleggsnavn = emptyList(),
-        ),
+        søknadDTO = søknad(),
         pdf = "dette er pdf innholdet".toByteArray(),
         vedlegg = listOf(
             Vedlegg(

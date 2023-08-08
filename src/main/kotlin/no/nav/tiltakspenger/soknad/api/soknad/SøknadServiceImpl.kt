@@ -21,7 +21,7 @@ class SøknadServiceImpl(
     private val joarkService: JoarkService,
 ) : SøknadService {
     override suspend fun opprettDokumenterOgArkiverIJoark(
-        søknad: SpørsmålsbesvarelserDTO,
+        spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
         fnr: String,
         person: PersonDTO,
         vedlegg: List<Vedlegg>,
@@ -30,7 +30,14 @@ class SøknadServiceImpl(
         callId: String,
     ): String {
         val vedleggsnavn = vedlegg.stream().map { vedlegg -> vedlegg.filnavn }.toList()
-        val søknadDTO = SøknadDTO.toDTO(søknad, fnr, person, acr, innsendingTidspunkt, vedleggsnavn)
+        val søknadDTO = SøknadDTO.toDTO(
+            spørsmålsbesvarelser = spørsmålsbesvarelser,
+            fnr = fnr,
+            person = person,
+            acr = acr,
+            innsendingTidspunkt = innsendingTidspunkt,
+            vedleggsnavn = vedleggsnavn,
+        )
         val pdf = pdfService.lagPdf(søknadDTO)
         log.info { "Generering av søknadsPDF OK" }
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
