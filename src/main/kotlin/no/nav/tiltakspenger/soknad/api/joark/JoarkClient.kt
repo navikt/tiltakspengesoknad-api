@@ -54,6 +54,7 @@ class JoarkClient(
                             bruker = dokumentInnhold.bruker,
                             // sak = dokumentInnhold.sak,
                             dokumenter = dokumentInnhold.dokumenter,
+                            eksternReferanseId = callId,
                         ),
                     ),
                 )

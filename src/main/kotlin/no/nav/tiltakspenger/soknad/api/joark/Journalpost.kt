@@ -100,6 +100,7 @@ internal data class JournalpostRequest(
     val bruker: Bruker,
     // val sak: Sak,
     val dokumenter: List<JournalpostDokument>,
+    val eksternReferanseId: String,
 )
 
 data class AvsenderMottaker(
