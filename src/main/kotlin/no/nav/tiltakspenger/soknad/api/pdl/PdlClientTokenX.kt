@@ -39,4 +39,21 @@ class PdlClientTokenX(
         }
         return pdlResponse
     }
+
+    suspend fun fetchAdressebeskyttelse(fødselsnummer: String, subjectToken: String, callId: String): Result<AdressebeskyttelseRespons> {
+        val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
+        val token = tokenResponse.accessToken
+        val pdlResponse: Result<AdressebeskyttelseRespons> = kotlin.runCatching {
+            httpClient.post(pdlEndpoint) {
+                accept(ContentType.Application.Json)
+                header("Tema", INDIVIDSTONAD)
+                header("Nav-Call-Id", callId)
+                header("behandlingsnummer", "B470")
+                bearerAuth(token)
+                contentType(ContentType.Application.Json)
+                setBody(hentAdressebeskyttelseQuery(fødselsnummer))
+            }.body()
+        }
+        return pdlResponse
+    }
 }

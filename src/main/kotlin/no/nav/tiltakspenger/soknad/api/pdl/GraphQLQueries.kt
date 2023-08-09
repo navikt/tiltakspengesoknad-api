@@ -1,11 +1,12 @@
 package no.nav.tiltakspenger.soknad.api.pdl
 
-val hentPersonQuery = PdlClientTokenX::class.java.getResource("/hentPersonQuery.graphql").readText()
-val hentBarnQuery = PdlCredentialsClient::class.java.getResource("/hentBarnQuery.graphql").readText()
+val hentPersonQueryString = PdlClientTokenX::class.java.getResource("/hentPersonQuery.graphql").readText()
+val hentBarnQueryString = PdlCredentialsClient::class.java.getResource("/hentBarnQuery.graphql").readText()
+val hentAdressebeskyttelseQueryString = PdlClientTokenX::class.java.getResource("/hentAdressebeskyttelseQuery.graphql").readText()
 
 fun hentPersonQuery(ident: String): GraphqlQuery {
     return GraphqlQuery(
-        query = hentPersonQuery,
+        query = hentPersonQueryString,
         variables = mapOf(
             "ident" to ident,
         ),
@@ -14,7 +15,16 @@ fun hentPersonQuery(ident: String): GraphqlQuery {
 
 fun hentBarnQuery(ident: String): GraphqlQuery {
     return GraphqlQuery(
-        query = hentBarnQuery,
+        query = hentBarnQueryString,
+        variables = mapOf(
+            "ident" to ident,
+        ),
+    )
+}
+
+fun hentAdressebeskyttelseQuery(ident: String): GraphqlQuery {
+    return GraphqlQuery(
+        query = hentAdressebeskyttelseQueryString,
         variables = mapOf(
             "ident" to ident,
         ),
