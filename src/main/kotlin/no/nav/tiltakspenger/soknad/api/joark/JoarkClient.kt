@@ -12,6 +12,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
+import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.pdl.INDIVIDSTONAD
 import org.slf4j.LoggerFactory
@@ -20,7 +21,7 @@ internal const val joarkPath = "rest/journalpostapi/v1/journalpost"
 
 class JoarkClient(
     private val config: ApplicationConfig,
-    private val client: HttpClient,
+    private val client: HttpClient = httpClientWithRetry(timeout = 30L),
     private val tokenService: TokenService,
 ) : Joark {
 

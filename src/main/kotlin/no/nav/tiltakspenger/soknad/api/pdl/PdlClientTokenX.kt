@@ -12,12 +12,13 @@ import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
+import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
 const val INDIVIDSTONAD = "IND"
 
 class PdlClientTokenX(
     config: ApplicationConfig,
-    private val httpClient: HttpClient = httpClientCIO(timeout = 10L),
+    private val httpClient: HttpClient = httpClientWithRetry(timeout = 10L),
 ) {
     private val pdlEndpoint = config.property("endpoints.pdl").getString()
     private val pdlAudience = config.property("audience.pdl").getString()
