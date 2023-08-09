@@ -5,8 +5,8 @@ import mu.KotlinLogging
 
 class TiltakService(
     applicationConfig: ApplicationConfig,
+    private val tiltakspengerArenaClient: TiltakspengerArenaClient = TiltakspengerArenaClient(config = applicationConfig),
 ) {
-    private val tiltakspengerArenaClient = TiltakspengerArenaClient(config = applicationConfig)
     private val log = KotlinLogging.logger {}
 
     suspend fun hentTiltak(subjectToken: String, maskerArrangørnavn: Boolean): TiltakDto {
