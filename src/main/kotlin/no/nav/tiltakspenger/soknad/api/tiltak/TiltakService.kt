@@ -9,7 +9,7 @@ class TiltakService(
     private val tiltakspengerArenaClient = TiltakspengerArenaClient(config = applicationConfig)
     private val log = KotlinLogging.logger {}
 
-    suspend fun hentTiltak(subjectToken: String): TiltakDto {
+    suspend fun hentTiltak(subjectToken: String, maskerArrangørnavn: Boolean): TiltakDto {
         log.info { "Henter tiltak fra Arena" }
         val result = tiltakspengerArenaClient.fetchTiltak(subjectToken = subjectToken)
         if (result.isSuccess) {
@@ -20,7 +20,7 @@ class TiltakService(
                     tiltak = ArenaTiltakResponse(
                         tiltaksaktiviteter = tiltak.tiltaksaktiviteter,
                         feil = tiltak.feil,
-                    ).toTiltakDto().tiltak.filter {
+                    ).toTiltakDto(maskerArrangørnavn).tiltak.filter {
                         it.erInnenforRelevantTidsrom() && it.harRelevantStatus() && it.type.rettPåTiltakspenger
                     },
                 )
