@@ -89,7 +89,7 @@ class JoarkClient(
             }
         } catch (throwable: Throwable) {
             if (throwable is ClientRequestException && throwable.response.status == HttpStatusCode.Conflict) {
-                log.info("Søknaden har allerede blitt journalført (409 Conflict)")
+                log.warn("Søknaden har allerede blitt journalført (409 Conflict)")
                 val response = throwable.response.call.body<JoarkResponse>()
                 return response.journalpostId.orEmpty()
             }
