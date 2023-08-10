@@ -2,6 +2,7 @@ package no.nav.tiltakspenger.soknad.api.joark
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
@@ -87,6 +88,11 @@ class JoarkClient(
                 }
             }
         } catch (throwable: Throwable) {
+            if (throwable is ClientRequestException && throwable.response.status == HttpStatusCode.Conflict) {
+                log.info("Søknaden har allerede blitt journalført (409 Conflict)")
+                val response = throwable.response.call.body<JoarkResponse>()
+                return response.journalpostId.orEmpty()
+            }
             if (throwable is IllegalStateException) {
                 throw throwable
             } else {

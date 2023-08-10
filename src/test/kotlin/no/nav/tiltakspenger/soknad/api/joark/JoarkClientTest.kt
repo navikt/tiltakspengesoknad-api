@@ -89,6 +89,36 @@ internal class JoarkClientTest {
         }
     }
 
+    @Test
+    fun `hvis joark svarer med 409 Conflict returnerer opprettJournalpost en journalpostId hvis vi har fått en`() {
+        val mock = MockEngine {
+            respond(
+                content = okSvarJoark,
+                status = HttpStatusCode.Conflict,
+                headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+            )
+        }
+
+        val mockTokenService = mockk<TokenService>()
+        coEvery { mockTokenService.getToken(any()) } returns "token"
+
+        val client = httpClientGeneric(mock)
+        val config = ApplicationConfig("application.test.conf")
+        val joarkClient = JoarkClient(
+            config = config,
+            client = client,
+            tokenService = mockTokenService,
+        )
+
+        runTest {
+            val resp = joarkClient.opprettJournalpost(
+                dokumentInnhold = dokument,
+                callId = "test",
+            )
+            resp shouldBe journalpostId
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `joark svarer med feil`() {
