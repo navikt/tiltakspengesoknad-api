@@ -84,7 +84,6 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         joarkService = JoarkServiceImpl(
             joark = JoarkClient(
                 config = environment.config,
-                client = httpClientCIO(timeout = 30L),
                 tokenService = TokenServiceImpl(),
             ),
         ),

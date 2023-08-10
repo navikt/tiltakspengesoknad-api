@@ -11,10 +11,11 @@ import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
+import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
 class TiltakspengerArenaClient(
     config: ApplicationConfig,
-    private val httpClient: HttpClient = httpClientCIO(timeout = 10L),
+    private val httpClient: HttpClient = httpClientWithRetry(timeout = 10L),
 ) {
     private val tiltakspengerArenaEndpoint = config.property("endpoints.tiltakspengerarena").getString()
     private val tiltakspengerArenaAudience = config.property("audience.tiltakspengerarena").getString()
