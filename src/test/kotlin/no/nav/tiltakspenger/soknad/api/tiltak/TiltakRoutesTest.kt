@@ -11,6 +11,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -100,6 +101,103 @@ internal class TiltakRoutesTest {
                 Assertions.assertEquals(HttpStatusCode.OK, response.status)
                 val body: TiltakDto = response.body()
                 assertEquals(mockedTiltak.tiltak, body.tiltak)
+            }
+        }
+    }
+
+    @Test
+    fun `get på tiltak-endepunkt skal kalle på TiltakService med fødselsnummeret som ligger bakt inn i pid claim i tokenet`() {
+        val token = issueTestToken()
+
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(
+                pdlService = mockedPdlService,
+                tiltakService = mockedTiltakservice,
+            )
+            runBlocking {
+                client.get(TILTAK_PATH) {
+                    contentType(type = ContentType.Application.Json)
+                    header("Authorization", "Bearer ${token.serialize()}")
+                }
+                coVerify { mockedTiltakservice.hentTiltak(token.serialize(), any()) }
+            }
+        }
+    }
+
+    @Test
+    fun `get på tiltak-endepunkt skal returnere 401 dersom token mangler`() {
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(
+                pdlService = mockedPdlService,
+                tiltakService = mockedTiltakservice,
+            )
+            runBlocking {
+                val response = client.get(TILTAK_PATH) {
+                    contentType(type = ContentType.Application.Json)
+                }
+                assertEquals(HttpStatusCode.Unauthorized, response.status)
+            }
+        }
+    }
+
+    @Test
+    fun `get på tiltak-endepunkt skal returnere 401 dersom token kommer fra ugyldig issuer`() {
+        val tokenMedUgyldigIssuer = issueTestToken(issuer = "ugyldigIssuer")
+
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(
+                pdlService = mockedPdlService,
+                tiltakService = mockedTiltakservice,
+            )
+            runBlocking {
+                val response = client.get(TILTAK_PATH) {
+                    contentType(type = ContentType.Application.Json)
+                    header("Authorization", "Bearer ${tokenMedUgyldigIssuer.serialize()}")
+                }
+                assertEquals(HttpStatusCode.Unauthorized, response.status)
+            }
+        }
+    }
+
+    @Test
+    fun `get på tiltak-endepunkt skal returnere 401 dersom token mangler acr=Level4 claim`() {
+        val tokenMedManglendeClaim = issueTestToken(claims = mapOf("pid" to testFødselsnummer))
+
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(
+                pdlService = mockedPdlService,
+                tiltakService = mockedTiltakservice,
+            )
+            runBlocking {
+                val response = client.get(TILTAK_PATH) {
+                    contentType(type = ContentType.Application.Json)
+                    header("Authorization", "Bearer ${tokenMedManglendeClaim.serialize()}")
+                }
+                assertEquals(HttpStatusCode.Unauthorized, response.status)
             }
         }
     }
