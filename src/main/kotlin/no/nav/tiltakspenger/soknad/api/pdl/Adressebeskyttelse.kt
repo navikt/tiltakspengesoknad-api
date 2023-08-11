@@ -17,7 +17,8 @@ fun avklarGradering(gradering: List<Adressebeskyttelse>): AdressebeskyttelseGrad
     return if (gradering.isEmpty()) {
         AdressebeskyttelseGradering.UGRADERT
     } else if (gradering.size == 1) {
-        gradering.first().gradering
+        gradering.firstOrNull { !kildeErUdokumentert(it.metadata) }?.gradering
+            ?: throw IllegalStateException("Adressebeskyttelse kunne ikke avklares")
     } else {
         gradering
             .sortedByDescending { getEndringstidspunktOrNull(it) }
