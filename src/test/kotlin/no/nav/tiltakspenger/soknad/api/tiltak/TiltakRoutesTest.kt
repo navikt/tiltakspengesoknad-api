@@ -9,6 +9,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
+import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -16,10 +17,14 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
+import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO
 import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.FULLF
 import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO.TiltakType.ABOPPF
 import no.nav.tiltakspenger.soknad.api.TILTAK_PATH
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
+import no.nav.tiltakspenger.soknad.api.pdl.AdressebeskyttelseGradering.FORTROLIG
+import no.nav.tiltakspenger.soknad.api.pdl.AdressebeskyttelseGradering.STRENGT_FORTROLIG
+import no.nav.tiltakspenger.soknad.api.pdl.AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
 import no.nav.tiltakspenger.soknad.api.pdl.AdressebeskyttelseGradering.UGRADERT
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import org.junit.jupiter.api.AfterAll
@@ -101,6 +106,56 @@ internal class TiltakRoutesTest {
                 Assertions.assertEquals(HttpStatusCode.OK, response.status)
                 val body: TiltakDto = response.body()
                 assertEquals(mockedTiltak.tiltak, body.tiltak)
+            }
+        }
+    }
+
+    @Test
+    fun `get på tiltak-endepunk skal fjerne arrangørnavn for en søker med adressebeskyttelse`() {
+        val token = issueTestToken()
+
+        val mockedPdlServiceKode6og7 = mockk<PdlService>().also { mock ->
+            coEvery {
+                mock.hentAdressebeskyttelse(
+                    any(),
+                    any(),
+                    any(),
+                )
+            } returns FORTROLIG andThen STRENGT_FORTROLIG andThen STRENGT_FORTROLIG_UTLAND
+        }
+
+        val tiltakspengerArenaClient = mockk<TiltakspengerArenaClient>().also { mock ->
+            coEvery { mock.fetchTiltak(any()) } returns Result.success(
+                mockArenaTiltaksaktivitetResponsDTO("Testarrangør AS"),
+            )
+        }
+        val tiltakService = TiltakService(
+            applicationConfig = ApplicationConfig("application.test.conf"),
+            tiltakspengerArenaClient = tiltakspengerArenaClient,
+        )
+
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(
+                pdlService = mockedPdlServiceKode6og7,
+                tiltakService = tiltakService,
+            )
+            runBlocking {
+                listOf(FORTROLIG, STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND).forEach { gradering ->
+                    val response = client.get(TILTAK_PATH) {
+                        contentType(type = ContentType.Application.Json)
+                        header("Authorization", "Bearer ${token.serialize()}")
+                    }
+                    Assertions.assertEquals(HttpStatusCode.OK, response.status)
+                    val body: TiltakDto = response.body()
+
+                    assertEquals("", body.tiltak.first().arrangør)
+                }
             }
         }
     }
@@ -201,4 +256,23 @@ internal class TiltakRoutesTest {
             }
         }
     }
+
+    fun mockArenaTiltaksaktivitetResponsDTO(arrangør: String = "Arrangør AS") =
+        ArenaTiltaksaktivitetResponsDTO(
+            tiltaksaktiviteter = listOf(
+                ArenaTiltaksaktivitetResponsDTO.TiltaksaktivitetDTO(
+                    tiltakType = ArenaTiltaksaktivitetResponsDTO.TiltakType.ABIST,
+                    aktivitetId = "",
+                    tiltakLokaltNavn = "",
+                    arrangoer = arrangør,
+                    bedriftsnummer = "123456789",
+                    deltakelsePeriode = null,
+                    deltakelseProsent = 100f,
+                    deltakerStatusType = ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.DELAVB,
+                    statusSistEndret = null,
+                    begrunnelseInnsoeking = null,
+                    antallDagerPerUke = null,
+                ),
+            ),
+        )
 }
