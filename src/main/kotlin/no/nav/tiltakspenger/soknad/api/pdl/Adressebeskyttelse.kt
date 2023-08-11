@@ -16,10 +16,13 @@ data class Adressebeskyttelse(
 fun avklarGradering(gradering: List<Adressebeskyttelse>): AdressebeskyttelseGradering {
     return if (gradering.isEmpty()) {
         AdressebeskyttelseGradering.UGRADERT
+    } else if (gradering.size == 1) {
+        gradering.firstOrNull { !kildeErUdokumentert(it.metadata) }?.gradering
+            ?: throw IllegalStateException("Adressebeskyttelse kunne ikke avklares")
     } else {
         gradering
             .sortedByDescending { getEndringstidspunktOrNull(it) }
-            .firstOrNull { !kildeErUdokumentert(it.metadata) }?.gradering
+            .firstOrNull { it.gradering != AdressebeskyttelseGradering.UGRADERT && !kildeErUdokumentert(it.metadata) }?.gradering
             ?: throw IllegalStateException("Adressebeskyttelse kunne ikke avklares")
     }
 }
