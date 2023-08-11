@@ -29,4 +29,16 @@ class PdlService(
         log.error { "Noe gikk galt under kall til PDL" }
         throw IllegalStateException("Noe gikk galt under kall til PDL")
     }
+
+    suspend fun hentAdressebeskyttelse(fødselsnummer: String, subjectToken: String, callId: String): AdressebeskyttelseGradering {
+        log.info { "Henter informasjon om adressebeskyttelse" }
+        val result = pdlClientTokenX.fetchAdressebeskyttelse(fødselsnummer = fødselsnummer, subjectToken = subjectToken, callId = callId)
+        if (result.isSuccess) {
+            log.info { "Henting søkers adressebeskyttelse har gått OK" }
+            return result.getOrNull()!!.toAdressebeskyttelseGradering()
+        }
+
+        log.error { "Noe gikk galt under kall til PDL ved henting av adressebeskyttelse" }
+        throw IllegalStateException("Noe gikk galt under kall til PDL ved henting av adressebeskyttelse")
+    }
 }

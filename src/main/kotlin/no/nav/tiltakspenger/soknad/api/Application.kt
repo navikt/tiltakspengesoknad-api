@@ -135,6 +135,7 @@ internal fun Application.setupRouting(
             tiltakRoutes(
                 tiltakService = tiltakService,
                 metricsCollector = metricsCollector,
+                pdlService = pdlService,
             )
         }
         healthRoutes(emptyList()) // TODO: Relevante helsesjekker
