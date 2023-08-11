@@ -31,12 +31,12 @@ internal class AdressebeskyttelseTest {
             endringer = listOf(
                 Endring(
                     kilde = kilde,
-                    registrert= registrert,
-                    registrertAv= "test",
-                    systemkilde= "test",
-                    type= "test",
-                )
-            )
+                    registrert = registrert,
+                    registrertAv = "test",
+                    systemkilde = "test",
+                    type = "test",
+                ),
+            ),
         )
 
     fun mockUdokumentertEndringsmetadata(endringstidspunkt: LocalDateTime = LocalDateTime.now()) =
@@ -69,7 +69,7 @@ internal class AdressebeskyttelseTest {
     fun `hvis liste med Adressebeskyttelse har ett element, så plukker vi graderingen som er spesifisert, sålenge den er dokumentert`() {
         val adressebeskyttelse = mockAdressebeskyttelse(
             gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND,
-            metadata = mockDokumentertEndringsmetadata()
+            metadata = mockDokumentertEndringsmetadata(),
         )
         val gradering = avklarGradering(gradering = listOf(adressebeskyttelse))
         assertEquals(AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND, gradering)
@@ -79,7 +79,7 @@ internal class AdressebeskyttelseTest {
     fun `hvis liste med Adressebeskyttelse har ett element som er udokumentert, så kaster vi en feil`() {
         val adressebeskyttelse = mockAdressebeskyttelse(
             gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND,
-            metadata = mockUdokumentertEndringsmetadata()
+            metadata = mockUdokumentertEndringsmetadata(),
         )
         shouldThrow<IllegalStateException> {
             avklarGradering(gradering = listOf(adressebeskyttelse))
@@ -90,7 +90,7 @@ internal class AdressebeskyttelseTest {
     fun `hvis liste med Adressebeskyttelse har flere elementer, så plukker vi graderingen med seneste endringstidspunkt`() {
         val strengtFortroligUtlandAdressebeskyttelse = mockAdressebeskyttelse(
             gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND,
-            metadata = mockDokumentertEndringsmetadata()
+            metadata = mockDokumentertEndringsmetadata(),
         )
         val strengtFortroligAdressebeskyttelse = mockAdressebeskyttelse(
             gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG,
@@ -107,7 +107,7 @@ internal class AdressebeskyttelseTest {
             metadata = mockDokumentertEndringsmetadata(
                 master = FREG,
                 kilde = FREG,
-            )
+            ),
         )
 
         val gradering = avklarGradering(
@@ -115,7 +115,7 @@ internal class AdressebeskyttelseTest {
                 fortroligAdressebeskyttelse,
                 strengtFortroligAdressebeskyttelse,
                 strengtFortroligUtlandAdressebeskyttelse,
-            )
+            ),
         )
         assertEquals(AdressebeskyttelseGradering.STRENGT_FORTROLIG, gradering)
     }
@@ -126,7 +126,7 @@ internal class AdressebeskyttelseTest {
             gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND,
             metadata = mockDokumentertEndringsmetadata(
                 endringstidspunkt = LocalDateTime.MIN,
-            )
+            ),
         )
 
         val ugradertAdressebeskyttelse = mockAdressebeskyttelse(
@@ -135,14 +135,14 @@ internal class AdressebeskyttelseTest {
                 master = FREG,
                 kilde = FREG,
                 endringstidspunkt = LocalDateTime.MAX,
-            )
+            ),
         )
 
         val gradering = avklarGradering(
             gradering = listOf(
                 strengtFortroligUtlandAdressebeskyttelse,
-                ugradertAdressebeskyttelse
-            )
+                ugradertAdressebeskyttelse,
+            ),
         )
 
         assertEquals(AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND, gradering)
@@ -162,8 +162,8 @@ internal class AdressebeskyttelseTest {
             avklarGradering(
                 gradering = listOf(
                     udokumentertAdressebeskyttelse1,
-                    udokumentertAdressebeskyttelse2
-                )
+                    udokumentertAdressebeskyttelse2,
+                ),
             )
         }
     }
@@ -182,8 +182,8 @@ internal class AdressebeskyttelseTest {
             avklarGradering(
                 gradering = listOf(
                     udokumentertAdressebeskyttelse1,
-                    udokumentertAdressebeskyttelse2
-                )
+                    udokumentertAdressebeskyttelse2,
+                ),
             )
         }
     }
