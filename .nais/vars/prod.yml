@@ -9,6 +9,10 @@ endpoints:
   joark: https://dokarkiv.prod-fss-pub.nais.io
   tiltakspengerarena: https://tiltakspenger-arena.prod-fss-pub.nais.io
   av: http://clamav.nais-system/scan
+outboundExternalUrls:
+  pdl: pdl-api.prod-fss-pub.nais.io
+  dokarkiv: dokarkiv.prod-fss-pub.nais.io
+  tiltakspengerarena: tiltakspenger-arena.prod-fss-pub.nais.io
 audience:
   pdl: prod-fss:pdl:pdl-api
   joark: prod-fss:teamdokumenthandtering:dokarkiv
