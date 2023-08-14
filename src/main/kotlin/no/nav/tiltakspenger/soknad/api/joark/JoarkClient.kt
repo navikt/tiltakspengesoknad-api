@@ -2,6 +2,7 @@ package no.nav.tiltakspenger.soknad.api.joark
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
@@ -12,6 +13,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
+import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.pdl.INDIVIDSTONAD
 import org.slf4j.LoggerFactory
@@ -20,7 +22,7 @@ internal const val joarkPath = "rest/journalpostapi/v1/journalpost"
 
 class JoarkClient(
     private val config: ApplicationConfig,
-    private val client: HttpClient,
+    private val client: HttpClient = httpClientWithRetry(timeout = 30L),
     private val tokenService: TokenService,
 ) : Joark {
 
@@ -54,6 +56,7 @@ class JoarkClient(
                             bruker = dokumentInnhold.bruker,
                             // sak = dokumentInnhold.sak,
                             dokumenter = dokumentInnhold.dokumenter,
+                            eksternReferanseId = callId,
                         ),
                     ),
                 )
@@ -85,6 +88,11 @@ class JoarkClient(
                 }
             }
         } catch (throwable: Throwable) {
+            if (throwable is ClientRequestException && throwable.response.status == HttpStatusCode.Conflict) {
+                log.warn("Søknaden har allerede blitt journalført (409 Conflict)")
+                val response = throwable.response.call.body<JoarkResponse>()
+                return response.journalpostId.orEmpty()
+            }
             if (throwable is IllegalStateException) {
                 throw throwable
             } else {

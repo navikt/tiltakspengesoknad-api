@@ -47,7 +47,7 @@ data class ArenaTiltakResponse(
     val tiltaksaktiviteter: List<ArenaTiltaksaktivitetResponsDTO.TiltaksaktivitetDTO>? = null,
     val feil: ArenaTiltaksaktivitetResponsDTO.FeilmeldingDTO? = null,
 ) {
-    fun toTiltakDto(): TiltakDto {
+    fun toTiltakDto(maskerArrangørnavn: Boolean): TiltakDto {
         return TiltakDto(
             tiltak = (tiltaksaktiviteter ?: emptyList()).map {
                 TiltaksdeltakelseDto(
@@ -58,7 +58,7 @@ data class ArenaTiltakResponse(
                         fra = it.deltakelsePeriode?.fom,
                         til = it.deltakelsePeriode?.tom,
                     ),
-                    arrangør = it.arrangoer ?: "",
+                    arrangør = if (maskerArrangørnavn) "" else it.arrangoer ?: "",
                     status = it.deltakerStatusType,
                 )
             },

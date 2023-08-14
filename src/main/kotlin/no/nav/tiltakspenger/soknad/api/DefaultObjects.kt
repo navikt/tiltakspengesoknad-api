@@ -8,6 +8,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
@@ -23,6 +24,15 @@ private val SECURELOG = KotlinLogging.logger("tjenestekall")
 private const val SIXTY_SECONDS = 60L
 fun httpClientCIO(timeout: Long = SIXTY_SECONDS) = HttpClient(CIO).config(timeout)
 fun httpClientGeneric(engine: HttpClientEngine, timeout: Long = SIXTY_SECONDS) = HttpClient(engine).config(timeout)
+fun httpClientWithRetry(timeout: Long = SIXTY_SECONDS) = httpClientCIO(timeout).also { httpClient ->
+    httpClient.config {
+        install(HttpRequestRetry) {
+            retryOnServerErrors(maxRetries = 3)
+            retryOnException(maxRetries = 3, retryOnTimeout = true)
+            constantDelay(100, 0, false)
+        }
+    }
+}
 
 private fun HttpClient.config(timeout: Long) = this.config {
     install(ContentNegotiation) {
@@ -43,7 +53,6 @@ private fun HttpClient.config(timeout: Long) = this.config {
         requestTimeoutMillis = Duration.ofSeconds(timeout).toMillis()
         socketTimeoutMillis = Duration.ofSeconds(timeout).toMillis()
     }
-
     install(Logging) {
         logger = object : Logger {
             override fun log(message: String) {
