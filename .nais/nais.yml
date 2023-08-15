@@ -19,8 +19,7 @@ spec:
     path: /isalive
   readiness:
     path: /isready
-  ingresses:
-    - {{ ingress.url }}
+  {{ ingresses }}
   prometheus:
     enabled: true
     path: /metrics

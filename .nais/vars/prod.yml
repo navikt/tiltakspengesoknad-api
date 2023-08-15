@@ -1,8 +1,6 @@
 kafka:
   pool: nav-prod
 cluster: prod-gcp
-ingress:
-  url: https://tiltakspenger-soknad-api.nav.no
 endpoints:
   pdl: https://pdl-api.prod-fss-pub.nais.io/graphql
   pdf: http://tiltakspenger-pdfgen
