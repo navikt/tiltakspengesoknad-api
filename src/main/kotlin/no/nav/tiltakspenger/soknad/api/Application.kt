@@ -78,7 +78,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         pdfService = PdfServiceImpl(
             PdfClient(
                 config = environment.config,
-                client = httpClientCIO(timeout = 10L),
+                client = httpClientCIO(timeout = 30L),
             ),
         ),
         joarkService = JoarkServiceImpl(
