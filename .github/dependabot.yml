@@ -1,4 +1,11 @@
 version: 2
+registries:
+  tiltakspenger-libs:
+    type: maven-repository
+    url: https://maven.pkg.github.com/navikt/tiltakspenger-libs
+    username: x-access-token
+    password: ${{ secrets.READER_TOKEN }}
+    
 updates:
   - package-ecosystem: gradle
     directory: "/"
@@ -6,6 +13,8 @@ updates:
       interval: daily
     # set limit to 1 as auto-merge seems to fail if more than 1
     open-pull-requests-limit: 1
+    registries:
+      - tiltakspenger-libs
     assignees:
       - "@navikt/tpts"
   - package-ecosystem: github-actions
