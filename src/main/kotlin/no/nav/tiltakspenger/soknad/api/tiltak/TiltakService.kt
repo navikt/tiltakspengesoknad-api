@@ -8,6 +8,7 @@ class TiltakService(
     private val tiltakspengerArenaClient: TiltakspengerArenaClient = TiltakspengerArenaClient(config = applicationConfig),
 ) {
     private val log = KotlinLogging.logger {}
+    private val secureLog = KotlinLogging.logger("tjenestekall")
 
     suspend fun hentTiltak(subjectToken: String, maskerArrangørnavn: Boolean): TiltakDto {
         log.info { "Henter tiltak fra Arena" }
@@ -26,7 +27,8 @@ class TiltakService(
                 )
             }
         }
-        log.error { "Noe gikk galt under kall til tiltakspenger-arena" }
+        log.error { "Noe gikk galt under kall til tiltakspenger-arena " }
+        secureLog.error { "Exception ved kall mot tiltakspenger-arena: ${result.exceptionOrNull()}" }
         throw IllegalStateException("Noe gikk galt under kall til tiltakspenger-arena")
     }
 }
