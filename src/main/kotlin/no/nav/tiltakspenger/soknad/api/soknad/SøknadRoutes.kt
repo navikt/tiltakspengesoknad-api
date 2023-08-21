@@ -24,6 +24,7 @@ import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
+private val securelog = KotlinLogging.logger("tjenestekall")
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
@@ -71,7 +72,8 @@ fun Route.søknadRoutes(
                 is UninitializedPropertyAccessException,
                 is RequestValidationException,
                 -> {
-                    LOG.error("Ugyldig søknad ${exception.message}", exception)
+                    securelog.error("Ugyldig søknad ${exception.message}", exception)
+                    metricsCollector.ANTALL_FEILEDE_INNSENDINGER_COUNTER.inc()
                     metricsCollector.ANTALL_UGYLDIGE_SØKNADER_COUNTER.inc()
                     requestTimer.observeDuration()
                     call.respondText(
