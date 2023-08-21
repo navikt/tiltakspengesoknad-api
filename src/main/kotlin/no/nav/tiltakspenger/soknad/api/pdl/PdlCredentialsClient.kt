@@ -11,7 +11,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
-import no.nav.tiltakspenger.soknad.api.httpClientCIO
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
 class PdlCredentialsClient(
@@ -20,7 +19,7 @@ class PdlCredentialsClient(
 ) {
     private val pdlEndpoint = config.property("endpoints.pdl").getString()
     private val pdlScope = config.property("scope.pdl").getString()
-    private val oauth2CredentialsClient = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
+    private val oauth2CredentialsClient = checkNotNull(ClientConfig(config, httpClientWithRetry()).clients["azure"])
 
     suspend fun fetchBarn(ident: String, callId: String): Result<SøkersBarnRespons> {
         val clientCredentialsGrant = oauth2CredentialsClient.clientCredentials(pdlScope)
