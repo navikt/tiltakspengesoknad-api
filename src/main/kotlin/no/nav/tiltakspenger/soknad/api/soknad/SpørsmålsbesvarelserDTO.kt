@@ -104,6 +104,10 @@ class Tiltak(
         // todo: hvordan validere tiltak som ikke har noen periode i Arena?
         return true
     }
+
+    override fun toString(): String {
+        return "Tiltak(periode=$periode, arenaRegistrertPeriode=$arenaRegistrertPeriode)"
+    }
 }
 
 data class Barnetillegg(
