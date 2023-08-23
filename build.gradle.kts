@@ -12,7 +12,7 @@ val unleashVersion = "8.3.0"
 plugins {
     application
     distribution
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.10"
     id("ca.cutterslade.analyze") version "1.9.1"
     id("com.diffplug.spotless") version "6.20.0"
 }
