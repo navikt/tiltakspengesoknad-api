@@ -28,7 +28,7 @@ class OAuth2Client(
     private val httpClient: HttpClient,
     private val wellKnownUrl: String,
     private val clientAuthProperties: ClientAuthenticationProperties,
-    private val cacheConfig: OAuth2CacheConfig = OAuth2CacheConfig(enabled = true, maximumSize = 1000, evictSkew = 5),
+    private val cacheConfig: OAuth2CacheConfig = OAuth2CacheConfig(enabled = true, maximumSize = 10, evictSkew = 5),
 ) {
     private val wellKnown: WellKnown =
         runBlocking { httpClient.get(wellKnownUrl).body() }

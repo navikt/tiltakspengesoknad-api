@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 data class OAuth2CacheConfig(
     val enabled: Boolean,
-    val maximumSize: Long = 50,
+    val maximumSize: Long = 10,
     val evictSkew: Long = 5,
 ) {
     fun cache(
