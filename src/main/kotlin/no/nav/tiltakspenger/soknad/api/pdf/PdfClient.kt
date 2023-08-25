@@ -53,7 +53,7 @@ class PdfClient(
 
     override suspend fun konverterVedlegg(vedlegg: List<Vedlegg>): List<Vedlegg> {
         return vedlegg.map {
-            LOG.info("Starter konvertering av vedlegg: ${it.filnavn}")
+            LOG.info("Starter konvertering av vedlegg}")
             val contentType = it.dokument.detect()
             when (contentType) {
                 APPLICATON_PDF -> {
