@@ -20,8 +20,8 @@ fun Application.installAuthentication() {
                 config = config,
                 requiredClaims = RequiredClaims(
                     issuer = issuer,
-                    claimMap = arrayOf("acr=Level4"),
-                    combineWithOr = false,
+                    claimMap = arrayOf("acr=Level4", "acr=idporten-loa-high"),
+                    combineWithOr = true,
                 ),
             )
         }
