@@ -20,10 +20,16 @@ data class TiltaksdeltakelseDto(
         val datoFor6MånederSiden = LocalDate.now().minusMonths(6)
         val dato2MånederFrem = LocalDate.now().plusMonths(2)
 
+        /*
+         * Mangler fra-dato, mangler til-dato: tiltaket skal vises
+         * Mangler fra-dato, har til-dato: tiltaket skal filtreres bort
+         * Har fra-dato, mangler til-dato: tiltaket skal filtreres bort
+         * Har begge: fra-dato før intervallslutt, til-dato etter intervallstart
+         */
         return if (arenaRegistrertPeriode.fra == null) {
-            true
+            arenaRegistrertPeriode.til == null
         } else if (arenaRegistrertPeriode.til == null) {
-            arenaRegistrertPeriode.fra.isBefore(dato2MånederFrem) && arenaRegistrertPeriode.fra.isAfter(datoFor6MånederSiden)
+            false
         } else {
             arenaRegistrertPeriode.fra.isBefore(dato2MånederFrem) && arenaRegistrertPeriode.til.isAfter(datoFor6MånederSiden)
         }
