@@ -52,7 +52,7 @@ internal class PdlRoutesTest {
         issuer: String = "tokendings",
         clientId: String = "testClientId",
         claims: Map<String, String> = mapOf(
-            "acr" to "Level4",
+            "acr" to "idporten-loa-high",
             "pid" to testFødselsnummer,
         ),
     ): SignedJWT {

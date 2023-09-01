@@ -65,11 +65,29 @@ internal class TiltakRoutesTest {
 
     val testFødselsnummer = "123"
 
-    private fun issueTestToken(
+    private fun issueTestTokenOldAcr(
         issuer: String = "tokendings",
         clientId: String = "testClientId",
         claims: Map<String, String> = mapOf(
             "acr" to "Level4",
+            "pid" to testFødselsnummer,
+        ),
+    ): SignedJWT {
+        return mockOAuth2Server.issueToken(
+            issuer,
+            clientId,
+            DefaultOAuth2TokenCallback(
+                audience = listOf("audience"),
+                claims = claims,
+            ),
+        )
+    }
+
+    private fun issueTestToken(
+        issuer: String = "tokendings",
+        clientId: String = "testClientId",
+        claims: Map<String, String> = mapOf(
+            "acr" to "idporten-loa-high",
             "pid" to testFødselsnummer,
         ),
     ): SignedJWT {
@@ -102,6 +120,33 @@ internal class TiltakRoutesTest {
                 val response = client.get(TILTAK_PATH) {
                     contentType(type = ContentType.Application.Json)
                     header("Authorization", "Bearer ${token.serialize()}")
+                }
+                Assertions.assertEquals(HttpStatusCode.OK, response.status)
+                val body: TiltakDto = response.body()
+                assertEquals(mockedTiltak.tiltak, body.tiltak)
+            }
+        }
+    }
+
+    @Test
+    fun `get på tiltak-endepunkt skal svare med tiltak fra tiltakservice hvis tokenet er gyldig, også for token med gammelt acr-claim`() {
+        val tokenAcrLevel4 = issueTestTokenOldAcr()
+
+        testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    jackson()
+                }
+            }
+
+            configureTestApplication(
+                pdlService = mockedPdlService,
+                tiltakService = mockedTiltakservice,
+            )
+            runBlocking {
+                val response = client.get(TILTAK_PATH) {
+                    contentType(type = ContentType.Application.Json)
+                    header("Authorization", "Bearer ${tokenAcrLevel4.serialize()}")
                 }
                 Assertions.assertEquals(HttpStatusCode.OK, response.status)
                 val body: TiltakDto = response.body()
