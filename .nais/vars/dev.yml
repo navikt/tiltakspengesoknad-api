@@ -6,7 +6,6 @@ ingresses: |
     - https://tiltakspenger-soknad-api.intern.dev.nav.no
 endpoints:
   pdl: https://pdl-api.dev-fss-pub.nais.io/graphql
-  pdf: http://tiltakspenger-pdfgen
   dokument: http://tiltakspenger-dokument
   tiltakspengerarena: https://tiltakspenger-arena.dev-fss-pub.nais.io
   av: http://clamav.nais-system/scan

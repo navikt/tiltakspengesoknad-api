@@ -55,8 +55,6 @@ spec:
       value: {{ audience.pdl }}
     - name: PDL_SCOPE
       value: {{ scope.pdl }}
-    - name: PDF_ENDPOINT_URL
-      value: {{ endpoints.pdf }}
     - name: AV_ENDPOINT_URL
       value: {{ endpoints.av }}
     - name: DOKUMENT_ENDPOINT_URL
