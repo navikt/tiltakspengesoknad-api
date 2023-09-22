@@ -45,7 +45,6 @@ spec:
           namespace: nais-system
       external:
         - host: {{outboundExternalUrls.pdl}}
-        - host: {{outboundExternalUrls.dokarkiv}}
         - host: {{outboundExternalUrls.tiltakspengerarena}}
         - host: "tiltakspenger-unleash-api.nav.cloud.nais.io"
   env:
