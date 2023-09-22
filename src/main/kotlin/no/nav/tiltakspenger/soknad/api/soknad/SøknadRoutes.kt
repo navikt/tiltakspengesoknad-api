@@ -43,8 +43,8 @@ fun Route.søknadRoutes(
             val acr = call.acr() ?: "Ingen Level"
             val subjectToken = call.token()
             val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken, call.callId!!)
-            val journalpostId =
-                søknadService.opprettDokumenterOgArkiverIJoark(
+            val søknadResponse =
+                søknadService.opprettDokumenterOgSendTilDokument(
                     søknad,
                     fødselsnummer,
                     person,
@@ -53,10 +53,6 @@ fun Route.søknadRoutes(
                     innsendingTidspunkt,
                     call.callId!!,
                 )
-            val søknadResponse = SøknadResponse(
-                journalpostId = journalpostId,
-                innsendingTidspunkt = innsendingTidspunkt,
-            )
             metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
             metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
             requestTimer.observeDuration()

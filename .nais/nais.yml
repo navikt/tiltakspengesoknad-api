@@ -40,7 +40,7 @@ spec:
           cluster: {{ cluster }}
     outbound:
       rules:
-        - application: tiltakspenger-pdfgen
+        - application: tiltakspenger-dokument
         - application: clamav
           namespace: nais-system
       external:
@@ -55,16 +55,12 @@ spec:
       value: {{ audience.pdl }}
     - name: PDL_SCOPE
       value: {{ scope.pdl }}
-    - name: JOARK_ENDPOINT_URL
-      value: {{ endpoints.joark }}
-    - name: JOARK_AUDIENCE
-      value: {{ audience.joark }}
-    - name: JOARK_SCOPE
-      value: {{ scope.joark }}
     - name: PDF_ENDPOINT_URL
       value: {{ endpoints.pdf }}
     - name: AV_ENDPOINT_URL
       value: {{ endpoints.av }}
+    - name: DOKUMENT_ENDPOINT_URL
+      value: {{ endpoints.dokument }}
     - name: TILTAKSPENGER_ARENA_ENDPOINT_URL
       value: {{ endpoints.tiltakspengerarena }}
     - name: TILTAKSPENGER_ARENA_AUDIENCE
