@@ -37,7 +37,7 @@ fun Route.søknadRoutes(
         metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.inc()
         try {
             val innsendingTidspunkt = LocalDateTime.now()
-            val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
+            val (spørsmålsbesvarelser, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
             avService.gjørVirussjekkAvVedlegg(vedlegg)
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"
@@ -45,7 +45,7 @@ fun Route.søknadRoutes(
             val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken, call.callId!!)
             val søknadResponse =
                 søknadService.opprettDokumenterOgSendTilDokument(
-                    søknad,
+                    spørsmålsbesvarelser,
                     fødselsnummer,
                     person,
                     vedlegg,
