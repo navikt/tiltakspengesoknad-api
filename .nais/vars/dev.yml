@@ -1,9 +1,6 @@
 kafka:
   pool: nav-dev
 cluster: dev-gcp
-ingresses: |
-  ingresses:
-    - https://tiltakspenger-soknad-api.intern.dev.nav.no
 endpoints:
   pdl: https://pdl-api.dev-fss-pub.nais.io/graphql
   pdf: http://tiltakspenger-pdfgen
