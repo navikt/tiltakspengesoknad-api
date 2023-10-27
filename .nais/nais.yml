@@ -39,6 +39,7 @@ spec:
           cluster: {{ cluster }}
     outbound:
       rules:
+        - application: tiltakspenger-tiltak
         - application: tiltakspenger-pdfgen
         - application: clamav
           namespace: nais-system
@@ -68,6 +69,10 @@ spec:
       value: {{ endpoints.tiltakspengerarena }}
     - name: TILTAKSPENGER_ARENA_AUDIENCE
       value: {{ audience.tiltakspengerarena }}
+    - name: TILTAKSPENGER_TILTAK_ENDPOINT_URL
+      value: {{ endpoints.tiltakspengertiltak }}
+    - name: TILTAKSPENGER_TILTAK_AUDIENCE
+      value: {{ audience.tiltakspengertiltak }}
     - name: UNLEASH_ENVIRONMENT
       value: {{ unleash.environment }}
   envFrom:

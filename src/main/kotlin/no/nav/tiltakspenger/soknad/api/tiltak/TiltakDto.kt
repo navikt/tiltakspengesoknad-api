@@ -14,7 +14,7 @@ data class TiltaksdeltakelseDto(
     val typeNavn: String,
     val arenaRegistrertPeriode: Deltakelsesperiode,
     val arrangør: String,
-    val status: ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType,
+    // val status: ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType,
 ) {
     fun erInnenforRelevantTidsrom(): Boolean {
         val datoFor6MånederSiden = LocalDate.now().minusMonths(6)
@@ -29,21 +29,21 @@ data class TiltaksdeltakelseDto(
         }
     }
 
-    fun harRelevantStatus(): Boolean {
+/*    fun harRelevantStatus(): Boolean {
         return status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.AKTUELL ||
             status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.JATAKK ||
             status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.GJENN ||
             status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.FULLF ||
             status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.DELAVB ||
             status == ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.TILBUD
-    }
+    }*/
 }
 
 data class TiltakDto(
     val tiltak: List<TiltaksdeltakelseDto>,
 )
 
-data class ArenaTiltakResponse(
+/*data class ArenaTiltakResponse(
     val tiltaksaktiviteter: List<ArenaTiltaksaktivitetResponsDTO.TiltaksaktivitetDTO>? = null,
     val feil: ArenaTiltaksaktivitetResponsDTO.FeilmeldingDTO? = null,
 ) {
@@ -60,6 +60,28 @@ data class ArenaTiltakResponse(
                     ),
                     arrangør = if (maskerArrangørnavn) "" else it.arrangoer ?: "",
                     status = it.deltakerStatusType,
+                )
+            },
+        )
+    }
+}*/
+
+data class TiltakspengerTiltakResponse(
+    val tiltaksaktiviteter: List<TiltakDeltakelseResponse>,
+) {
+    fun toTiltakDto(maskerArrangørnavn: Boolean): TiltakDto {
+        return TiltakDto(
+            tiltak = tiltaksaktiviteter.map {
+                TiltaksdeltakelseDto(
+                    aktivitetId = it.id,
+                    type = ArenaTiltaksaktivitetResponsDTO.TiltakType.valueOf(it.gjennomforing.arenaKode),
+                    typeNavn = it.gjennomforing.typeNavn,
+                    arenaRegistrertPeriode = Deltakelsesperiode(
+                        fra = it.startDato,
+                        til = it.sluttDato,
+                    ),
+                    arrangør = if (maskerArrangørnavn) "" else it.gjennomforing.arrangornavn ?: "",
+                    // status = ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.valueOf(it.status.name),
                 )
             },
         )

@@ -17,8 +17,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
-import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO
-import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.FULLF
 import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO.TiltakType.ABOPPF
 import no.nav.tiltakspenger.soknad.api.TILTAK_PATH
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
@@ -31,6 +29,8 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
 internal class TiltakRoutesTest {
@@ -54,7 +54,7 @@ internal class TiltakRoutesTest {
                 typeNavn = "typenavn",
                 arenaRegistrertPeriode = Deltakelsesperiode(null, null),
                 arrangør = "Testarrangør AS",
-                status = FULLF,
+                // status = FULLF,
             ),
         ),
     )
@@ -169,14 +169,14 @@ internal class TiltakRoutesTest {
             } returns FORTROLIG andThen STRENGT_FORTROLIG andThen STRENGT_FORTROLIG_UTLAND
         }
 
-        val tiltakspengerArenaClient = mockk<TiltakspengerArenaClient>().also { mock ->
+        val tiltakspengerTiltakClient = mockk<TiltakspengerTiltakClient>().also { mock ->
             coEvery { mock.fetchTiltak(any()) } returns Result.success(
-                mockArenaTiltaksaktivitetResponsDTO("Testarrangør AS"),
+                mockTiltakspengerTiltakResponse("Testarrangør AS"),
             )
         }
         val tiltakService = TiltakService(
             applicationConfig = ApplicationConfig("application.test.conf"),
-            tiltakspengerArenaClient = tiltakspengerArenaClient,
+            tiltakspengerTiltakClient = tiltakspengerTiltakClient,
         )
 
         testApplication {
@@ -302,7 +302,7 @@ internal class TiltakRoutesTest {
         }
     }
 
-    fun mockArenaTiltaksaktivitetResponsDTO(arrangør: String = "Arrangør AS") =
+/*    fun mockArenaTiltaksaktivitetResponsDTO(arrangør: String = "Arrangør AS") =
         ArenaTiltaksaktivitetResponsDTO(
             tiltaksaktiviteter = listOf(
                 ArenaTiltaksaktivitetResponsDTO.TiltaksaktivitetDTO(
@@ -318,6 +318,27 @@ internal class TiltakRoutesTest {
                     begrunnelseInnsoeking = null,
                     antallDagerPerUke = null,
                 ),
+            ),
+        )*/
+
+    fun mockTiltakspengerTiltakResponse(arrangør: String = "Arrangør AS") =
+        listOf(
+            TiltakDeltakelseResponse(
+                id = "123456",
+                gjennomforing = GjennomforingResponseDTO(
+                    id = "123456",
+                    arenaKode = "ABIST",
+                    typeNavn = "typenavn",
+                    arrangornavn = arrangør,
+                    startDato = LocalDate.now(),
+                    sluttDato = LocalDate.now(),
+                ),
+                startDato = null,
+                sluttDato = null,
+                status = DeltakerStatusResponseDTO.DELTAR,
+                dagerPerUke = null,
+                prosentStilling = null,
+                registrertDato = LocalDateTime.now(),
             ),
         )
 }

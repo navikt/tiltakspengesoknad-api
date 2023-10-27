@@ -7,6 +7,7 @@ endpoints:
   joark: https://dokarkiv.dev-fss-pub.nais.io
   tiltakspengerarena: https://tiltakspenger-arena.dev-fss-pub.nais.io
   av: http://clamav.nais-system/scan
+  tiltak: http://tiltakspenger-tiltak
 outboundExternalUrls:
   pdl: pdl-api.dev-fss-pub.nais.io
   dokarkiv: dokarkiv.dev-fss-pub.nais.io

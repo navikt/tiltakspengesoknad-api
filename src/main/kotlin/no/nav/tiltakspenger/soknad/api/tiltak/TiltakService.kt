@@ -5,24 +5,23 @@ import mu.KotlinLogging
 
 class TiltakService(
     applicationConfig: ApplicationConfig,
-    private val tiltakspengerArenaClient: TiltakspengerArenaClient = TiltakspengerArenaClient(config = applicationConfig),
+    private val tiltakspengerTiltakClient: TiltakspengerTiltakClient = TiltakspengerTiltakClient(config = applicationConfig),
 ) {
     private val log = KotlinLogging.logger {}
     private val secureLog = KotlinLogging.logger("tjenestekall")
 
     suspend fun hentTiltak(subjectToken: String, maskerArrangørnavn: Boolean): TiltakDto {
         log.info { "Henter tiltak fra Arena" }
-        val result = tiltakspengerArenaClient.fetchTiltak(subjectToken = subjectToken)
+        val result = tiltakspengerTiltakClient.fetchTiltak(subjectToken = subjectToken)
         if (result.isSuccess) {
             log.info { "Henting av tiltak OK" }
             val tiltak = result.getOrNull()
             if (tiltak !== null) {
                 return TiltakDto(
-                    tiltak = ArenaTiltakResponse(
-                        tiltaksaktiviteter = tiltak.tiltaksaktiviteter,
-                        feil = tiltak.feil,
+                    tiltak = TiltakspengerTiltakResponse(
+                        tiltaksaktiviteter = tiltak,
                     ).toTiltakDto(maskerArrangørnavn).tiltak.filter {
-                        it.erInnenforRelevantTidsrom() && it.harRelevantStatus() && it.type.rettPåTiltakspenger
+                        it.erInnenforRelevantTidsrom() // && it.harRelevantStatus() && it.type.rettPåTiltakspenger - dette filtreres allerede i den nye tjenesten
                     },
                 )
             }
