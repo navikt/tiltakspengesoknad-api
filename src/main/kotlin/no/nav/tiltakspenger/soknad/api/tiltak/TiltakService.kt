@@ -26,8 +26,8 @@ class TiltakService(
                 )
             }
         }
-        log.error { "Noe gikk galt under kall til tiltakspenger-arena " }
-        secureLog.error { "Exception ved kall mot tiltakspenger-arena: ${result.exceptionOrNull()}" }
-        throw IllegalStateException("Noe gikk galt under kall til tiltakspenger-arena")
+        log.error { "Noe gikk galt under kall til tiltakspenger-tiltak " }
+        secureLog.error { "Exception ved kall mot tiltakspenger-tiltak: ${result.exceptionOrNull()}" }
+        throw IllegalStateException("Noe gikk galt under kall til tiltakspenger-tiltak")
     }
 }
