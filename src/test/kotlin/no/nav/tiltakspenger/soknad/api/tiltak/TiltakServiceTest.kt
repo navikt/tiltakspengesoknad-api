@@ -51,7 +51,7 @@ internal class TiltakServiceTest {
                 coEvery { tiltakspengerTiltakClient.fetchTiltak(any()) } returns Result.failure(IllegalStateException())
                 tiltakService.hentTiltak("subjectToken", false)
             }.also {
-                assertEquals(it.message, "Noe gikk galt under kall til tiltakspenger-arena")
+                assertEquals(it.message, "Noe gikk galt under kall til tiltakspenger-tiltak")
             }
         }
     }
