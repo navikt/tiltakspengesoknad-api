@@ -53,7 +53,7 @@ internal class TiltakRoutesTest {
                 aktivitetId = "123456",
                 type = TiltakResponsDTO.TiltakType.ABOPPF,
                 typeNavn = "typenavn",
-                deltakelsesPeriode = Deltakelsesperiode(null, null),
+                arenaRegistrertPeriode = Deltakelsesperiode(null, null),
                 arrangør = "Testarrangør AS",
                 // status = FULLF,
             ),

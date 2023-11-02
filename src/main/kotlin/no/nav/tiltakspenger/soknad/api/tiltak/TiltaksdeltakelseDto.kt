@@ -13,19 +13,19 @@ data class TiltaksdeltakelseDto(
     val aktivitetId: String,
     val type: TiltakType,
     val typeNavn: String,
-    val deltakelsesPeriode: Deltakelsesperiode,
+    val arenaRegistrertPeriode: Deltakelsesperiode,
     val arrangør: String,
 ) {
     fun erInnenforRelevantTidsrom(): Boolean {
         val datoFor6MånederSiden = LocalDate.now().minusMonths(6)
         val dato2MånederFrem = LocalDate.now().plusMonths(2)
 
-        return if (deltakelsesPeriode.fra == null) {
+        return if (arenaRegistrertPeriode.fra == null) {
             true
-        } else if (deltakelsesPeriode.til == null) {
-            deltakelsesPeriode.fra.isBefore(dato2MånederFrem) && deltakelsesPeriode.fra.isAfter(datoFor6MånederSiden)
+        } else if (arenaRegistrertPeriode.til == null) {
+            arenaRegistrertPeriode.fra.isBefore(dato2MånederFrem) && arenaRegistrertPeriode.fra.isAfter(datoFor6MånederSiden)
         } else {
-            deltakelsesPeriode.fra.isBefore(dato2MånederFrem) && deltakelsesPeriode.til.isAfter(datoFor6MånederSiden)
+            arenaRegistrertPeriode.fra.isBefore(dato2MånederFrem) && arenaRegistrertPeriode.til.isAfter(datoFor6MånederSiden)
         }
     }
 }
@@ -36,7 +36,7 @@ fun List<TiltakDTO>.toTiltakDto(maskerArrangørnavn: Boolean): List<Tiltaksdelta
             aktivitetId = it.id,
             type = it.gjennomforing.arenaKode,
             typeNavn = it.gjennomforing.typeNavn,
-            deltakelsesPeriode = Deltakelsesperiode(
+            arenaRegistrertPeriode = Deltakelsesperiode(
                 fra = it.startDato,
                 til = it.sluttDato,
             ),
