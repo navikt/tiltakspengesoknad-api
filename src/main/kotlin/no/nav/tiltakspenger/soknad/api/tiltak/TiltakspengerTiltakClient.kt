@@ -8,6 +8,7 @@ import io.ktor.client.request.get
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
+import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO.TiltakDTO
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
@@ -20,7 +21,7 @@ class TiltakspengerTiltakClient(
     private val tiltakspengerTiltakAudience = config.property("audience.tiltakspengertiltak").getString()
     private val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
 
-    suspend fun fetchTiltak(subjectToken: String): Result<List<TiltakDeltakelseResponse>> {
+    suspend fun fetchTiltak(subjectToken: String): Result<List<TiltakDTO>> {
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, tiltakspengerTiltakAudience)
         val token = tokenResponse.accessToken
         return kotlin.runCatching {

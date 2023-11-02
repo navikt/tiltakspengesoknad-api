@@ -10,20 +10,16 @@ class TiltakService(
     private val log = KotlinLogging.logger {}
     private val secureLog = KotlinLogging.logger("tjenestekall")
 
-    suspend fun hentTiltak(subjectToken: String, maskerArrangørnavn: Boolean): TiltakDto {
-        log.info { "Henter tiltak fra Arena" }
+    suspend fun hentTiltak(subjectToken: String, maskerArrangørnavn: Boolean): List<TiltaksdeltakelseDto> {
+        log.info { "Henter tiltak" }
         val result = tiltakspengerTiltakClient.fetchTiltak(subjectToken = subjectToken)
         if (result.isSuccess) {
             log.info { "Henting av tiltak OK" }
             val tiltak = result.getOrNull()
             if (tiltak !== null) {
-                return TiltakDto(
-                    tiltak = TiltakspengerTiltakResponse(
-                        tiltaksaktiviteter = tiltak,
-                    ).toTiltakDto(maskerArrangørnavn).tiltak.filter {
-                        it.erInnenforRelevantTidsrom() // && it.harRelevantStatus() && it.type.rettPåTiltakspenger - dette filtreres allerede i den nye tjenesten
-                    },
-                )
+                return tiltak.toTiltakDto(maskerArrangørnavn).filter {
+                    it.erInnenforRelevantTidsrom()
+                }
             }
         }
         log.error { "Noe gikk galt under kall til tiltakspenger-tiltak " }

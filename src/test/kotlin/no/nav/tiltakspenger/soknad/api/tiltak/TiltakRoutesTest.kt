@@ -17,7 +17,8 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
-import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO.TiltakType.ABOPPF
+import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO
+import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO.TiltakDTO
 import no.nav.tiltakspenger.soknad.api.TILTAK_PATH
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
 import no.nav.tiltakspenger.soknad.api.pdl.AdressebeskyttelseGradering.FORTROLIG
@@ -46,18 +47,17 @@ internal class TiltakRoutesTest {
         coEvery { mock.hentAdressebeskyttelse(any(), any(), any()) } returns UGRADERT
     }
 
-    val mockedTiltak = TiltakDto(
+    val mockedTiltak =
         listOf(
             TiltaksdeltakelseDto(
                 aktivitetId = "123456",
-                type = ABOPPF,
+                type = TiltakResponsDTO.TiltakType.ABOPPF,
                 typeNavn = "typenavn",
-                arenaRegistrertPeriode = Deltakelsesperiode(null, null),
+                deltakelsesPeriode = Deltakelsesperiode(null, null),
                 arrangør = "Testarrangør AS",
                 // status = FULLF,
             ),
-        ),
-    )
+        )
 
     private val mockedTiltakservice = mockk<TiltakService>().also { mock ->
         coEvery { mock.hentTiltak(any(), any()) } returns mockedTiltak
@@ -122,8 +122,8 @@ internal class TiltakRoutesTest {
                     header("Authorization", "Bearer ${token.serialize()}")
                 }
                 Assertions.assertEquals(HttpStatusCode.OK, response.status)
-                val body: TiltakDto = response.body()
-                assertEquals(mockedTiltak.tiltak, body.tiltak)
+                val body: List<TiltaksdeltakelseDto> = response.body()
+                assertEquals(mockedTiltak, body)
             }
         }
     }
@@ -149,8 +149,8 @@ internal class TiltakRoutesTest {
                     header("Authorization", "Bearer ${tokenAcrLevel4.serialize()}")
                 }
                 Assertions.assertEquals(HttpStatusCode.OK, response.status)
-                val body: TiltakDto = response.body()
-                assertEquals(mockedTiltak.tiltak, body.tiltak)
+                val body: List<TiltaksdeltakelseDto> = response.body()
+                assertEquals(mockedTiltak, body)
             }
         }
     }
@@ -191,15 +191,15 @@ internal class TiltakRoutesTest {
                 tiltakService = tiltakService,
             )
             runBlocking {
-                listOf(FORTROLIG, STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND).forEach { gradering ->
+                listOf(FORTROLIG, STRENGT_FORTROLIG, STRENGT_FORTROLIG_UTLAND).forEach { _ ->
                     val response = client.get(TILTAK_PATH) {
                         contentType(type = ContentType.Application.Json)
                         header("Authorization", "Bearer ${token.serialize()}")
                     }
                     Assertions.assertEquals(HttpStatusCode.OK, response.status)
-                    val body: TiltakDto = response.body()
+                    val body: List<TiltaksdeltakelseDto> = response.body()
 
-                    assertEquals("", body.tiltak.first().arrangør)
+                    assertEquals("", body.first().arrangør)
                 }
             }
         }
@@ -321,13 +321,13 @@ internal class TiltakRoutesTest {
             ),
         )*/
 
-    fun mockTiltakspengerTiltakResponse(arrangør: String = "Arrangør AS") =
+    private fun mockTiltakspengerTiltakResponse(arrangør: String = "Arrangør AS") =
         listOf(
-            TiltakDeltakelseResponse(
+            TiltakDTO(
                 id = "123456",
-                gjennomforing = GjennomforingResponseDTO(
+                gjennomforing = TiltakResponsDTO.GjennomforingResponseDTO(
                     id = "123456",
-                    arenaKode = "ABIST",
+                    arenaKode = TiltakResponsDTO.TiltakType.ABOPPF,
                     typeNavn = "typenavn",
                     arrangornavn = arrangør,
                     startDato = LocalDate.now(),
@@ -335,7 +335,7 @@ internal class TiltakRoutesTest {
                 ),
                 startDato = null,
                 sluttDato = null,
-                status = DeltakerStatusResponseDTO.DELTAR,
+                status = TiltakResponsDTO.DeltakerStatusResponseDTO.DELTAR,
                 dagerPerUke = null,
                 prosentStilling = null,
                 registrertDato = LocalDateTime.now(),

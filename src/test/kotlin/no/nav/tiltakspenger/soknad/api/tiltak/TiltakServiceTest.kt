@@ -4,6 +4,7 @@ import io.ktor.server.config.ApplicationConfig
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
@@ -27,7 +28,7 @@ internal class TiltakServiceTest {
             )
 
             val tiltak = tiltakService.hentTiltak("subjectToken", true)
-            assertEquals(tiltak.tiltak.first().arrangør, "")
+            assertEquals(tiltak.first().arrangør, "")
         }
     }
 
@@ -40,7 +41,7 @@ internal class TiltakServiceTest {
             )
 
             val tiltak = tiltakService.hentTiltak("subjectToken", false)
-            assertEquals(tiltak.tiltak.first().arrangør, arrangørNavn)
+            assertEquals(tiltak.first().arrangør, arrangørNavn)
         }
     }
 
@@ -77,11 +78,11 @@ internal class TiltakServiceTest {
 
     private fun mockTiltakspengerTiltakResponsDTO(arrangør: String = "Arrangør AS") =
         listOf(
-            TiltakDeltakelseResponse(
+            TiltakResponsDTO.TiltakDTO(
                 id = "123456",
-                gjennomforing = GjennomforingResponseDTO(
+                gjennomforing = TiltakResponsDTO.GjennomforingResponseDTO(
                     id = "123456",
-                    arenaKode = "ABIST",
+                    arenaKode = TiltakResponsDTO.TiltakType.ABIST,
                     typeNavn = "typenavn",
                     arrangornavn = arrangør,
                     startDato = LocalDate.now(),
@@ -89,7 +90,7 @@ internal class TiltakServiceTest {
                 ),
                 startDato = null,
                 sluttDato = null,
-                status = DeltakerStatusResponseDTO.DELTAR,
+                status = TiltakResponsDTO.DeltakerStatusResponseDTO.DELTAR,
                 dagerPerUke = null,
                 prosentStilling = null,
                 registrertDato = LocalDateTime.now(),
