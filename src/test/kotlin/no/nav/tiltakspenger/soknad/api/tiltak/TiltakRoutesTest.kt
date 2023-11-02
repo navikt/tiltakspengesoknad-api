@@ -122,8 +122,8 @@ internal class TiltakRoutesTest {
                     header("Authorization", "Bearer ${token.serialize()}")
                 }
                 Assertions.assertEquals(HttpStatusCode.OK, response.status)
-                val body: List<TiltaksdeltakelseDto> = response.body()
-                assertEquals(mockedTiltak, body)
+                val body: TiltakDto = response.body()
+                assertEquals(mockedTiltak, body.tiltak)
             }
         }
     }
@@ -149,8 +149,8 @@ internal class TiltakRoutesTest {
                     header("Authorization", "Bearer ${tokenAcrLevel4.serialize()}")
                 }
                 Assertions.assertEquals(HttpStatusCode.OK, response.status)
-                val body: List<TiltaksdeltakelseDto> = response.body()
-                assertEquals(mockedTiltak, body)
+                val body: TiltakDto = response.body()
+                assertEquals(mockedTiltak, body.tiltak)
             }
         }
     }
@@ -197,9 +197,9 @@ internal class TiltakRoutesTest {
                         header("Authorization", "Bearer ${token.serialize()}")
                     }
                     Assertions.assertEquals(HttpStatusCode.OK, response.status)
-                    val body: List<TiltaksdeltakelseDto> = response.body()
+                    val body: TiltakDto = response.body()
 
-                    assertEquals("", body.first().arrangør)
+                    assertEquals("", body.tiltak.first().arrangør)
                 }
             }
         }
