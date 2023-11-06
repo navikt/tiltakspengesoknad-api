@@ -80,19 +80,20 @@ internal class TiltakServiceTest {
         listOf(
             TiltakResponsDTO.TiltakDTO(
                 id = "123456",
-                gjennomforing = TiltakResponsDTO.GjennomforingResponseDTO(
+                gjennomforing = TiltakResponsDTO.GjennomføringDTO(
                     id = "123456",
                     arenaKode = TiltakResponsDTO.TiltakType.ABIST,
                     typeNavn = "typenavn",
-                    arrangornavn = arrangør,
-                    startDato = LocalDate.now(),
-                    sluttDato = LocalDate.now(),
+                    arrangørnavn = arrangør,
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
                 ),
-                startDato = null,
-                sluttDato = null,
-                status = TiltakResponsDTO.DeltakerStatusResponseDTO.DELTAR,
-                dagerPerUke = null,
-                prosentStilling = null,
+                deltakelseFom = null,
+                deltakelseTom = null,
+                deltakelseStatus = TiltakResponsDTO.DeltakerStatusDTO.DELTAR,
+                deltakelseDagerUke = null,
+                deltakelseProsent = null,
+                kilde = "Komet",
                 registrertDato = LocalDateTime.now(),
             ),
         )

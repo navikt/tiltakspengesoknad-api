@@ -37,10 +37,10 @@ fun List<TiltakDTO>.toTiltakDto(maskerArrangørnavn: Boolean): List<Tiltaksdelta
             type = it.gjennomforing.arenaKode,
             typeNavn = it.gjennomforing.typeNavn,
             arenaRegistrertPeriode = Deltakelsesperiode(
-                fra = it.startDato,
-                til = it.sluttDato,
+                fra = it.deltakelseFom,
+                til = it.deltakelseTom,
             ),
-            arrangør = if (maskerArrangørnavn) "" else it.gjennomforing.arrangornavn,
+            arrangør = if (maskerArrangørnavn) "" else it.gjennomforing.arrangørnavn,
             // status = ArenaTiltaksaktivitetResponsDTO.DeltakerStatusType.valueOf(it.status.name),
         )
     }
