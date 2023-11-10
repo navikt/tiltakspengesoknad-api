@@ -11,7 +11,6 @@ import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
 import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
 import no.nav.tiltakspenger.soknad.api.soknad.Jobbsjansen
 import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
-import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 import no.nav.tiltakspenger.soknad.api.soknad.ManueltRegistrertBarn
 import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
@@ -58,7 +57,6 @@ fun spørsmålsbesvarelser(
     supplerendestønadover67: Supplerendestønadover67 = supplerendestønadover67år(),
     supplerendestønadflyktninger: Supplerendestønadflyktninger = supplerendestønadflyktninger(),
     etterlønn: Etterlønn = etterlønn(),
-    lønnetArbeid: LønnetArbeid = lønnetarbeid(),
     jobbsjansen: Jobbsjansen = jobbsjansen(),
     harBekreftetAlleOpplysninger: Boolean = true,
     harBekreftetÅSvareSåGodtManKan: Boolean = true,
@@ -76,7 +74,6 @@ fun spørsmålsbesvarelser(
     supplerendestønadover67 = supplerendestønadover67,
     supplerendestønadflyktninger = supplerendestønadflyktninger,
     etterlønn = etterlønn,
-    lønnetArbeid = lønnetArbeid,
     jobbsjansen = jobbsjansen,
     harBekreftetAlleOpplysninger = harBekreftetAlleOpplysninger,
     harBekreftetÅSvareSåGodtManKan = harBekreftetÅSvareSåGodtManKan,
@@ -104,8 +101,6 @@ private fun barnetillegg(): Barnetillegg = Barnetillegg(
 )
 
 private fun etterlønn(): Etterlønn = Etterlønn(mottar = true)
-
-private fun lønnetarbeid(): LønnetArbeid = LønnetArbeid(erILønnetArbeid = true)
 
 private fun institusjonsopphold() = Institusjonsopphold(
     borPåInstitusjon = true,
