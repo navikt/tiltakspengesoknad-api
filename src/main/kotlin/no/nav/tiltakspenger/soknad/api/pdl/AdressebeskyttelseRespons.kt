@@ -17,7 +17,7 @@ data class AdressebeskyttelseRespons(
 ) {
     private fun extractPerson(): AdressebeskyttelseFraPDL? {
         if (this.errors.isNotEmpty()) {
-            throw IllegalStateException(this.errors.firstOrNull()?.message)
+            throw IllegalStateException(this.errors.firstOrNull()?.toString())
         }
         return this.data?.hentPerson
     }

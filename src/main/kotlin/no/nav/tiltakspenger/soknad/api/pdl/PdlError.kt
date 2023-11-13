@@ -14,5 +14,11 @@ data class PdlErrorLocation(
 
 data class PdlErrorExtension(
     val code: String? = null,
+    val details: PdlErrorDetails,
     val classification: String,
+)
+data class PdlErrorDetails(
+    val type: String,
+    val cause: String? = null,
+    val policy: String? = null,
 )

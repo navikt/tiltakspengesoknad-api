@@ -17,7 +17,7 @@ data class SøkersBarnRespons(
 ) {
     private fun extractPerson(): SøkersBarnFraPDL? {
         if (this.errors.isNotEmpty()) {
-            throw IllegalStateException(this.errors.firstOrNull()?.message)
+            throw IllegalStateException(this.errors.firstOrNull()?.toString())
         }
         return this.data?.hentPerson
     }

@@ -8,7 +8,6 @@ import no.nav.tiltakspenger.soknad.api.soknad.Institusjonsopphold
 import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
 import no.nav.tiltakspenger.soknad.api.soknad.Jobbsjansen
 import no.nav.tiltakspenger.soknad.api.soknad.Kvalifiseringsprogram
-import no.nav.tiltakspenger.soknad.api.soknad.LønnetArbeid
 import no.nav.tiltakspenger.soknad.api.soknad.ManueltRegistrertBarn
 import no.nav.tiltakspenger.soknad.api.soknad.Pensjonsordning
 import no.nav.tiltakspenger.soknad.api.soknad.Periode
@@ -103,11 +102,6 @@ fun mockEtterlønn(
 ): Etterlønn =
     Etterlønn(mottar)
 
-fun mockLønnetArbeid(
-    erILønnetArbeid: Boolean = false,
-): LønnetArbeid =
-    LønnetArbeid(erILønnetArbeid)
-
 fun mockJobbsjansen(
     mottar: Boolean = false,
     periode: Periode? = null,
@@ -169,7 +163,6 @@ fun mockSpørsmålsbesvarelser(
     supplerendestønadflyktninger: Supplerendestønadflyktninger = mockSupplerendestønadflyktninger(),
     pensjonsordning: Pensjonsordning = mockPensjonsordning(),
     etterlønn: Etterlønn = mockEtterlønn(),
-    lønnetArbeid: LønnetArbeid = mockLønnetArbeid(),
     jobbsjansen: Jobbsjansen = mockJobbsjansen(),
     harBekreftetAlleOpplysninger: Boolean = true,
     harBekreftetÅSvareSåGodtManKan: Boolean = true,
@@ -187,7 +180,6 @@ fun mockSpørsmålsbesvarelser(
     supplerendestønadflyktninger = supplerendestønadflyktninger,
     pensjonsordning = pensjonsordning,
     etterlønn = etterlønn,
-    lønnetArbeid = lønnetArbeid,
     jobbsjansen = jobbsjansen,
     harBekreftetAlleOpplysninger = harBekreftetAlleOpplysninger,
     harBekreftetÅSvareSåGodtManKan = harBekreftetÅSvareSåGodtManKan,
