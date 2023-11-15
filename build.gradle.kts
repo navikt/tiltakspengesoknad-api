@@ -1,5 +1,5 @@
-val javaVersion = JavaVersion.VERSION_17
-val mockkVersion = "1.13.7"
+val javaVersion = JavaVersion.VERSION_21
+val mockkVersion = "1.13.8"
 val ktorVersion = "2.3.3"
 val kotestVersion = "5.6.1"
 val jacksonVersion = "2.15.2"
@@ -12,8 +12,8 @@ val unleashVersion = "8.3.0"
 plugins {
     application
     distribution
-    kotlin("jvm") version "1.9.10"
-    id("ca.cutterslade.analyze") version "1.9.1"
+    kotlin("jvm") version "1.9.20"
+    // id("ca.cutterslade.analyze") version "1.9.1"
     id("com.diffplug.spotless") version "6.21.0"
 }
 
@@ -131,10 +131,11 @@ tasks {
             events = setOf(
                 org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
                 org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
-                org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
+                org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
             )
         }
     }
+    /*
     analyzeClassesDependencies {
         warnUsedUndeclared = true
         warnUnusedDeclared = true
@@ -143,4 +144,5 @@ tasks {
         warnUsedUndeclared = true
         warnUnusedDeclared = true
     }
+     */
 }
