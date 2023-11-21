@@ -6,7 +6,7 @@ val jacksonVersion = "2.15.2"
 val kotlinxCoroutinesVersion = "1.7.3"
 val tokenSupportVersion = "3.1.5"
 val prometheusVersion = "0.16.0"
-val apacheCommonsTextVersion = "1.10.0"
+val apacheCommonsTextVersion = "1.11.0"
 val unleashVersion = "8.3.0"
 
 plugins {
@@ -32,7 +32,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.jetbrains:annotations:24.0.1")
     implementation("com.natpryce:konfig:1.6.10.0")
-    implementation("com.github.navikt.tiltakspenger-libs:tiltak-dtos:0.0.49")
+    implementation("com.github.navikt.tiltakspenger-libs:tiltak-dtos:0.0.50")
     implementation("org.apache.commons:commons-text:$apacheCommonsTextVersion")
     implementation("io.getunleash:unleash-client-java:$unleashVersion")
 
