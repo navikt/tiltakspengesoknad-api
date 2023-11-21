@@ -15,6 +15,10 @@ import no.nav.tiltakspenger.soknad.api.pdl.AdressebeskyttelseGradering.UGRADERT
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.token
 
+data class TiltakDto(
+    val tiltak: List<TiltaksdeltakelseDto>,
+)
+
 fun Route.tiltakRoutes(tiltakService: TiltakService, metricsCollector: MetricsCollector, pdlService: PdlService) {
     val secureLog = KotlinLogging.logger("tjenestekall")
 
@@ -28,9 +32,11 @@ fun Route.tiltakRoutes(tiltakService: TiltakService, metricsCollector: MetricsCo
 
             val callId = call.callId!!
             val adressebeskyttelse = pdlService.hentAdressebeskyttelse(fødselsnummer, subjectToken, callId)
-            val tiltakDto = tiltakService.hentTiltak(
-                subjectToken = subjectToken,
-                maskerArrangørnavn = adressebeskyttelse != UGRADERT,
+            val tiltakDto = TiltakDto(
+                tiltakService.hentTiltak(
+                    subjectToken = subjectToken,
+                    maskerArrangørnavn = adressebeskyttelse != UGRADERT,
+                ),
             )
 
             call.respond(tiltakDto)

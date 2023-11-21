@@ -8,24 +8,24 @@ import io.ktor.client.request.get
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
-import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO
+import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO.TiltakDTO
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
-class TiltakspengerArenaClient(
+class TiltakspengerTiltakClient(
     config: ApplicationConfig,
     private val httpClient: HttpClient = httpClientWithRetry(timeout = 10L),
 ) {
-    private val tiltakspengerArenaEndpoint = config.property("endpoints.tiltakspengerarena").getString()
-    private val tiltakspengerArenaAudience = config.property("audience.tiltakspengerarena").getString()
+    private val tiltakspengerTiltakEndpoint = config.property("endpoints.tiltakspengertiltak").getString()
+    private val tiltakspengerTiltakAudience = config.property("audience.tiltakspengertiltak").getString()
     private val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
 
-    suspend fun fetchTiltak(subjectToken: String): Result<ArenaTiltaksaktivitetResponsDTO> {
-        val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, tiltakspengerArenaAudience)
+    suspend fun fetchTiltak(subjectToken: String): Result<List<TiltakDTO>> {
+        val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, tiltakspengerTiltakAudience)
         val token = tokenResponse.accessToken
         return kotlin.runCatching {
-            httpClient.get("$tiltakspengerArenaEndpoint/tiltak") {
+            httpClient.get("$tiltakspengerTiltakEndpoint/tokenx/tiltak") {
                 accept(ContentType.Application.Json)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)

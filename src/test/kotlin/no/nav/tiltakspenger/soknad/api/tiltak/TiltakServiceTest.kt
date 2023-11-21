@@ -4,29 +4,31 @@ import io.ktor.server.config.ApplicationConfig
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.tiltakspenger.libs.arena.tiltak.ArenaTiltaksaktivitetResponsDTO
+import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
 internal class TiltakServiceTest {
 
-    private val tiltakspengerArenaClient = mockk<TiltakspengerArenaClient>()
+    private val tiltakspengerTiltakClient = mockk<TiltakspengerTiltakClient>()
 
     private val tiltakService = TiltakService(
         applicationConfig = ApplicationConfig("application.test.conf"),
-        tiltakspengerArenaClient = tiltakspengerArenaClient,
+        tiltakspengerTiltakClient = tiltakspengerTiltakClient,
     )
 
     @Test
     fun `tiltaksarrangør maskeres når maskerArrangørnavn=true`() {
         runBlocking {
-            coEvery { tiltakspengerArenaClient.fetchTiltak(any()) } returns Result.success(
-                mockArenaTiltaksaktivitetResponsDTO(),
+            coEvery { tiltakspengerTiltakClient.fetchTiltak(any()) } returns Result.success(
+                mockTiltakspengerTiltakResponsDTO(),
             )
 
             val tiltak = tiltakService.hentTiltak("subjectToken", true)
-            assertEquals(tiltak.tiltak.first().arrangør, "")
+            assertEquals(tiltak.first().arrangør, "")
         }
     }
 
@@ -34,12 +36,12 @@ internal class TiltakServiceTest {
     fun `man får all informasjon om tiltaket når maskerArrangørnavn=false`() {
         val arrangørNavn = "Arrangør AS"
         runBlocking {
-            coEvery { tiltakspengerArenaClient.fetchTiltak(any()) } returns Result.success(
-                mockArenaTiltaksaktivitetResponsDTO(arrangørNavn),
+            coEvery { tiltakspengerTiltakClient.fetchTiltak(any()) } returns Result.success(
+                mockTiltakspengerTiltakResponsDTO(arrangørNavn),
             )
 
             val tiltak = tiltakService.hentTiltak("subjectToken", false)
-            assertEquals(tiltak.tiltak.first().arrangør, arrangørNavn)
+            assertEquals(tiltak.first().arrangør, arrangørNavn)
         }
     }
 
@@ -47,15 +49,15 @@ internal class TiltakServiceTest {
     fun `ved feil mot tiltakspenger-arena kastes en IllegalStateException`() {
         runBlocking {
             assertThrows<IllegalStateException> {
-                coEvery { tiltakspengerArenaClient.fetchTiltak(any()) } returns Result.failure(IllegalStateException())
+                coEvery { tiltakspengerTiltakClient.fetchTiltak(any()) } returns Result.failure(IllegalStateException())
                 tiltakService.hentTiltak("subjectToken", false)
             }.also {
-                assertEquals(it.message, "Noe gikk galt under kall til tiltakspenger-arena")
+                assertEquals(it.message, "Noe gikk galt under kall til tiltakspenger-tiltak")
             }
         }
     }
 
-    private fun mockArenaTiltaksaktivitetResponsDTO(arrangør: String = "Arrangør AS") =
+/*    private fun mockArenaTiltaksaktivitetResponsDTO(arrangør: String = "Arrangør AS") =
         ArenaTiltaksaktivitetResponsDTO(
             tiltaksaktiviteter = listOf(
                 ArenaTiltaksaktivitetResponsDTO.TiltaksaktivitetDTO(
@@ -71,6 +73,28 @@ internal class TiltakServiceTest {
                     begrunnelseInnsoeking = null,
                     antallDagerPerUke = null,
                 ),
+            ),
+        )*/
+
+    private fun mockTiltakspengerTiltakResponsDTO(arrangør: String = "Arrangør AS") =
+        listOf(
+            TiltakResponsDTO.TiltakDTO(
+                id = "123456",
+                gjennomforing = TiltakResponsDTO.GjennomføringDTO(
+                    id = "123456",
+                    arenaKode = TiltakResponsDTO.TiltakType.ABIST,
+                    typeNavn = "typenavn",
+                    arrangørnavn = arrangør,
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
+                ),
+                deltakelseFom = null,
+                deltakelseTom = null,
+                deltakelseStatus = TiltakResponsDTO.DeltakerStatusDTO.DELTAR,
+                deltakelseDagerUke = null,
+                deltakelseProsent = null,
+                kilde = "Komet",
+                registrertDato = LocalDateTime.now(),
             ),
         )
 }

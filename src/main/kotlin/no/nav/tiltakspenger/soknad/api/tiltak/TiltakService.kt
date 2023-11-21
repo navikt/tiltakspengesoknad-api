@@ -5,30 +5,25 @@ import mu.KotlinLogging
 
 class TiltakService(
     applicationConfig: ApplicationConfig,
-    private val tiltakspengerArenaClient: TiltakspengerArenaClient = TiltakspengerArenaClient(config = applicationConfig),
+    private val tiltakspengerTiltakClient: TiltakspengerTiltakClient = TiltakspengerTiltakClient(config = applicationConfig),
 ) {
     private val log = KotlinLogging.logger {}
     private val secureLog = KotlinLogging.logger("tjenestekall")
 
-    suspend fun hentTiltak(subjectToken: String, maskerArrangørnavn: Boolean): TiltakDto {
-        log.info { "Henter tiltak fra Arena" }
-        val result = tiltakspengerArenaClient.fetchTiltak(subjectToken = subjectToken)
+    suspend fun hentTiltak(subjectToken: String, maskerArrangørnavn: Boolean): List<TiltaksdeltakelseDto> {
+        log.info { "Henter tiltak" }
+        val result = tiltakspengerTiltakClient.fetchTiltak(subjectToken = subjectToken)
         if (result.isSuccess) {
             log.info { "Henting av tiltak OK" }
             val tiltak = result.getOrNull()
             if (tiltak !== null) {
-                return TiltakDto(
-                    tiltak = ArenaTiltakResponse(
-                        tiltaksaktiviteter = tiltak.tiltaksaktiviteter,
-                        feil = tiltak.feil,
-                    ).toTiltakDto(maskerArrangørnavn).tiltak.filter {
-                        it.erInnenforRelevantTidsrom() && it.harRelevantStatus() && it.type.rettPåTiltakspenger
-                    },
-                )
+                return tiltak.toTiltakDto(maskerArrangørnavn).filter {
+                    it.erInnenforRelevantTidsrom()
+                }
             }
         }
-        log.error { "Noe gikk galt under kall til tiltakspenger-arena " }
-        secureLog.error { "Exception ved kall mot tiltakspenger-arena: ${result.exceptionOrNull()}" }
-        throw IllegalStateException("Noe gikk galt under kall til tiltakspenger-arena")
+        log.error { "Noe gikk galt under kall til tiltakspenger-tiltak " }
+        secureLog.error { "Exception ved kall mot tiltakspenger-tiltak: ${result.exceptionOrNull()}" }
+        throw IllegalStateException("Noe gikk galt under kall til tiltakspenger-tiltak")
     }
 }

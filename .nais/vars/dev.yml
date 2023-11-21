@@ -6,7 +6,9 @@ endpoints:
   pdf: http://tiltakspenger-pdfgen
   joark: https://dokarkiv.dev-fss-pub.nais.io
   tiltakspengerarena: https://tiltakspenger-arena.dev-fss-pub.nais.io
+  tiltakspengertiltak: http://tiltakspenger-tiltak
   av: http://clamav.nais-system/scan
+  tiltak: http://tiltakspenger-tiltak
 outboundExternalUrls:
   pdl: pdl-api.dev-fss-pub.nais.io
   dokarkiv: dokarkiv.dev-fss-pub.nais.io
@@ -15,6 +17,7 @@ audience:
   pdl: dev-fss:pdl:pdl-api
   joark: dev-fss:teamdokumenthandtering:dokarkiv
   tiltakspengerarena: dev-fss:tpts:tiltakspenger-arena
+  tiltakspengertiltak: dev-gcp:tpts:tiltakspenger-tiltak
 scope:
   pdl: api://dev-fss.pdl.pdl-api/.default
   joark: api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default
