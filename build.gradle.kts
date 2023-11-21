@@ -6,7 +6,7 @@ val jacksonVersion = "2.15.2"
 val kotlinxCoroutinesVersion = "1.7.3"
 val tokenSupportVersion = "3.1.5"
 val prometheusVersion = "0.16.0"
-val apacheCommonsTextVersion = "1.10.0"
+val apacheCommonsTextVersion = "1.11.0"
 val unleashVersion = "8.3.0"
 
 plugins {
