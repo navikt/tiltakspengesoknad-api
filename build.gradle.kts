@@ -81,7 +81,7 @@ dependencies {
     // Caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    testImplementation(platform("org.junit:junit-bom:5.10.1"))
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.22")
     testImplementation("org.junit.jupiter:junit-jupiter")
