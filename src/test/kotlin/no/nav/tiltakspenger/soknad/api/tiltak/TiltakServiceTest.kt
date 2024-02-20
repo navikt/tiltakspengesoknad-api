@@ -7,7 +7,6 @@ import kotlinx.coroutines.runBlocking
 import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
@@ -85,8 +84,6 @@ internal class TiltakServiceTest {
                     arenaKode = TiltakResponsDTO.TiltakType.ABIST,
                     typeNavn = "typenavn",
                     arrangørnavn = arrangør,
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now(),
                 ),
                 deltakelseFom = null,
                 deltakelseTom = null,
