@@ -30,7 +30,6 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
@@ -330,8 +329,6 @@ internal class TiltakRoutesTest {
                     arenaKode = TiltakResponsDTO.TiltakType.ABOPPF,
                     typeNavn = "typenavn",
                     arrangørnavn = arrangør,
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now(),
                 ),
                 deltakelseFom = null,
                 deltakelseTom = null,
