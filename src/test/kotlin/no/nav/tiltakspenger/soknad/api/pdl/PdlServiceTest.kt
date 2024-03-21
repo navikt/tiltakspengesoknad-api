@@ -1,5 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.pdl
 
+import io.kotest.matchers.shouldBe
 import io.ktor.server.config.ApplicationConfig
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -388,6 +389,55 @@ internal class PdlServiceTest {
             assertNotNull(barn.mellomnavn)
             assertNotNull(barn.etternavn)
             assertNotNull(barn.fødselsdato)
+        }
+    }
+
+    fun SøkersBarnRespons.toBarnDTO(): BarnDTO = BarnDTO(
+        fødselsdato = this.data?.hentPerson?.foedsel?.first()!!.foedselsdato,
+        fornavn = this.data?.hentPerson?.navn?.first()!!.fornavn,
+        mellomnavn = this.data?.hentPerson?.navn?.first()!!.mellomnavn,
+        etternavn = this.data?.hentPerson?.navn?.first()!!.etternavn,
+    )
+
+    @Test
+    fun `hentPersonaliaMedBarn skal filtrere vekk barn som er over 16 år på styrendeDato`() {
+        val token = "token"
+        val startdato = LocalDate.of(2020, 1, 1)
+
+        val barnOver16ÅrPåTiltaksstartdato = mockSøkersBarn(fødsel = listOf(mockFødsel(fødselsdato = startdato.minusYears(16).minusDays(1))))
+        val barnSomFyller16ÅrPåTiltaksstartdato = mockSøkersBarn(fødsel = listOf(mockFødsel(fødselsdato = startdato.minusYears(16))))
+        val barnUnder16ÅrPåTiltaksstartdato = mockSøkersBarn(fødsel = listOf(mockFødsel(fødselsdato = startdato.minusYears(16).plusDays(1))))
+        val barn2Under16ÅrPåTiltaksstartdato = mockSøkersBarn(fødsel = listOf(mockFødsel(fødselsdato = startdato.minusYears(16).plusDays(2))))
+
+        runBlocking {
+            mockedTokenXClient.also { mock ->
+                coEvery { mock.fetchSøker(any(), any(), any()) } returns Result.success(
+                    mockSøkerRespons(
+                        forelderBarnRelasjon = listOf(
+                            mockForelderBarnRelasjon(ident = "barnOver16År"),
+                            mockForelderBarnRelasjon(ident = "barnSomFyller16År"),
+                            mockForelderBarnRelasjon(ident = "barnUnder16År"),
+                            mockForelderBarnRelasjon(ident = "barnUnder16År2"),
+                        ),
+                    ),
+                )
+            }
+            mockedCredentialsClient.also { mock ->
+                coEvery { mock.fetchBarn("barnOver16År", any()) } returns Result.success(barnOver16ÅrPåTiltaksstartdato)
+                coEvery { mock.fetchBarn("barnSomFyller16År", any()) } returns Result.success(barnSomFyller16ÅrPåTiltaksstartdato)
+                coEvery { mock.fetchBarn("barnUnder16År", any()) } returns Result.success(barnUnder16ÅrPåTiltaksstartdato)
+                coEvery { mock.fetchBarn("barnUnder16År2", any()) } returns Result.success(barn2Under16ÅrPåTiltaksstartdato)
+            }
+
+            val person = pdlService.hentPersonaliaMedBarn(
+                fødselsnummer = testFødselsnummer,
+                styrendeDato = startdato,
+                subjectToken = token,
+                callId = "test",
+            )
+
+            person.barn.size shouldBe 2
+            person.barn shouldBe listOf(barnUnder16ÅrPåTiltaksstartdato.toBarnDTO(), barn2Under16ÅrPåTiltaksstartdato.toBarnDTO())
         }
     }
 }

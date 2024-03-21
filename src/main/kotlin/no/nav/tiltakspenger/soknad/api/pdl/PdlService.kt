@@ -2,6 +2,7 @@ package no.nav.tiltakspenger.soknad.api.pdl
 
 import io.ktor.server.config.ApplicationConfig
 import mu.KotlinLogging
+import java.time.LocalDate
 
 class PdlService(
     applicationConfig: ApplicationConfig,
@@ -10,7 +11,7 @@ class PdlService(
 ) {
     private val log = KotlinLogging.logger {}
 
-    suspend fun hentPersonaliaMedBarn(fødselsnummer: String, subjectToken: String, callId: String): PersonDTO {
+    suspend fun hentPersonaliaMedBarn(fødselsnummer: String, subjectToken: String, callId: String, styrendeDato: LocalDate = LocalDate.now()): PersonDTO {
         log.info { "Henter søkers personalia fra PDL" }
         val result = pdlClientTokenX.fetchSøker(fødselsnummer = fødselsnummer, subjectToken = subjectToken, callId = callId)
         if (result.isSuccess) {
@@ -21,7 +22,7 @@ class PdlService(
             val barn = barnsIdenter
                 .map { barnsIdent -> pdlClientCredentials.fetchBarn(barnsIdent, callId).getOrNull()?.toPerson() }
                 .mapNotNull { it }
-                .filter { it.erUnder16År() }
+                .filter { it.erUnder16ÅrPåDato(dato = styrendeDato) }
             log.info { "Henting personalia søkers barn har gått OK" }
             return person.toPersonDTO(barn)
         }

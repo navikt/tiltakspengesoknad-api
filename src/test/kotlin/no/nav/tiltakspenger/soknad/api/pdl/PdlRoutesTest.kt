@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
+import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -77,7 +78,7 @@ internal class PdlRoutesTest {
                 }
             }
 
-            configureTestApplication(pdlService = mockedPdlService)
+            configureTestApplication(pdlService = mockedPdlService, tiltakService = mockk<TiltakService>(relaxed = true))
             runBlocking {
                 val response = client.get("/personalia") {
                     contentType(type = ContentType.Application.Json)
@@ -103,13 +104,13 @@ internal class PdlRoutesTest {
                 }
             }
 
-            configureTestApplication(pdlService = mockedPdlService)
+            configureTestApplication(pdlService = mockedPdlService, tiltakService = mockk<TiltakService>(relaxed = true))
             runBlocking {
                 client.get("/personalia") {
                     contentType(type = ContentType.Application.Json)
                     header("Authorization", "Bearer ${token.serialize()}")
                 }
-                coVerify { mockedPdlService.hentPersonaliaMedBarn(testFødselsnummer, any(), any()) }
+                coVerify { mockedPdlService.hentPersonaliaMedBarn(testFødselsnummer, any(), any(), any()) }
             }
         }
     }
@@ -123,7 +124,7 @@ internal class PdlRoutesTest {
                 }
             }
 
-            configureTestApplication(pdlService = mockedPdlService)
+            configureTestApplication(pdlService = mockedPdlService, tiltakService = mockk<TiltakService>(relaxed = true))
             runBlocking {
                 val response = client.get("/personalia") {
                     contentType(type = ContentType.Application.Json)
@@ -144,7 +145,7 @@ internal class PdlRoutesTest {
                 }
             }
 
-            configureTestApplication(pdlService = mockedPdlService)
+            configureTestApplication(pdlService = mockedPdlService, tiltakService = mockk<TiltakService>(relaxed = true))
             runBlocking {
                 val response = client.get("/personalia") {
                     contentType(type = ContentType.Application.Json)
@@ -166,7 +167,7 @@ internal class PdlRoutesTest {
                 }
             }
 
-            configureTestApplication(pdlService = mockedPdlService)
+            configureTestApplication(pdlService = mockedPdlService, tiltakService = mockk<TiltakService>(relaxed = true))
             runBlocking {
                 val response = client.get("/personalia") {
                     contentType(type = ContentType.Application.Json)

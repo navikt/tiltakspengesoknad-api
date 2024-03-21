@@ -117,6 +117,7 @@ internal fun Application.setupRouting(
         authenticate(*issuers.toTypedArray()) {
             pdlRoutes(
                 pdlService = pdlService,
+                tiltakService = tiltakService,
                 metricsCollector = metricsCollector,
             )
             søknadRoutes(

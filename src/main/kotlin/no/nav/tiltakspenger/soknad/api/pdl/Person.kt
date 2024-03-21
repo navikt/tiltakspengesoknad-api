@@ -41,10 +41,10 @@ data class Person(
             .distinct()
     }
 
-    fun erUnder16År(): Boolean {
-        val datoFor16ÅrSiden = LocalDate.now().minusYears(16)
+    fun erUnder16ÅrPåDato(dato: LocalDate): Boolean {
+        val datoMinus16år = dato.minusYears(16)
         return this.fødselsdato?.let {
-            return it.isAfter(datoFor16ÅrSiden)
+            return it.isAfter(datoMinus16år)
         } ?: throw IllegalStateException("Barn mangler fødselsdato")
     }
 }

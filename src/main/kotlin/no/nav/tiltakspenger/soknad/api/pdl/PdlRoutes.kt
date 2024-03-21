@@ -11,11 +11,13 @@ import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.PERSONALIA_PATH
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
+import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.token
+import java.time.LocalDate
 
 val secureLog = KotlinLogging.logger("tjenestekall")
 
-fun Route.pdlRoutes(pdlService: PdlService, metricsCollector: MetricsCollector) {
+fun Route.pdlRoutes(pdlService: PdlService, tiltakService: TiltakService, metricsCollector: MetricsCollector) {
     get(PERSONALIA_PATH) {
         try {
             val fødselsnummer = call.fødselsnummer()
@@ -24,7 +26,19 @@ fun Route.pdlRoutes(pdlService: PdlService, metricsCollector: MetricsCollector) 
             if (fødselsnummer == null) {
                 throw IllegalStateException("Mangler fødselsnummer")
             }
-            val personDTO = pdlService.hentPersonaliaMedBarn(fødselsnummer = fødselsnummer, subjectToken = subjectToken, callId = call.callId!!)
+
+            val tiltak = tiltakService.hentTiltak(subjectToken = subjectToken, maskerArrangørnavn = true)
+            val tiltakMedTidligsteFradato = tiltak
+                .filter { it.arenaRegistrertPeriode.fra != null }
+                .sortedBy { it.arenaRegistrertPeriode.fra }
+                .firstOrNull()
+
+            val personDTO = pdlService.hentPersonaliaMedBarn(
+                fødselsnummer = fødselsnummer,
+                styrendeDato = tiltakMedTidligsteFradato.let { it?.arenaRegistrertPeriode?.fra } ?: LocalDate.now(),
+                subjectToken = subjectToken,
+                callId = call.callId!!,
+            )
             call.respond(personDTO)
         } catch (e: Exception) {
             metricsCollector.ANTALL_FEIL_VED_HENT_PERSONALIA.inc()
