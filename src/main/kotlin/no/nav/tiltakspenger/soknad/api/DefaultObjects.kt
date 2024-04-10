@@ -22,13 +22,13 @@ private val LOG = KotlinLogging.logger {}
 private val SECURELOG = KotlinLogging.logger("tjenestekall")
 
 private const val SIXTY_SECONDS = 60L
-private const val MAX_RETRIES = 3
 fun httpClientCIO(timeout: Long = SIXTY_SECONDS) = HttpClient(CIO).config(timeout)
 fun httpClientGeneric(engine: HttpClientEngine, timeout: Long = SIXTY_SECONDS) = HttpClient(engine).config(timeout)
 fun httpClientWithRetry(timeout: Long = SIXTY_SECONDS) = httpClientCIO(timeout).also { httpClient ->
     httpClient.config {
         install(HttpRequestRetry) {
-            retryIf(maxRetries = MAX_RETRIES) { request, response ->
+            maxRetries = 3
+            retryIf { request, response ->
                 if (response.status.value.let { it in 500..599 }) {
                     SECURELOG.warn("Http-kall feilet med ${response.status.value}. Kjører retry")
                     true
@@ -36,7 +36,7 @@ fun httpClientWithRetry(timeout: Long = SIXTY_SECONDS) = httpClientCIO(timeout).
                     false
                 }
             }
-            retryOnExceptionIf(MAX_RETRIES) { request, throwable ->
+            retryOnExceptionIf { request, throwable ->
                 SECURELOG.warn("Kastet exception ved http-kall: ${throwable.message}")
                 true
             }
