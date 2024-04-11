@@ -27,8 +27,19 @@ fun httpClientGeneric(engine: HttpClientEngine, timeout: Long = SIXTY_SECONDS) =
 fun httpClientWithRetry(timeout: Long = SIXTY_SECONDS) = httpClientCIO(timeout).also { httpClient ->
     httpClient.config {
         install(HttpRequestRetry) {
-            retryOnServerErrors(maxRetries = 3)
-            retryOnException(maxRetries = 3, retryOnTimeout = true)
+            maxRetries = 3
+            retryIf { request, response ->
+                if (response.status.value.let { it in 500..599 }) {
+                    SECURELOG.warn("Http-kall feilet med ${response.status.value}. Kjører retry")
+                    true
+                } else {
+                    false
+                }
+            }
+            retryOnExceptionIf { request, throwable ->
+                SECURELOG.warn("Kastet exception ved http-kall: ${throwable.message}")
+                true
+            }
             constantDelay(100, 0, false)
         }
     }
