@@ -29,6 +29,7 @@ class PdlCredentialsClient(
                 accept(ContentType.Application.Json)
                 header("Tema", INDIVIDSTONAD)
                 header("Nav-Call-Id", callId)
+                header("behandlingsnummer", "B470")
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(hentBarnQuery(ident))
