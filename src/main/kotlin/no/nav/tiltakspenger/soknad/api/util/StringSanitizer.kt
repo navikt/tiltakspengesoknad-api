@@ -14,7 +14,7 @@ object StringSanitizer {
                 "\\u00C6" -> "Æ"
                 "\\u00D8" -> "Ø"
                 "\\u00C5" -> "Å"
-                else -> "Æ"
+                else -> ""
             }
         }
     }
