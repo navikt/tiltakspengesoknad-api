@@ -193,9 +193,9 @@ internal class SøknadServiceTest {
 
         runBlocking {
             val (spørsmålsbesvarelser) = søknadService.taInnSøknadSomMultipart(mockMultiPartData)
-            assertEquals(spørsmålsbesvarelser.tiltak.arrangør, "&amp;lt;script&amp;gt;arrangør&amp;lt;/script&amp;gt;")
-            assertEquals(spørsmålsbesvarelser.tiltak.type, "&amp;lt;script&amp;gt;type&amp;lt;/script&amp;gt;")
-            assertEquals(spørsmålsbesvarelser.tiltak.typeNavn, "&amp;lt;script&amp;gt;typeNavn&amp;lt;/script&amp;gt;")
+            assertEquals(spørsmålsbesvarelser.tiltak.arrangør, """&amp;lt;script&amp;gt;arrangør&amp;lt;\\\/script&amp;gt;""")
+            assertEquals(spørsmålsbesvarelser.tiltak.type, """&amp;lt;script&amp;gt;type&amp;lt;\\\/script&amp;gt;""")
+            assertEquals(spørsmålsbesvarelser.tiltak.typeNavn, """&amp;lt;script&amp;gt;typeNavn&amp;lt;\\\/script&amp;gt;""")
 
             val manueltRegistrertBarn = spørsmålsbesvarelser.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.get(0)
             assertEquals(manueltRegistrertBarn.fornavn, "&amp;lt;script&amp;gt;a")
