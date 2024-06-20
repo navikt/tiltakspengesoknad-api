@@ -1,9 +1,10 @@
 package no.nav.tiltakspenger.soknad.api.util
 
 import io.ktor.http.ContentType
-import org.apache.pdfbox.io.MemoryUsageSetting
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.io.IOUtils
+import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.multipdf.PDFMergerUtility
-import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.PDFRenderer
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -14,7 +15,7 @@ import javax.imageio.ImageIO
 class PdfTools {
     companion object {
         fun konverterPdfTilBilder(pdfByteArray: ByteArray): List<Bilde> {
-            val pdfDokument = PDDocument.load(pdfByteArray)
+            val pdfDokument = Loader.loadPDF(pdfByteArray)
             val renderer = PDFRenderer(pdfDokument)
             val siderSomBilder = (0 until pdfDokument.numberOfPages).map {
                 val bilde = renderer.renderImage(it)
@@ -31,9 +32,10 @@ class PdfTools {
             val baosUt = ByteArrayOutputStream()
             pdfMerger.destinationStream = baosUt
             pdfbaListe.forEach {
-                pdfMerger.addSource(ByteArrayInputStream(it))
+                val inputStream = ByteArrayInputStream(it)
+                pdfMerger.addSource(RandomAccessReadBuffer(inputStream))
             }
-            pdfMerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly()); // TODO: Sjekk ut memory settings
+            pdfMerger.mergeDocuments(IOUtils.createMemoryOnlyStreamCache()); // TODO: Sjekk ut memory settings
             return baosUt.toByteArray()
         }
     }
