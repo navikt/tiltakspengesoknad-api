@@ -23,7 +23,7 @@ class TiltakspengerTiltakClient(
 
     suspend fun fetchTiltak(subjectToken: String): Result<List<TiltakDTO>> {
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, tiltakspengerTiltakAudience)
-        val token = tokenResponse.accessToken
+        val token = tokenResponse.accessToken ?: throw IllegalStateException("Mangler token")
         return kotlin.runCatching {
             httpClient.get("$tiltakspengerTiltakEndpoint/tokenx/tiltak") {
                 accept(ContentType.Application.Json)

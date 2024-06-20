@@ -35,5 +35,5 @@ internal fun ApplicationCall.getClaim(issuer: String, name: String): String? =
         ?.getStringClaim(name)
 
 internal fun TokenValidationContextPrincipal?.asTokenString(): String =
-    this?.context?.firstValidToken?.map { it.tokenAsString }?.orElse(null)
+    this?.context?.firstValidToken?.encodedToken
         ?: throw RuntimeException("no token found in call context")

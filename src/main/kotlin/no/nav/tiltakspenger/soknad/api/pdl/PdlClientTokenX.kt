@@ -26,7 +26,7 @@ class PdlClientTokenX(
 
     suspend fun fetchSøker(fødselsnummer: String, subjectToken: String, callId: String): Result<SøkerRespons> {
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
-        val token = tokenResponse.accessToken
+        val token = tokenResponse.accessToken ?: throw IllegalStateException("Mangler token")
         val pdlResponse: Result<SøkerRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)
@@ -43,7 +43,7 @@ class PdlClientTokenX(
 
     suspend fun fetchAdressebeskyttelse(fødselsnummer: String, subjectToken: String, callId: String): Result<AdressebeskyttelseRespons> {
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
-        val token = tokenResponse.accessToken
+        val token = tokenResponse.accessToken ?: throw IllegalStateException("Mangler token")
         val pdlResponse: Result<AdressebeskyttelseRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)

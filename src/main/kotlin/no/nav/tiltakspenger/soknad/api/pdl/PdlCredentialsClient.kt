@@ -23,7 +23,7 @@ class PdlCredentialsClient(
 
     suspend fun fetchBarn(ident: String, callId: String): Result<SøkersBarnRespons> {
         val clientCredentialsGrant = oauth2CredentialsClient.clientCredentials(pdlScope)
-        val token = clientCredentialsGrant.accessToken
+        val token = clientCredentialsGrant.accessToken ?: throw IllegalStateException("Mangler token")
         return kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)

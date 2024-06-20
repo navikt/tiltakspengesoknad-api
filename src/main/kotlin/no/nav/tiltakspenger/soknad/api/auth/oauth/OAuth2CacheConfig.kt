@@ -29,16 +29,12 @@ data class OAuth2CacheConfig(
     private fun evictOnResponseExpiresIn(skewInSeconds: Long): Expiry<GrantRequest, OAuth2AccessTokenResponse> {
         return object : Expiry<GrantRequest, OAuth2AccessTokenResponse> {
 
-            override fun expireAfterCreate(
-                key: GrantRequest,
-                response: OAuth2AccessTokenResponse,
-                currentTime: Long,
-            ): Long {
+            override fun expireAfterCreate(key: GrantRequest, response: OAuth2AccessTokenResponse, currentTime: Long): Long {
                 val seconds =
-                    if (response.expiresIn > skewInSeconds) {
-                        response.expiresIn - skewInSeconds
+                    if (response.expiresIn!! > skewInSeconds) {
+                        response.expiresIn!! - skewInSeconds
                     } else {
-                        response.expiresIn
+                        response.expiresIn!!
                             .toLong()
                     }
                 return TimeUnit.SECONDS.toNanos(seconds)

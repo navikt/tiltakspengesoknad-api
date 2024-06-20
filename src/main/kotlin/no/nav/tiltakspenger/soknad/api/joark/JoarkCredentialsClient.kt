@@ -14,6 +14,6 @@ class JoarkCredentialsClient(
 
     suspend fun getToken(): String {
         val clientCredentialsGrant = oauth2CredentialsClient.clientCredentials(joarkScope)
-        return clientCredentialsGrant.accessToken
+        return clientCredentialsGrant.accessToken ?: throw IllegalStateException("Mangler token")
     }
 }
