@@ -59,8 +59,20 @@ class OAuth2Client(private val httpClient: HttpClient, private val wellKnownUrl:
 
 data class GrantRequest(val grantType: GrantType, val params: Map<String, String> = emptyMap()) {
     companion object {
-        fun tokenExchange(token: String, audience: String) = GrantRequest(TOKEN_EXCHANGE, mapOf(SUBJECT_TOKEN_TYPE to "urn:ietf:params:oauth:token-type:jwt", SUBJECT_TOKEN to token, AUDIENCE to audience))
-        fun clientCredentials(scope: String) = GrantRequest(CLIENT_CREDENTIALS, mapOf(SCOPE to scope))
+        fun tokenExchange(token: String, audience: String) =
+            GrantRequest(
+                TOKEN_EXCHANGE,
+                mapOf(
+                    SUBJECT_TOKEN_TYPE to "urn:ietf:params:oauth:token-type:jwt",
+                    SUBJECT_TOKEN to token,
+                    AUDIENCE to audience,
+                ),
+            )
+        fun clientCredentials(scope: String) =
+            GrantRequest(
+                CLIENT_CREDENTIALS,
+                mapOf(SCOPE to scope),
+            )
     }
 }
 
