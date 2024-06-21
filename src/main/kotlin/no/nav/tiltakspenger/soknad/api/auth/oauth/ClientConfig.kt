@@ -8,7 +8,11 @@ import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 class ClientConfig(applicationConfig: ApplicationConfig, httpClient: HttpClient) {
     private val cacheConfig =
         with(applicationConfig.config(CACHE_PATH)) {
-            OAuth2CacheConfig(propertyToStringOrNull("cache.enabled")?.toBoolean() ?: false, propertyToStringOrNull("cache.maximumSize")?.toLong() ?: 0, propertyToStringOrNull("cache.evictSkew")?.toLong() ?: 0)
+            OAuth2CacheConfig(
+                propertyToStringOrNull("cache.enabled")?.toBoolean() ?: false,
+                propertyToStringOrNull("cache.maximumSize")?.toLong() ?: 0,
+                propertyToStringOrNull("cache.evictSkew")?.toLong() ?: 0,
+            )
         }
 
     internal val clients =
