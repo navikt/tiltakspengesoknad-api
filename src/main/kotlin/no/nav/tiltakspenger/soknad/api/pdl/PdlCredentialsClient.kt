@@ -11,6 +11,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
+import no.nav.tiltakspenger.soknad.api.extensions.getAccessTokenOrThrow
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
 class PdlCredentialsClient(
@@ -23,7 +24,7 @@ class PdlCredentialsClient(
 
     suspend fun fetchBarn(ident: String, callId: String): Result<SøkersBarnRespons> {
         val clientCredentialsGrant = oauth2CredentialsClient.clientCredentials(pdlScope)
-        val token = clientCredentialsGrant.accessToken ?: throw IllegalStateException("Mangler token")
+        val token = clientCredentialsGrant.getAccessTokenOrThrow()
         return kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)

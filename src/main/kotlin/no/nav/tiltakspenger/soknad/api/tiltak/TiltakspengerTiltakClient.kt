@@ -10,6 +10,7 @@ import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO.TiltakDTO
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
+import no.nav.tiltakspenger.soknad.api.extensions.getAccessTokenOrThrow
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
@@ -23,7 +24,7 @@ class TiltakspengerTiltakClient(
 
     suspend fun fetchTiltak(subjectToken: String): Result<List<TiltakDTO>> {
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, tiltakspengerTiltakAudience)
-        val token = tokenResponse.accessToken ?: throw IllegalStateException("Mangler token")
+        val token = tokenResponse.getAccessTokenOrThrow()
         return kotlin.runCatching {
             httpClient.get("$tiltakspengerTiltakEndpoint/tokenx/tiltak") {
                 accept(ContentType.Application.Json)
