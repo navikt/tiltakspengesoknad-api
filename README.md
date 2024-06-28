@@ -15,39 +15,36 @@ For hvilke versjoner som brukes, [se byggefilen](build.gradle.kts)
 
 ## Kjøre opp lokalt
 
-Appen kjøres opp lokalt ved å kjøre opp `main()` i `Application.kt`.
+Appen kan enten kjøres opp lokalt ved å kjøre opp `main()` i `Application.kt` fra f.eks. IntelliJ, eller ved å bruke docker-compose oppsettet
+som ligger i [meta-repoet](https://github.com/navikt/tiltakspenger) til team tiltakspenger. Compose-oppsettet til søknaden
+kjører også opp [tiltakspenger-soknad-mock-api](https://github.com/navikt/tiltakspenger-soknad-mock-api), som er skreddersydd for
+å mocke ut andre api-er som dette api-et er avhengig av for å fungere i utviklingsmiljø.
 
-Det ligger et docker-compose oppsett i `/docker-compose` på rot, som mocker ut OAuth2 med mock-oauth2-server. Dette kan
-kjøres opp med `docker-compose up -d --build` fra `/docker-compose`-mappa på rot av repository.
-
-Følgende miljøvariabler må settes (typisk i din egen run config) for at appen skal kunne kjøres opp lokalt fra IDE. Påse at 
-miljøvariabler ikke blir sjekket inn i versjonskontroll, ettersom det avhenger litt av IDE/eget oppsett hvor sånne ting
-havner. 
+Eksempel på miljøvariabler som kan settes i en Run Configuration for å kjøre opp appen fra IntelliJ mot kjørende Compose-oppsett:
 
 ```
-AV_ENDPOINT_URL=<din url til av>
+AV_ENDPOINT_URL=http://localhost:8484/av
 AZURE_APP_CLIENT_ID=mocked_client_id
 AZURE_APP_CLIENT_SECRET=mocked_secret
 AZURE_APP_WELL_KNOWN_URL=http://host.docker.internal:6969/azure/.well-known/openid-configuration
 JOARK_AUDIENCE=mock_audience
-JOARK_ENDPOINT_URL=<din url til joark>
+JOARK_ENDPOINT_URL=http://localhost:8484
 JOARK_SCOPE=mock_scope
-PDF_ENDPOINT_URL=<din url til pdf>
+PDF_ENDPOINT_URL=http://localhost:8085
 PDL_AUDIENCE=mock_audience
-PDL_ENDPOINT_URL=<din url til pdl>
+PDL_ENDPOINT_URL=http://localhost:8484/personalia
 PDL_SCOPE=mock_scope
 TILTAKSPENGER_ARENA_AUDIENCE=mock_audience
-TILTAKSPENGER_ARENA_ENDPOINT_URL=<din url til tiltakspenger-arena>
+TILTAKSPENGER_ARENA_ENDPOINT_URL=http://localhost:8484
+TILTAKSPENGER_TILTAK_AUDIENCE=blabla
+TILTAKSPENGER_TILTAK_ENDPOINT_URL=http://localhost:8484
 TOKEN_X_CLIENT_ID=localhost:tpts:tiltakspenger-soknad-api
-TOKEN_X_PRIVATE_JWK=<generert jwk>
+TOKEN_X_PRIVATE_JWK=<din jwk>
 TOKEN_X_WELL_KNOWN_URL=http://host.docker.internal:6969/tokendings/.well-known/openid-configuration
-UNLEASH_SERVER_API_TOKEN=<token til unleash api>
-UNLEASH_SERVER_API_URL=<url til unleash api>
+UNLEASH_ENVIRONMENT=development
+UNLEASH_SERVER_API_TOKEN=token
+UNLEASH_SERVER_API_URL=http://localhost:8484/unleash
 ```
-
-Hva de ulike miljøvariablene skal settes til avhenger av hva man er ute etter å teste. Hvis man kun
-er ute etter å få kjørt opp appen lokalt, kan man sette placeholder-verdier på det meste (f.eks. http://localhost på et eller annet portnummer) 
-frem til man trenger å sette noe annet.
 
 ## Bygging og denslags
 For å bygge artifaktene:
