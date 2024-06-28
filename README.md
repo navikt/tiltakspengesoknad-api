@@ -23,26 +23,26 @@ kjører også opp [tiltakspenger-soknad-mock-api](https://github.com/navikt/tilt
 Eksempel på miljøvariabler som kan settes i en Run Configuration for å kjøre opp appen fra IntelliJ mot kjørende Compose-oppsett:
 
 ```
-AV_ENDPOINT_URL=http://localhost:8484/av;
-AZURE_APP_CLIENT_ID=mocked_client_id;
-AZURE_APP_CLIENT_SECRET=mocked_secret;
-AZURE_APP_WELL_KNOWN_URL=http://host.docker.internal:6969/azure/.well-known/openid-configuration;
-JOARK_AUDIENCE=mock_audience;
-JOARK_ENDPOINT_URL=http://localhost:8484;
-JOARK_SCOPE=mock_scope;
-PDF_ENDPOINT_URL=http://localhost:8085;
-PDL_AUDIENCE=mock_audience;
-PDL_ENDPOINT_URL=http://localhost:8484/personalia;
-PDL_SCOPE=mock_scope;
-TILTAKSPENGER_ARENA_AUDIENCE=mock_audience;
-TILTAKSPENGER_ARENA_ENDPOINT_URL=http://localhost:8484;
-TILTAKSPENGER_TILTAK_AUDIENCE=blabla;
-TILTAKSPENGER_TILTAK_ENDPOINT_URL=http://localhost:8484;
-TOKEN_X_CLIENT_ID=localhost:tpts:tiltakspenger-soknad-api;
+AV_ENDPOINT_URL=http://localhost:8484/av
+AZURE_APP_CLIENT_ID=mocked_client_id
+AZURE_APP_CLIENT_SECRET=mocked_secret
+AZURE_APP_WELL_KNOWN_URL=http://host.docker.internal:6969/azure/.well-known/openid-configuration
+JOARK_AUDIENCE=mock_audience
+JOARK_ENDPOINT_URL=http://localhost:8484
+JOARK_SCOPE=mock_scope
+PDF_ENDPOINT_URL=http://localhost:8085
+PDL_AUDIENCE=mock_audience
+PDL_ENDPOINT_URL=http://localhost:8484/personalia
+PDL_SCOPE=mock_scope
+TILTAKSPENGER_ARENA_AUDIENCE=mock_audience
+TILTAKSPENGER_ARENA_ENDPOINT_URL=http://localhost:8484
+TILTAKSPENGER_TILTAK_AUDIENCE=blabla
+TILTAKSPENGER_TILTAK_ENDPOINT_URL=http://localhost:8484
+TOKEN_X_CLIENT_ID=localhost:tpts:tiltakspenger-soknad-api
 TOKEN_X_PRIVATE_JWK=<din jwk>
-TOKEN_X_WELL_KNOWN_URL=http://host.docker.internal:6969/tokendings/.well-known/openid-configuration;
-UNLEASH_ENVIRONMENT=development;
-UNLEASH_SERVER_API_TOKEN=token;
+TOKEN_X_WELL_KNOWN_URL=http://host.docker.internal:6969/tokendings/.well-known/openid-configuration
+UNLEASH_ENVIRONMENT=development
+UNLEASH_SERVER_API_TOKEN=token
 UNLEASH_SERVER_API_URL=http://localhost:8484/unleash
 ```
 
