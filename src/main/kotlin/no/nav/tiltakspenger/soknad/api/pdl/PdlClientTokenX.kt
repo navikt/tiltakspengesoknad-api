@@ -11,6 +11,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
+import no.nav.tiltakspenger.soknad.api.extensions.getAccessTokenOrThrow
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
@@ -26,7 +27,7 @@ class PdlClientTokenX(
 
     suspend fun fetchSøker(fødselsnummer: String, subjectToken: String, callId: String): Result<SøkerRespons> {
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
-        val token = tokenResponse.accessToken
+        val token = tokenResponse.getAccessTokenOrThrow()
         val pdlResponse: Result<SøkerRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)
@@ -43,7 +44,7 @@ class PdlClientTokenX(
 
     suspend fun fetchAdressebeskyttelse(fødselsnummer: String, subjectToken: String, callId: String): Result<AdressebeskyttelseRespons> {
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
-        val token = tokenResponse.accessToken
+        val token = tokenResponse.getAccessTokenOrThrow()
         val pdlResponse: Result<AdressebeskyttelseRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)
