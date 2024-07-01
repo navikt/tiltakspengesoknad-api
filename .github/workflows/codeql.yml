@@ -25,13 +25,14 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+          queries: security-extended
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 21
       - name: Build
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
