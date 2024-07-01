@@ -8,6 +8,7 @@ val tokenSupportVersion = "3.2.0"
 val prometheusVersion = "0.16.0"
 val apacheCommonsTextVersion = "1.12.0"
 val unleashVersion = "9.2.2"
+val pdfboxVersion = "3.0.2"
 
 plugins {
     application
@@ -73,7 +74,7 @@ dependencies {
     implementation("no.nav.security:token-client-core:$tokenSupportVersion")
 
     // PDF handling
-    implementation("org.apache.pdfbox:pdfbox:2.0.28")
+    implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
 
     // Apache Tika
     implementation("org.apache.tika:tika-core:2.9.2")
