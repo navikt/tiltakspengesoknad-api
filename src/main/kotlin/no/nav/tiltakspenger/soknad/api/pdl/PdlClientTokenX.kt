@@ -10,6 +10,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
+import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.extensions.getAccessTokenOrThrow
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
@@ -24,10 +25,14 @@ class PdlClientTokenX(
     private val pdlEndpoint = config.property("endpoints.pdl").getString()
     private val pdlAudience = config.property("audience.pdl").getString()
     private val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
+    private val log = KotlinLogging.logger {}
 
     suspend fun fetchSøker(fødselsnummer: String, subjectToken: String, callId: String): Result<SøkerRespons> {
+        log.info("Henter token for å snakke med PDL")
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
+        log.info("Token-respons mottatt")
         val token = tokenResponse.getAccessTokenOrThrow()
+        log.info("Token-exchange OK")
         val pdlResponse: Result<SøkerRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)
@@ -43,8 +48,11 @@ class PdlClientTokenX(
     }
 
     suspend fun fetchAdressebeskyttelse(fødselsnummer: String, subjectToken: String, callId: String): Result<AdressebeskyttelseRespons> {
+        log.info("Henter token for å snakke med PDL")
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, pdlAudience)
+        log.info("Token-respons mottatt")
         val token = tokenResponse.getAccessTokenOrThrow()
+        log.info("Token-exchange OK")
         val pdlResponse: Result<AdressebeskyttelseRespons> = kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)

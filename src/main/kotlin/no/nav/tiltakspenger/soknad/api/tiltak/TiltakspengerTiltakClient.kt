@@ -8,6 +8,7 @@ import io.ktor.client.request.get
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
+import mu.KotlinLogging
 import no.nav.tiltakspenger.libs.tiltak.TiltakResponsDTO.TiltakDTO
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.extensions.getAccessTokenOrThrow
@@ -21,10 +22,14 @@ class TiltakspengerTiltakClient(
     private val tiltakspengerTiltakEndpoint = config.property("endpoints.tiltakspengertiltak").getString()
     private val tiltakspengerTiltakAudience = config.property("audience.tiltakspengertiltak").getString()
     private val oauth2ClientTokenX = checkNotNull(ClientConfig(config, httpClientCIO()).clients["tokendings"])
+    private val log = KotlinLogging.logger {}
 
     suspend fun fetchTiltak(subjectToken: String): Result<List<TiltakDTO>> {
+        log.info("Henter token for å snakke med tiltakspenger-tiltak")
         val tokenResponse = oauth2ClientTokenX.tokenExchange(subjectToken, tiltakspengerTiltakAudience)
+        log.info("Token-respons mottatt")
         val token = tokenResponse.getAccessTokenOrThrow()
+        log.info("Token til tiltakspenger-tiltak mottatt OK")
         return kotlin.runCatching {
             httpClient.get("$tiltakspengerTiltakEndpoint/tokenx/tiltak") {
                 accept(ContentType.Application.Json)

@@ -10,6 +10,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
+import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.extensions.getAccessTokenOrThrow
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
@@ -21,10 +22,14 @@ class PdlCredentialsClient(
     private val pdlEndpoint = config.property("endpoints.pdl").getString()
     private val pdlScope = config.property("scope.pdl").getString()
     private val oauth2CredentialsClient = checkNotNull(ClientConfig(config, httpClientWithRetry()).clients["azure"])
+    private val log = KotlinLogging.logger {}
 
     suspend fun fetchBarn(ident: String, callId: String): Result<SøkersBarnRespons> {
+        log.info("Henter credentials for å snakke med PDL")
         val clientCredentialsGrant = oauth2CredentialsClient.clientCredentials(pdlScope)
+        log.info("Credentials-respons mottatt")
         val token = clientCredentialsGrant.getAccessTokenOrThrow()
+        log.info("Hent credentials OK")
         return kotlin.runCatching {
             httpClient.post(pdlEndpoint) {
                 accept(ContentType.Application.Json)
