@@ -13,6 +13,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
+import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.pdl.INDIVIDSTONAD
@@ -27,6 +28,8 @@ class JoarkClient(
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
+    private val securelog = KotlinLogging.logger("tjenestekall")
+
     private val joarkEndpoint = config.property("endpoints.joark").getString()
 
     suspend fun opprettJournalpost(
@@ -34,8 +37,9 @@ class JoarkClient(
         callId: String,
     ): String {
         try {
-            log.info("Starter journalføring av søknad")
+            log.info("Henter credentials for å arkivere i Joark")
             val token = joarkCredentialsClient.getToken()
+            log.info("Hent credentials til arkiv OK. Starter journalføring av søknad")
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
@@ -94,6 +98,7 @@ class JoarkClient(
                 return response.journalpostId.orEmpty()
             }
             if (throwable is IllegalStateException) {
+                securelog.error("Vi fikk en IllegalStateException i JoarkClient", throwable)
                 throw throwable
             } else {
                 log.error("Kallet til joark feilet $throwable")
