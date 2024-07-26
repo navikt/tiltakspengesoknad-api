@@ -7,7 +7,7 @@ val kotlinxCoroutinesVersion = "1.8.1"
 val tokenSupportVersion = "5.0.1"
 val prometheusVersion = "0.16.0"
 val apacheCommonsTextVersion = "1.12.0"
-val unleashVersion = "9.2.2"
+val unleashVersion = "9.2.3"
 val pdfboxVersion = "3.0.2"
 
 plugins {
