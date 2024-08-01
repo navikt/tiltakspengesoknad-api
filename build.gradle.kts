@@ -35,7 +35,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.jetbrains:annotations:24.1.0")
     implementation("com.natpryce:konfig:1.6.10.0")
-    implementation("com.github.navikt.tiltakspenger-libs:tiltak-dtos:0.0.164")
+    implementation("com.github.navikt.tiltakspenger-libs:tiltak-dtos:0.0.165")
     implementation("org.apache.commons:commons-text:$apacheCommonsTextVersion")
     implementation("io.getunleash:unleash-client-java:$unleashVersion")
 
