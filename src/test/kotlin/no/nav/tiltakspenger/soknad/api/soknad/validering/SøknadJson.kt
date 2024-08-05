@@ -4,13 +4,11 @@ import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import java.time.LocalDateTime
-import java.util.UUID
 
 fun søknad(
     spørsmålsbesvarelser: SpørsmålsbesvarelserDTO = spørsmålsbesvarelser(),
     personopplysninger: Personopplysninger = personopplysninger(),
 ) = SøknadDTO(
-    id = UUID.randomUUID(),
     versjon = "4",
     acr = "Level4",
     spørsmålsbesvarelser = spørsmålsbesvarelser,

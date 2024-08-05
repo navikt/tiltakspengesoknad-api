@@ -1,9 +1,9 @@
 package no.nav.tiltakspenger.soknad.api.domain
 
+import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class Personopplysninger(
     val ident: String,
@@ -12,7 +12,7 @@ data class Personopplysninger(
 )
 
 data class SøknadDTO(
-    val id: UUID = UUID.randomUUID(),
+    val id: String = SøknadId.random().toString(),
     val acr: String,
     val versjon: String,
     val spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,

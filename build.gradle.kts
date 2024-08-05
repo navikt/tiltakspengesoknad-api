@@ -9,6 +9,7 @@ val prometheusVersion = "0.16.0"
 val apacheCommonsTextVersion = "1.12.0"
 val unleashVersion = "9.2.4"
 val pdfboxVersion = "3.0.2"
+val felleslibVersion = "0.0.168"
 
 plugins {
     application
@@ -35,7 +36,8 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.jetbrains:annotations:24.1.0")
     implementation("com.natpryce:konfig:1.6.10.0")
-    implementation("com.github.navikt.tiltakspenger-libs:tiltak-dtos:0.0.165")
+    implementation("com.github.navikt.tiltakspenger-libs:tiltak-dtos:$felleslibVersion")
+    implementation("com.github.navikt.tiltakspenger-libs:common:$felleslibVersion")
     implementation("org.apache.commons:commons-text:$apacheCommonsTextVersion")
     implementation("io.getunleash:unleash-client-java:$unleashVersion")
 
