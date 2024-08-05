@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 val javaVersion = JavaVersion.VERSION_21
 val mockkVersion = "1.13.12"
 val ktorVersion = "2.3.12"
@@ -119,12 +121,17 @@ spotless {
 }
 
 tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = javaVersion.toString()
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = javaVersion.toString()
-        kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    kotlin {
+        compileKotlin {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_21)
+            }
+        }
+        compileTestKotlin {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_21)
+            }
+        }
     }
     test {
         // JUnit 5 support
