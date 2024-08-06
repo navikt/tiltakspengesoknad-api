@@ -189,7 +189,6 @@ internal class JoarkClientTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `joark svarer uten journalpostid`() {
         val mock = MockEngine {
@@ -223,7 +222,7 @@ internal class JoarkClientTest {
                     dokumentInnhold = dokument,
                     callId = "test",
                 )
-            }.message shouldBe "Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark"
+            }.message shouldBe "Fikk 201 Created fra Joark, men vi fikk ingen journalpostId. response=JoarkResponse(journalpostId=null, journalpostferdigstilt=null, dokumenter=[Dokumenter(dokumentInfoId=485227498, tittel=Søknad om tiltakspenger)])"
         }
     }
 

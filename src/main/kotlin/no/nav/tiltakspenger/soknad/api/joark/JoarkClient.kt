@@ -9,6 +9,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -66,13 +67,13 @@ class JoarkClient(
                 )
             }
 
-            when (res.status) {
+            when (val status = res.status) {
                 HttpStatusCode.Created -> {
                     val response = res.call.body<JoarkResponse>()
 
                     val journalpostId = if (response.journalpostId.isNullOrEmpty()) {
-                        log.error("Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark")
-                        throw IllegalStateException("Kallet til Joark gikk ok, men vi fikk ingen journalpostId fra Joark")
+                        log.error("Fikk 201 Created fra Joark, men vi fikk ingen journalpostId. response=$response")
+                        throw IllegalStateException("Fikk 201 Created fra Joark, men vi fikk ingen journalpostId. response=$response")
                     } else {
                         response.journalpostId
                     }
@@ -82,13 +83,14 @@ class JoarkClient(
                     //     throw IllegalStateException("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
                     // }
 
-                    log.info("Vi har opprettet journalpost med id : $journalpostId")
+                    log.info("Vi har opprettet journalpost med id: $journalpostId")
                     return journalpostId
                 }
 
                 else -> {
-                    log.error("Kallet til joark feilet ${res.status} ${res.status.description}")
-                    throw RuntimeException("Feil i kallet til joark")
+                    val body = res.bodyAsText()
+                    log.error("Fikk respons fra Joark, men forventet 201 CREATED. Status: $status, body: $body")
+                    throw RuntimeException("Fikk respons fra Joark, men forventet 201 CREATED. Status: $status, body: $body")
                 }
             }
         } catch (throwable: Throwable) {
@@ -98,11 +100,11 @@ class JoarkClient(
                 return response.journalpostId.orEmpty()
             }
             if (throwable is IllegalStateException) {
-                securelog.error("Vi fikk en IllegalStateException i JoarkClient", throwable)
+                log.error("Vi fikk en IllegalStateException i JoarkClient", throwable)
                 throw throwable
             } else {
-                log.error("Kallet til joark feilet $throwable")
-                throw RuntimeException("Feil i kallet til joark $throwable")
+                log.error("JoarkClient: Fikk en ukjent exception.", throwable)
+                throw RuntimeException("JoarkClient: Fikk en ukjent exception.", throwable)
             }
         }
     }
