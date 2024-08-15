@@ -22,6 +22,7 @@ import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
+import java.util.*
 
 val LOG = KotlinLogging.logger { }
 private val securelog = KotlinLogging.logger("tjenestekall")
@@ -36,6 +37,11 @@ fun Route.søknadRoutes(
         val requestTimer = metricsCollector.SØKNADSMOTTAK_LATENCY_SECONDS.startTimer()
         metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.inc()
         try {
+            val shouldFail = Random().nextFloat() > 0.2
+            if (shouldFail) {
+                LOG.info { "Feiler for testing" }
+                throw IllegalStateException("Failing!")
+            }
             val innsendingTidspunkt = LocalDateTime.now()
             val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
             avService.gjørVirussjekkAvVedlegg(vedlegg)
