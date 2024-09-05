@@ -33,7 +33,7 @@ query($ident: ID!){
         doedsfall {
             doedsdato
         }
-        foedsel {
+        foedselsdato {
             foedselsdato
             folkeregistermetadata {
                 ...folkeregistermetadataDetails
