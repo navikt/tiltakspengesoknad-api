@@ -83,7 +83,7 @@ internal class PdlServiceTest {
                     adressebeskyttelse = emptyList(),
                     forelderBarnRelasjon = forelderBarnRelasjon,
                     doedsfall = emptyList(),
-                    foedsel = listOf(mockFødsel()),
+                    foedselsdato = listOf(mockFødsel()),
                 ),
             ),
         )
@@ -112,7 +112,7 @@ internal class PdlServiceTest {
                 hentPerson = SøkersBarnFraPDL(
                     navn = navn,
                     adressebeskyttelse = adressebeskyttelse,
-                    foedsel = fødsel,
+                    foedselsdato = fødsel,
                     doedsfall = dødsfall,
                 ),
             ),
@@ -393,7 +393,7 @@ internal class PdlServiceTest {
     }
 
     fun SøkersBarnRespons.toBarnDTO(): BarnDTO = BarnDTO(
-        fødselsdato = this.data?.hentPerson?.foedsel?.first()!!.foedselsdato,
+        fødselsdato = this.data?.hentPerson?.foedselsdato?.first()!!.foedselsdato,
         fornavn = this.data?.hentPerson?.navn?.first()!!.fornavn,
         mellomnavn = this.data?.hentPerson?.navn?.first()!!.mellomnavn,
         etternavn = this.data?.hentPerson?.navn?.first()!!.etternavn,
