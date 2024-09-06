@@ -28,6 +28,7 @@ private val securelog = KotlinLogging.logger("tjenestekall")
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
+    søknadRepo: SøknadRepo,
     avService: AvService,
     pdlService: PdlService,
     metricsCollector: MetricsCollector,
@@ -60,6 +61,15 @@ fun Route.søknadRoutes(
             metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
             metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
             requestTimer.observeDuration()
+
+            søknadRepo.lagre(
+                mapSøknad(
+                    spm = søknad,
+                    fnr = fødselsnummer,
+                    vedlegg = vedlegg,
+                ),
+            )
+
             call.respond(status = HttpStatusCode.Created, message = søknadResponse)
         } catch (exception: Exception) {
             metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()

@@ -185,10 +185,14 @@ internal class SøknadRoutesTest {
             coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any()) } returns "123"
         }
 
+        val repoMock = mockk<SøknadRepo>().also { mock ->
+            coEvery { mock.lagre(any()) } returns Unit
+        }
+
         val token = issueTestToken()
 
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
+            configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock, søknadRepo = repoMock)
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(
