@@ -29,7 +29,7 @@ class SøknadServiceImpl(
         innsendingTidspunkt: LocalDateTime,
         callId: String,
     ): String {
-        val vedleggsnavn = vedlegg.stream().map { it.filnavn }.toList()
+        val vedleggsnavn = vedlegg.map { it.filnavn }
         val søknadDTO = SøknadDTO.toDTO(
             spørsmålsbesvarelser = spørsmålsbesvarelser,
             fnr = fnr,
