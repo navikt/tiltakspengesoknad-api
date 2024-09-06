@@ -24,6 +24,7 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvClient
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
+import no.nav.tiltakspenger.soknad.api.db.flywayMigrate
 import no.nav.tiltakspenger.soknad.api.featuretoggling.setupUnleash
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
@@ -60,7 +61,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     val log = KotlinLogging.logger {}
     log.info { "starting server" }
 
-//    flywayMigrate()
+    flywayMigrate()
     installCallLogging()
     installAuthentication()
     installJacksonFeature()
