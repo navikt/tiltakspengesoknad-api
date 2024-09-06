@@ -22,3 +22,7 @@ scope:
   joark: api://prod-fss.teamdokumenthandtering.dokarkiv/.default
 unleash:
   environment: production
+sqlInstances:
+  diskAutoresize: true
+  pointInTimeRecovery: true
+  tier: db-custom-1-3840

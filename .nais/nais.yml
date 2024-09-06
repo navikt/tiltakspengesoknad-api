@@ -31,6 +31,16 @@ spec:
     enabled: true
   tokenx:
     enabled: true
+  gcp:
+    sqlInstances:
+      - name: tiltakspenger-soknad-api
+        type: POSTGRES_15
+        tier: {{ sqlInstances.tier }}
+        diskAutoresize: {{ sqlInstances.diskAutoresize }}
+        pointInTimeRecovery: {{ sqlInstances.pointInTimeRecovery }}
+        databases:
+          - name: soknad
+            envVarPrefix: DB
   accessPolicy:
     inbound:
       rules:

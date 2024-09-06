@@ -12,6 +12,8 @@ val apacheCommonsTextVersion = "1.12.0"
 val unleashVersion = "9.2.4"
 val pdfboxVersion = "3.0.3"
 val felleslibVersion = "0.0.211"
+val flywayVersjon = "10.17.1"
+val testContainersVersion = "1.20.1"
 
 plugins {
     application
@@ -73,6 +75,13 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
+    // DB
+    implementation("org.flywaydb:flyway-core:$flywayVersjon")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersjon")
+    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("org.postgresql:postgresql:42.7.3")
+    implementation("com.github.seratch:kotliquery:1.9.0")
+
     // TokenX
     implementation("no.nav.security:token-validation-ktor-v2:$tokenSupportVersion")
     implementation("no.nav.security:token-client-core:$tokenSupportVersion")
@@ -101,6 +110,9 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-json:$kotestVersion")
     testImplementation("io.kotest:kotest-extensions:$kotestVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:$kotlinxCoroutinesVersion")
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
+    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
 }
 
 application {
