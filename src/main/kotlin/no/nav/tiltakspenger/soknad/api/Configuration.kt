@@ -19,11 +19,7 @@ object Configuration {
         ConfigurationMap(
             mapOf(
                 "application.httpPort" to 8080.toString(),
-                "DB_DATABASE" to System.getenv("DB_DATABASE"),
-                "DB_HOST" to System.getenv("DB_HOSTS"),
-                "DB_PASSWORD" to System.getenv("DB_PASSWORD"),
-                "DB_PORT" to System.getenv("DB_PORT"),
-                "DB_USERNAME" to System.getenv("DB_USERNAME"),
+                "DB_JDBC_URL" to System.getenv("DB_JDBC_URL"),
                 "logback.configurationFile" to "egenLogback.xml",
             ),
         )
@@ -71,17 +67,9 @@ object Configuration {
     fun logbackConfigurationFile() = config()[Key("logback.configurationFile", stringType)]
 
     data class DataBaseConf(
-        val database: String,
-        val host: String,
-        val passord: String,
-        val port: Int,
-        val brukernavn: String,
+        val url: String,
     )
     fun database() = DataBaseConf(
-        database = config()[Key("DB_DATABASE", stringType)],
-        host = config()[Key("DB_HOST", stringType)],
-        passord = config()[Key("DB_PASSWORD", stringType)],
-        brukernavn = config()[Key("DB_USERNAME", stringType)],
-        port = config()[Key("DB_PORT", intType)],
+        url = config()[Key("DB_JDBC_URL", stringType)],
     )
 }
