@@ -1,5 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.db
 
+import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.Configuration.database
@@ -12,12 +13,13 @@ object DataSource {
     const val FAIL_TIMEOUT = 5000
 
     private fun init(): HikariDataSource {
-        return HikariDataSource().apply {
-            dataSourceClassName = "org.postgresql.ds.PGSimpleDataSource"
-            addDataSourceProperty("jdbcUrl", config.url)
-            initializationFailTimeout = FAIL_TIMEOUT.toLong()
+        val config = HikariConfig().apply {
+            jdbcUrl = config.url
             maximumPoolSize = MAX_POOLS
+            initializationFailTimeout = FAIL_TIMEOUT.toLong()
         }
+
+        return HikariDataSource(config)
     }
 
     val hikariDataSource: HikariDataSource by lazy {
