@@ -1,20 +1,20 @@
-DO
+do
 $$
-    BEGIN
-        IF
-            EXISTS
-                (SELECT 1 from pg_roles where rolname = 'cloudsqliamuser')
-        THEN
-            GRANT USAGE ON SCHEMA public TO cloudsqliamuser;
-            GRANT
-                SELECT
-                ON ALL TABLES IN SCHEMA public TO cloudsqliamuser;
-            ALTER
-                DEFAULT PRIVILEGES IN SCHEMA public GRANT
-                SELECT
-                ON TABLES TO cloudsqliamuser;
-        END IF;
-    END
+    begin
+        if
+            exists
+                (select 1 from pg_roles where rolname = 'cloudsqliamuser')
+        then
+            grant usage on schema public to cloudsqliamuser;
+            grant
+                select
+                on all tables in schema public to cloudsqliamuser;
+            alter
+                default privileges in schema public grant
+                select
+                on tables to cloudsqliamuser;
+        end if;
+    end
 $$;
 
 create table søknad
