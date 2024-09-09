@@ -24,8 +24,7 @@ create table søknad
     søknad               jsonb not null,
     vedlegg              jsonb not null,
     fnr                  varchar not null,
-    sendt_til_vedtak     boolean not null,
-    journalført          boolean not null,
-    opprettet            timestamp not null,
-    sist_endret          timestamp not null
+    sendt_til_vedtak     timestamp null,
+    journalført          timestamp null,
+    opprettet            timestamp not null
 );

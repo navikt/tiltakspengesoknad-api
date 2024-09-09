@@ -1,5 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
+import arrow.core.Either
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -28,6 +29,7 @@ private val securelog = KotlinLogging.logger("tjenestekall")
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
+    søknadRepo: SøknadRepo,
     avService: AvService,
     pdlService: PdlService,
     metricsCollector: MetricsCollector,
@@ -60,6 +62,19 @@ fun Route.søknadRoutes(
             metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
             metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
             requestTimer.observeDuration()
+
+            Either.catch {
+                søknadRepo.lagre(
+                    mapSøknad(
+                        spm = søknad,
+                        fnr = fødselsnummer,
+                        vedlegg = vedlegg,
+                    ),
+                )
+            }.onLeft {
+                securelog.error("Feil ved lagring av søknad", it)
+            }
+
             call.respond(status = HttpStatusCode.Created, message = søknadResponse)
         } catch (exception: Exception) {
             metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()

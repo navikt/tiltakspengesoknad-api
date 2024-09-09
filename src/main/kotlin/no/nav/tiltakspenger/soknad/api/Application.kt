@@ -34,6 +34,8 @@ import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
 import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
@@ -90,11 +92,13 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         ),
     )
     val tiltakService = TiltakService(environment.config)
+    val søknadRepo = SøknadRepoImpl()
 
     setupRouting(
         pdlService = pdlService,
         søknadService = søknadService,
         tiltakService = tiltakService,
+        søknadRepo = søknadRepo,
         avService = avService,
         metricsCollector = metricsCollector,
     )
@@ -111,6 +115,7 @@ internal fun Application.setupRouting(
     pdlService: PdlService,
     søknadService: SøknadService,
     tiltakService: TiltakService,
+    søknadRepo: SøknadRepo,
     avService: AvService,
     metricsCollector: MetricsCollector,
 ) {
@@ -127,6 +132,7 @@ internal fun Application.setupRouting(
                 avService = avService,
                 pdlService = pdlService,
                 metricsCollector = metricsCollector,
+                søknadRepo = søknadRepo,
             )
             tiltakRoutes(
                 tiltakService = tiltakService,
