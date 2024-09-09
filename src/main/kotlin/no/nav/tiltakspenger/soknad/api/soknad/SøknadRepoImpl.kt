@@ -32,20 +32,20 @@ class SøknadRepoImpl() : SøknadRepo {
     @Language("PostgreSQL")
     private val sqlLagre =
         """
-        insert into soknad (
+        insert into søknad (
             id,
             versjon,
             søknad,
             vedlegg,
             fnr,
             sendt_til_vedtak,
-            journalfort,
+            journalført,
             opprettet
         ) values (
             :id,
             :versjon,
-            :soknad,
-            :vedlegg,
+            to_jsonb(:soknad::jsonb),
+            to_jsonb(:vedlegg::jsonb),
             :fnr,
             :sendtTilVedtak,
             :journalfort,
