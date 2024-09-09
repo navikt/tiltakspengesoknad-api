@@ -19,6 +19,7 @@ object Configuration {
             mapOf(
                 "application.httpPort" to 8080.toString(),
                 "DB_JDBC_URL" to System.getenv("DB_JDBC_URL"),
+                "ELECTOR_PATH" to System.getenv("ELECTOR_PATH"),
                 "logback.configurationFile" to "egenLogback.xml",
             ),
         )
@@ -64,6 +65,10 @@ object Configuration {
         }
 
     fun logbackConfigurationFile() = config()[Key("logback.configurationFile", stringType)]
+
+    fun isNais() = applicationProfile() != Profile.LOCAL
+
+    fun electorPath(): String = config()[Key("ELECTOR_PATH", stringType)]
 
     data class DataBaseConf(
         val url: String,

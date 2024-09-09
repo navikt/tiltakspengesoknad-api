@@ -1,5 +1,7 @@
 package no.nav.tiltakspenger.soknad.api
 
+import arrow.core.Either
+import arrow.core.right
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -20,6 +22,10 @@ import io.ktor.server.routing.routing
 import io.prometheus.client.hotspot.DefaultExports
 import mu.KotlinLogging
 import no.nav.security.token.support.v2.asIssuerProps
+import no.nav.tiltakspenger.libs.jobber.LeaderPodLookup
+import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupClient
+import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupFeil
+import no.nav.tiltakspenger.libs.jobber.RunCheckFactory
 import no.nav.tiltakspenger.soknad.api.antivirus.AvClient
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
@@ -28,6 +34,7 @@ import no.nav.tiltakspenger.soknad.api.db.flywayMigrate
 import no.nav.tiltakspenger.soknad.api.featuretoggling.setupUnleash
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
+import no.nav.tiltakspenger.soknad.api.jobber.TaskExecutor
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.metrics.metricRoutes
 import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
@@ -103,10 +110,38 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         metricsCollector = metricsCollector,
     )
 
+    val runCheckFactory =
+        if (Configuration.isNais()) {
+            RunCheckFactory(
+                leaderPodLookup =
+                LeaderPodLookupClient(
+                    electorPath = Configuration.electorPath(),
+                    logger = KotlinLogging.logger { },
+                ),
+            )
+        } else {
+            RunCheckFactory(
+                leaderPodLookup =
+                object : LeaderPodLookup {
+                    override fun amITheLeader(localHostName: String): Either<LeaderPodLookupFeil, Boolean> =
+                        true.right()
+                },
+            )
+        }
+    val stoppableTasks =
+        TaskExecutor.startJob(
+            runCheckFactory = runCheckFactory,
+            tasks =
+            listOf { correlationId ->
+                søknadService.journalførLagredeSøknader(correlationId)
+            },
+        )
+
     environment.monitor.subscribe(ApplicationStarted) {
         log.info { "Starter server" }
     }
     environment.monitor.subscribe(ApplicationStopped) {
+        stoppableTasks.stop()
         log.info { "Stopper server" }
     }
 }
