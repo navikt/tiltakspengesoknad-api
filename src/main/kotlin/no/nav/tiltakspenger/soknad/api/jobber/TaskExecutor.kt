@@ -26,12 +26,12 @@ internal class TaskExecutor(
             runCheckFactory: RunCheckFactory,
             tasks: List<suspend (CorrelationId) -> Unit>,
             initialDelay: Duration = 1.minutes,
-            intervall: Duration = 10.seconds,
+            intervall: Duration = 60.seconds,
         ): TaskExecutor {
             val logger = KotlinLogging.logger { }
             return TaskExecutor(
                 startStoppableJob(
-                    jobName = "Jobb som kjører hvert 10. sekund",
+                    jobName = "Jobb som kjører hvert 60. sekund",
                     initialDelay = initialDelay.toJavaDuration(),
                     intervall = intervall.toJavaDuration(),
                     logger = logger,
