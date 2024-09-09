@@ -7,21 +7,21 @@ import no.nav.tiltakspenger.soknad.api.serialize
 import org.intellij.lang.annotations.Language
 
 class SøknadRepoImpl() : SøknadRepo {
-    override fun lagre(søknad: Søknad) {
+    override fun lagre(dto: SøknadDbDTO) {
         sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
                     queryOf(
                         sqlLagre,
                         mapOf(
-                            "id" to søknad.id.toString(),
-                            "versjon" to søknad.versjon,
-                            "soknad" to serialize(søknad.søknadSpm),
-                            "vedlegg" to serialize(søknad.vedlegg),
-                            "fnr" to søknad.fnr,
-                            "sendtTilVedtak" to søknad.sendtTilVedtak,
-                            "journalfort" to søknad.journalført,
-                            "opprettet" to søknad.opprettet,
+                            "id" to dto.id.toString(),
+                            "versjon" to dto.versjon,
+                            "soknad" to serialize(dto.søknadSpm),
+                            "vedlegg" to serialize(dto.vedlegg),
+                            "fnr" to dto.fnr,
+                            "sendtTilVedtak" to dto.sendtTilVedtak,
+                            "journalfort" to dto.journalført,
+                            "opprettet" to dto.opprettet,
                         ),
                     ).asUpdate,
                 )

@@ -2,7 +2,7 @@ package no.nav.tiltakspenger.soknad.api.repository
 
 import no.nav.tiltakspenger.soknad.api.db.PostgresTestcontainer
 import no.nav.tiltakspenger.soknad.api.db.flywayCleanAndMigrate
-import no.nav.tiltakspenger.soknad.api.soknad.Søknad
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadDbDTO
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.validering.spørsmålsbesvarelser
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
@@ -31,7 +31,7 @@ internal class SøknadRepoTest {
         val nå = LocalDateTime.now()
         val fnr = "12345678901"
         val spm = spørsmålsbesvarelser()
-        val søknad = Søknad(
+        val søknadDbDTO = SøknadDbDTO(
             id = uuid,
             versjon = "1",
             søknadSpm = spm,
@@ -48,6 +48,6 @@ internal class SøknadRepoTest {
             journalført = nå,
             opprettet = nå,
         )
-        søknadRepo.lagre(søknad)
+        søknadRepo.lagre(søknadDbDTO)
     }
 }

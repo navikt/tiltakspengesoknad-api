@@ -1,5 +1,5 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
 interface SøknadRepo {
-    fun lagre(søknad: Søknad)
+    fun lagre(dto: SøknadDbDTO)
 }

@@ -4,7 +4,7 @@ import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class Søknad(
+data class SøknadDbDTO(
     val id: UUID,
     val versjon: String,
     val søknadSpm: SpørsmålsbesvarelserDTO,

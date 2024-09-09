@@ -8,9 +8,9 @@ fun mapSøknad(
     spm: SpørsmålsbesvarelserDTO,
     fnr: String,
     vedlegg: List<Vedlegg>,
-): Søknad {
+): SøknadDbDTO {
     val nå = LocalDateTime.now()
-    return Søknad(
+    return SøknadDbDTO(
         id = UUID.randomUUID(),
         versjon = "1",
         søknadSpm = spm,
