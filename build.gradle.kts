@@ -65,6 +65,9 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
 
+    // Arrowe
+    implementation("io.arrow-kt:arrow-core:1.2.4")
+
     // Prometheus
     implementation("io.prometheus:simpleclient:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")

@@ -1,5 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
+import arrow.core.Either
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -62,13 +63,17 @@ fun Route.søknadRoutes(
             metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
             requestTimer.observeDuration()
 
-            søknadRepo.lagre(
-                mapSøknad(
-                    spm = søknad,
-                    fnr = fødselsnummer,
-                    vedlegg = vedlegg,
-                ),
-            )
+            Either.catch {
+                søknadRepo.lagre(
+                    mapSøknad(
+                        spm = søknad,
+                        fnr = fødselsnummer,
+                        vedlegg = vedlegg,
+                    ),
+                )
+            }.onLeft {
+                securelog.error("Feil ved lagring av søknad", it)
+            }
 
             call.respond(status = HttpStatusCode.Created, message = søknadResponse)
         } catch (exception: Exception) {
