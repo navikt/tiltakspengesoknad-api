@@ -2,7 +2,7 @@ package no.nav.tiltakspenger.soknad.api.soknad
 
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 fun mapSøknad(
     spm: SpørsmålsbesvarelserDTO,

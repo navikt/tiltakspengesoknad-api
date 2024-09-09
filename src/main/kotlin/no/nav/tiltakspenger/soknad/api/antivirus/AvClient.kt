@@ -10,7 +10,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.server.config.ApplicationConfig
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
-import java.util.*
 
 class AvClient(
     config: ApplicationConfig,
