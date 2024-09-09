@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Testcontainers
 internal class SøknadRepoTest {

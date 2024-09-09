@@ -5,6 +5,7 @@ import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import mu.KotlinLogging
+import no.nav.tiltakspenger.libs.common.CorrelationId
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
@@ -20,6 +21,10 @@ class SøknadServiceImpl(
     private val pdfService: PdfService,
     private val joarkService: JoarkService,
 ) : SøknadService {
+    override suspend fun journalførLagredeSøknader(correlationId: CorrelationId) {
+        log.info { "Vi skal hente søknader og journalføre de" }
+    }
+
     override suspend fun opprettDokumenterOgArkiverIJoark(
         spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
         fnr: String,
