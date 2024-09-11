@@ -1,12 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.soknad.jobb.person
 
 import arrow.core.flatMap
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.MapperFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.common.Fnr
@@ -34,11 +28,10 @@ class PersonHttpklient(
             endepunkt = endepunkt,
         )
 
-
     override suspend fun hentNavnForFnr(
         fnr: Fnr,
     ): no.nav.tiltakspenger.libs.personklient.pdl.dto.Navn {
-        val body = objectMapper.writeValueAsString(hentPersonQuery(fnr))
+        val body = objectMapper.writeValueAsString(hentPersonNavnQuery(fnr))
         return personklient
             .hentPerson(fnr, getSystemToken(), body)
             .flatMap { jsonBody: String ->
@@ -57,7 +50,6 @@ private data class PdlResponseData(
         val navn: List<no.nav.tiltakspenger.libs.personklient.pdl.dto.Navn>,
     )
 }
-
 
 private fun FellesPersonklientError.logError(): Nothing {
     when (this) {

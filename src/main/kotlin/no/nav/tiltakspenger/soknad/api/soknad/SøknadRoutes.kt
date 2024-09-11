@@ -14,6 +14,8 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import mu.KotlinLogging
+import no.nav.tiltakspenger.soknad.api.Configuration.applicationProfile
+import no.nav.tiltakspenger.soknad.api.Profile
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.acr
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
@@ -43,30 +45,38 @@ fun Route.søknadRoutes(
             avService.gjørVirussjekkAvVedlegg(vedlegg)
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"
-            val subjectToken = call.token()
-            val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken, call.callId!!)
-            val journalpostId =
-                søknadService.opprettDokumenterOgArkiverIJoark(
-                    søknad,
-                    fødselsnummer,
-                    person,
-                    vedlegg,
-                    acr,
-                    innsendingTidspunkt,
-                    call.callId!!,
+
+            if (applicationProfile() != Profile.DEV) {
+                val subjectToken = call.token()
+                val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken, call.callId!!)
+                val journalpostId =
+                    søknadService.opprettDokumenterOgArkiverIJoark(
+                        spørsmålsbesvarelser = søknad,
+                        fnr = fødselsnummer,
+                        fornavn = person.fornavn,
+                        etternavn = person.etternavn,
+                        vedlegg = vedlegg,
+                        acr = acr,
+                        innsendingTidspunkt = innsendingTidspunkt,
+                        callId = call.callId!!,
+                    )
+                val søknadResponse = SøknadResponse(
+                    journalpostId = journalpostId,
+                    innsendingTidspunkt = innsendingTidspunkt,
                 )
-            val søknadResponse = SøknadResponse(
-                journalpostId = journalpostId,
-                innsendingTidspunkt = innsendingTidspunkt,
-            )
-            metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
-            metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
-            requestTimer.observeDuration()
+
+                metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
+                metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
+                requestTimer.observeDuration()
+
+                call.respond(status = HttpStatusCode.Created, message = søknadResponse)
+            }
 
             Either.catch {
                 søknadRepo.lagre(
                     mapSøknad(
                         spm = søknad,
+                        acr = acr,
                         fnr = fødselsnummer,
                         vedlegg = vedlegg,
                     ),
@@ -74,6 +84,15 @@ fun Route.søknadRoutes(
             }.onLeft {
                 securelog.error("Feil ved lagring av søknad", it)
             }
+
+            metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
+            metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
+            requestTimer.observeDuration()
+
+            val søknadResponse = SøknadResponse(
+                journalpostId = "ikkeJournalførtEnda",
+                innsendingTidspunkt = innsendingTidspunkt,
+            )
 
             call.respond(status = HttpStatusCode.Created, message = søknadResponse)
         } catch (exception: Exception) {

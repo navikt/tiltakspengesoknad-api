@@ -43,13 +43,12 @@ import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
 import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
-import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonHttpklient
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
-import no.nav.tiltakspenger.soknad.api.soknad.jobb.SøknadJobbService
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.SøknadJobbServiceImpl
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonHttpklient
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
@@ -99,6 +98,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
                     ?: throw IllegalStateException("Responsen fra token-exchange mangler accessToken"),
             )
         }
+    val søknadRepo = SøknadRepoImpl()
     val pdlService = PdlService(environment.config)
     val søknadService: SøknadService = SøknadServiceImpl(
         pdfService = PdfServiceImpl(
@@ -109,7 +109,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         ),
         joarkService = JoarkService(environment.config),
     )
-    val søknadJobbService = SøknadJobbServiceImpl(personGateway)
+    val søknadJobbService = SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService)
     val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
@@ -117,8 +117,6 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         ),
     )
     val tiltakService = TiltakService(environment.config)
-    val søknadRepo = SøknadRepoImpl()
-
 
     setupRouting(
         pdlService = pdlService,

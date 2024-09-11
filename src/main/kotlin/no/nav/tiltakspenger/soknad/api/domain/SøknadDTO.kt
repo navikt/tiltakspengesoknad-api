@@ -1,7 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.domain
 
 import no.nav.tiltakspenger.libs.common.SøknadId
-import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import java.time.LocalDateTime
 
@@ -26,7 +25,8 @@ data class SøknadDTO(
             spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
             vedleggsnavn: List<String>,
             fnr: String,
-            person: PersonDTO,
+            fornavn: String,
+            etternavn: String,
             innsendingTidspunkt: LocalDateTime,
         ): SøknadDTO {
             return SøknadDTO(
@@ -36,8 +36,8 @@ data class SøknadDTO(
                 vedleggsnavn = vedleggsnavn,
                 personopplysninger = Personopplysninger(
                     ident = fnr,
-                    fornavn = person.fornavn,
-                    etternavn = person.etternavn,
+                    fornavn = fornavn,
+                    etternavn = etternavn,
                 ),
                 innsendingTidspunkt = innsendingTidspunkt,
             )

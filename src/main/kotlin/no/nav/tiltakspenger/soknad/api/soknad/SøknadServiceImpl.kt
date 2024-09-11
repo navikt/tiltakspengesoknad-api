@@ -5,12 +5,10 @@ import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import mu.KotlinLogging
-import no.nav.tiltakspenger.libs.common.CorrelationId
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.pdf.PdfService
-import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
 import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.time.LocalDateTime
@@ -24,7 +22,8 @@ class SøknadServiceImpl(
     override suspend fun opprettDokumenterOgArkiverIJoark(
         spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
         fnr: String,
-        person: PersonDTO,
+        fornavn: String,
+        etternavn: String,
         vedlegg: List<Vedlegg>,
         acr: String,
         innsendingTidspunkt: LocalDateTime,
@@ -34,7 +33,8 @@ class SøknadServiceImpl(
         val søknadDTO = SøknadDTO.toDTO(
             spørsmålsbesvarelser = spørsmålsbesvarelser,
             fnr = fnr,
-            person = person,
+            fornavn = fornavn,
+            etternavn = etternavn,
             acr = acr,
             innsendingTidspunkt = innsendingTidspunkt,
             vedleggsnavn = vedleggsnavn,

@@ -44,8 +44,12 @@ internal class SøknadRepoTest {
                 ),
             ),
             fnr = fnr,
+            acr = "acr",
+            fornavn = "fornavn",
+            etternavn = "etternavn",
             sendtTilVedtak = nå,
             journalført = nå,
+            journalpostId = "123",
             opprettet = nå,
         )
         søknadRepo.lagre(søknadDbDTO)
