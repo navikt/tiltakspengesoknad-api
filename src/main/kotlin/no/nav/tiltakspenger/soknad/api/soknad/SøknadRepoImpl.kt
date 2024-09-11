@@ -93,8 +93,8 @@ class SøknadRepoImpl() : SøknadRepo {
         return SøknadDbDTO(
             id = UUID.fromString(string("id")),
             versjon = string("versjon"),
-            søknad = string("soknad").toSøknadDbJson(),
-            søknadSpm = string("søknad").toSpørsmålsbesvarelserDbJson(),
+            søknad = string("søknad").toSøknadDbJson(),
+            søknadSpm = string("søknadSpm").toSpørsmålsbesvarelserDbJson(),
             vedlegg = string("vedlegg").vedleggDbJson(),
             acr = string("acr"),
             fnr = string("fnr"),
