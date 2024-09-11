@@ -99,7 +99,7 @@ class SøknadRepoImpl() : SøknadRepo {
             etternavn = stringOrNull("etternavn"),
             sendtTilVedtak = localDateTimeOrNull("sendt_til_vedtak"),
             journalført = localDateTimeOrNull("journalført"),
-            journalpostId = stringOrNull("journal_post_id"),
+            journalpostId = stringOrNull("journalpostId"),
             opprettet = localDateTime("opprettet"),
         )
     }
