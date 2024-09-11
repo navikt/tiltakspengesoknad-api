@@ -21,10 +21,6 @@ class SøknadServiceImpl(
     private val pdfService: PdfService,
     private val joarkService: JoarkService,
 ) : SøknadService {
-    override suspend fun journalførLagredeSøknader(correlationId: CorrelationId) {
-        log.info { "Vi skal hente søknader og journalføre de" }
-    }
-
     override suspend fun opprettDokumenterOgArkiverIJoark(
         spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
         fnr: String,
