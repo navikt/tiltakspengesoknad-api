@@ -182,7 +182,7 @@ internal class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
         val søknadServiceMock = mockk<SøknadService>().also { mock ->
             coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any(), any()) } returns "123"
+            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any(), any()) } returns Pair("123", mockk())
         }
 
         val repoMock = mockk<SøknadRepo>().also { mock ->
@@ -236,7 +236,7 @@ internal class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 500 hvis man ikke får hentet personalia fra PDL`() {
         val søknadServiceMock = mockk<SøknadService>().also { mock ->
             coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any(), any()) } returns "123"
+            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any(), any()) } returns Pair("123", mockk())
         }
 
         val pdlServiceMock = mockk<PdlService>().also { mock ->

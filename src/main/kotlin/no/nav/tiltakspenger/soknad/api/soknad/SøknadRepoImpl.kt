@@ -17,7 +17,8 @@ class SøknadRepoImpl() : SøknadRepo {
                         mapOf(
                             "id" to dto.id.toString(),
                             "versjon" to dto.versjon,
-                            "soknad" to dto.søknadSpm.toDbJson(),
+                            "soknad" to dto.søknad?.toDbJson(),
+                            "soknadSpm" to dto.søknadSpm.toDbJson(),
                             "vedlegg" to dto.vedlegg.toDbJson(),
                             "acr" to dto.acr,
                             "fnr" to dto.fnr,
@@ -42,6 +43,7 @@ class SøknadRepoImpl() : SøknadRepo {
                         sqlOppdater,
                         mapOf(
                             "id" to dto.id.toString(),
+                            "soknad" to dto.søknad?.toDbJson(),
                             "fornavn" to dto.fornavn,
                             "etternavn" to dto.etternavn,
                             "sendtTilVedtak" to dto.sendtTilVedtak,
@@ -91,6 +93,7 @@ class SøknadRepoImpl() : SøknadRepo {
         return SøknadDbDTO(
             id = UUID.fromString(string("id")),
             versjon = string("versjon"),
+            søknad = string("soknad").toSøknadDbJson(),
             søknadSpm = string("søknad").toSpørsmålsbesvarelserDbJson(),
             vedlegg = string("vedlegg").vedleggDbJson(),
             acr = string("acr"),
@@ -111,6 +114,7 @@ class SøknadRepoImpl() : SøknadRepo {
             id,
             versjon,
             søknad,
+            søknadSpm,
             vedlegg,
             acr,
             fnr,
@@ -124,6 +128,7 @@ class SøknadRepoImpl() : SøknadRepo {
             :id,
             :versjon,
             to_jsonb(:soknad::jsonb),
+            to_jsonb(:soknadSpm::jsonb),
             to_jsonb(:vedlegg::jsonb),
             :acr,
             :fnr,
@@ -142,6 +147,7 @@ class SøknadRepoImpl() : SøknadRepo {
             update søknad set
                 fornavn = :fornavn,
                 etternavn = :etternavn,
+                søknad = to_jsonb(:soknad::jsonb),
                 sendt_til_vedtak = :sendtTilVedtak,
                 journalført = :journalfort,
                 journalpostId = :journalpostId

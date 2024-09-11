@@ -1,6 +1,5 @@
 package no.nav.tiltakspenger.soknad.api.soknad.jobb
 
-import arrow.core.Either
 import no.nav.tiltakspenger.libs.common.CorrelationId
 import no.nav.tiltakspenger.libs.common.Fnr
 import no.nav.tiltakspenger.soknad.api.Configuration.applicationProfile
@@ -22,13 +21,14 @@ class SøknadJobbServiceImpl(
                 .forEach { søknad ->
                     log.info { "Vi skal prøve å journalføre søknad : ${søknad.id}" }
 
-                    val navn = Either.catch {
+                    val navn = try {
                         personGateway.hentNavnForFnr(Fnr.fromString(søknad.fnr))
-                    }.onLeft {
+                    } catch (e: Exception) {
                         log.error { "Feil ved henting av personnavn for søknad: ${søknad.id}" }
-                    }.getOrNull()!!
+                        return@forEach
+                    }
 
-                    val journalpostId = Either.catch {
+                    val (journalpostId, søknadDto) = try {
                         søknadService.opprettDokumenterOgArkiverIJoark(
                             spørsmålsbesvarelser = søknad.søknadSpm,
                             fnr = søknad.fnr,
@@ -39,12 +39,14 @@ class SøknadJobbServiceImpl(
                             innsendingTidspunkt = LocalDateTime.now(),
                             callId = correlationId.toString(),
                         )
-                    }.onLeft {
-                        log.error(it) { "Feil ved journalføring av søknad: ${søknad.id}" }
-                    }.getOrNull()!!
+                    } catch (e: Exception) {
+                        log.error { "Feil under journalføring av søknad : ${søknad.id}" }
+                        return@forEach
+                    }
 
                     søknadRepo.oppdater(
                         søknad.copy(
+                            søknad = søknadDto,
                             fornavn = navn.fornavn,
                             etternavn = navn.etternavn,
                             journalpostId = journalpostId,

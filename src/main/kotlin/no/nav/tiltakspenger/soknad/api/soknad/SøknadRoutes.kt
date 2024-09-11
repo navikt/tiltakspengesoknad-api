@@ -49,7 +49,7 @@ fun Route.søknadRoutes(
             if (applicationProfile() != Profile.DEV) {
                 val subjectToken = call.token()
                 val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken, call.callId!!)
-                val journalpostId =
+                val (journalpostId, _) =
                     søknadService.opprettDokumenterOgArkiverIJoark(
                         spørsmålsbesvarelser = søknad,
                         fnr = fødselsnummer,

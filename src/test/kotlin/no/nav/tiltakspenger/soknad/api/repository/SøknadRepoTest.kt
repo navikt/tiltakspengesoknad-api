@@ -34,6 +34,7 @@ internal class SøknadRepoTest {
         val søknadDbDTO = SøknadDbDTO(
             id = uuid,
             versjon = "1",
+            søknad = null,
             søknadSpm = spm,
             vedlegg = listOf(
                 Vedlegg(

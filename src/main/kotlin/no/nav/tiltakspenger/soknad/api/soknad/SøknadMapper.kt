@@ -14,6 +14,7 @@ fun mapSøknad(
     return SøknadDbDTO(
         id = UUID.randomUUID(),
         versjon = "1",
+        søknad = null,
         søknadSpm = spm,
         vedlegg = vedlegg,
         acr = acr,

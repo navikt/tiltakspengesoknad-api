@@ -28,7 +28,7 @@ class SøknadServiceImpl(
         acr: String,
         innsendingTidspunkt: LocalDateTime,
         callId: String,
-    ): String {
+    ): Pair<String, SøknadDTO> {
         val vedleggsnavn = vedlegg.map { it.filnavn }
         val søknadDTO = SøknadDTO.toDTO(
             spørsmålsbesvarelser = spørsmålsbesvarelser,
@@ -43,7 +43,8 @@ class SøknadServiceImpl(
         log.info { "Generering av søknadsPDF OK" }
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         log.info { "Vedleggskonvertering OK" }
-        return joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer, callId = callId)
+        val journalpostId = joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer, callId = callId)
+        return Pair(journalpostId, søknadDTO)
     }
 
     override suspend fun taInnSøknadSomMultipart(søknadSomMultipart: MultiPartData): Pair<SpørsmålsbesvarelserDTO, List<Vedlegg>> {
