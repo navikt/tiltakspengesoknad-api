@@ -4,6 +4,10 @@ import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import no.nav.tiltakspenger.soknad.api.db.DataSource
+import no.nav.tiltakspenger.soknad.api.domain.toDbJson
+import no.nav.tiltakspenger.soknad.api.domain.toSøknadDbJson
+import no.nav.tiltakspenger.soknad.api.vedlegg.toDbJson
+import no.nav.tiltakspenger.soknad.api.vedlegg.vedleggDbJson
 import org.intellij.lang.annotations.Language
 import java.util.*
 

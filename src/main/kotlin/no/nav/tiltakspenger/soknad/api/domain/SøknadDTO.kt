@@ -1,7 +1,10 @@
 package no.nav.tiltakspenger.soknad.api.domain
 
 import no.nav.tiltakspenger.libs.common.SøknadId
+import no.nav.tiltakspenger.soknad.api.deserialize
+import no.nav.tiltakspenger.soknad.api.serialize
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
+import java.security.InvalidParameterException
 import java.time.LocalDateTime
 
 data class Personopplysninger(
@@ -44,3 +47,13 @@ data class SøknadDTO(
         }
     }
 }
+
+fun String.toSøknadDbJson(): SøknadDTO {
+    try {
+        return deserialize(this)
+    } catch (exception: Exception) {
+        throw InvalidParameterException("Det oppstod en feil ved parsing av json for søknad: " + exception.message)
+    }
+}
+
+fun SøknadDTO.toDbJson(): String = serialize(this)
