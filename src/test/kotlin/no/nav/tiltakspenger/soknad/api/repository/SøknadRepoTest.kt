@@ -1,6 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.repository
 
 import io.kotest.matchers.shouldBe
+import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.db.PostgresTestcontainer
 import no.nav.tiltakspenger.soknad.api.db.flywayCleanAndMigrate
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadDbDTO
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Testcontainers
 internal class SøknadRepoTest {
@@ -29,13 +29,13 @@ internal class SøknadRepoTest {
 
     @Test
     fun `lagre søknad`() {
-        val uuid = UUID.randomUUID()
+        val id = SøknadId.random()
         val nå = LocalDateTime.now()
         val fnr = "12345678901"
         val spm = spørsmålsbesvarelser()
         val søknad = søknad()
         val søknadDbDTO = SøknadDbDTO(
-            id = uuid,
+            id = id,
             versjon = "1",
             søknad = null,
             søknadSpm = spm,

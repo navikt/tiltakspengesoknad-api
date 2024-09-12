@@ -6,7 +6,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
-import io.ktor.server.plugins.callid.callId
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -14,8 +13,6 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import mu.KotlinLogging
-import no.nav.tiltakspenger.soknad.api.Configuration.applicationProfile
-import no.nav.tiltakspenger.soknad.api.Profile
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.acr
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
@@ -23,7 +20,6 @@ import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
-import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
@@ -38,39 +34,12 @@ fun Route.søknadRoutes(
 ) {
     post(SØKNAD_PATH) {
         val requestTimer = metricsCollector.SØKNADSMOTTAK_LATENCY_SECONDS.startTimer()
-        metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.inc()
         try {
             val innsendingTidspunkt = LocalDateTime.now()
             val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
             avService.gjørVirussjekkAvVedlegg(vedlegg)
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"
-
-            if (applicationProfile() != Profile.DEV) {
-                val subjectToken = call.token()
-                val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken, call.callId!!)
-                val (journalpostId, _) =
-                    søknadService.opprettDokumenterOgArkiverIJoark(
-                        spørsmålsbesvarelser = søknad,
-                        fnr = fødselsnummer,
-                        fornavn = person.fornavn,
-                        etternavn = person.etternavn,
-                        vedlegg = vedlegg,
-                        acr = acr,
-                        innsendingTidspunkt = innsendingTidspunkt,
-                        callId = call.callId!!,
-                    )
-                val søknadResponse = SøknadResponse(
-                    journalpostId = journalpostId,
-                    innsendingTidspunkt = innsendingTidspunkt,
-                )
-
-                metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
-                metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
-                requestTimer.observeDuration()
-
-                call.respond(status = HttpStatusCode.Created, message = søknadResponse)
-            }
 
             Either.catch {
                 søknadRepo.lagre(
@@ -85,8 +54,9 @@ fun Route.søknadRoutes(
                 securelog.error("Feil ved lagring av søknad", it)
             }
 
+            // Dette kan flyttes ut til funksjoner med try/catch og logging
+            // Kan legge til egen teller som teller antall søknader som er journalført og sendt til vedtak
             metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
-            metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
             requestTimer.observeDuration()
 
             val søknadResponse = SøknadResponse(
@@ -96,7 +66,6 @@ fun Route.søknadRoutes(
 
             call.respond(status = HttpStatusCode.Created, message = søknadResponse)
         } catch (exception: Exception) {
-            metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
             when (exception) {
                 is CannotTransformContentToTypeException,
                 is BadRequestException,

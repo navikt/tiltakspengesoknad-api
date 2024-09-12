@@ -15,10 +15,14 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import mu.KotlinLogging
+import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.pdl.INDIVIDSTONAD
 import org.slf4j.LoggerFactory
+
+// https://confluence.adeo.no/display/BOA/opprettJournalpost
+// swagger: https://dokarkiv-q2.dev.intern.nav.no/swagger-ui/index.html#/
 
 internal const val joarkPath = "rest/journalpostapi/v1/journalpost"
 
@@ -35,7 +39,7 @@ class JoarkClient(
 
     suspend fun opprettJournalpost(
         dokumentInnhold: Journalpost,
-        callId: String,
+        søknadId: SøknadId,
     ): String {
         try {
             log.info("Henter credentials for å arkivere i Joark")
@@ -44,7 +48,7 @@ class JoarkClient(
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
-                header("Nav-Callid", callId)
+                header("Nav-Callid", søknadId.toString())
                 parameter("forsoekFerdigstill", false)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
@@ -61,7 +65,7 @@ class JoarkClient(
                             bruker = dokumentInnhold.bruker,
                             // sak = dokumentInnhold.sak,
                             dokumenter = dokumentInnhold.dokumenter,
-                            eksternReferanseId = callId,
+                            eksternReferanseId = søknadId.toString(),
                         ),
                     ),
                 )
@@ -84,6 +88,20 @@ class JoarkClient(
                     // }
 
                     log.info("Vi har opprettet journalpost med id: $journalpostId")
+                    return journalpostId
+                }
+
+                HttpStatusCode.Conflict -> {
+                    val response = res.call.body<JoarkResponse>()
+
+                    val journalpostId = if (response.journalpostId.isNullOrEmpty()) {
+                        log.error("Fikk 409 Conflict fra Joark, men vi fikk ingen journalpostId. response=$response")
+                        throw IllegalStateException("Fikk 409 Conflict fra Joark, men vi fikk ingen journalpostId. response=$response")
+                    } else {
+                        response.journalpostId
+                    }
+
+                    log.info("Søknad fantes allerede i joark med journalpost med id: $journalpostId")
                     return journalpostId
                 }
 

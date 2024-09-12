@@ -5,6 +5,7 @@ import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import mu.KotlinLogging
+import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
@@ -27,10 +28,11 @@ class SøknadServiceImpl(
         vedlegg: List<Vedlegg>,
         acr: String,
         innsendingTidspunkt: LocalDateTime,
-        callId: String,
+        søknadId: SøknadId,
     ): Pair<String, SøknadDTO> {
         val vedleggsnavn = vedlegg.map { it.filnavn }
         val søknadDTO = SøknadDTO.toDTO(
+            id = søknadId.toString(),
             spørsmålsbesvarelser = spørsmålsbesvarelser,
             fnr = fnr,
             fornavn = fornavn,
@@ -43,7 +45,7 @@ class SøknadServiceImpl(
         log.info { "Generering av søknadsPDF OK" }
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         log.info { "Vedleggskonvertering OK" }
-        val journalpostId = joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer, callId = callId)
+        val journalpostId = joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer, søknadId = søknadId)
         return Pair(journalpostId, søknadDTO)
     }
 

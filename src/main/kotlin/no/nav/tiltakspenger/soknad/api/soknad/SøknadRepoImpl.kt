@@ -3,6 +3,7 @@ package no.nav.tiltakspenger.soknad.api.soknad
 import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
+import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.db.DataSource
 import no.nav.tiltakspenger.soknad.api.domain.toDbJson
 import no.nav.tiltakspenger.soknad.api.domain.toSøknadDbJson
@@ -95,7 +96,7 @@ class SøknadRepoImpl() : SøknadRepo {
 
     private fun Row.toSøknadDbDto(): SøknadDbDTO {
         return SøknadDbDTO(
-            id = UUID.fromString(string("id")),
+            id = SøknadId.fromString(string("id")),
             versjon = string("versjon"),
             søknad = stringOrNull("søknad")?.toSøknadDbJson(),
             søknadSpm = string("søknadSpm").toSpørsmålsbesvarelserDbJson(),
