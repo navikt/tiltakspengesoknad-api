@@ -25,7 +25,7 @@ private fun gcpFlyway() = Flyway
     .loggers("slf4j")
     .encoding("UTF-8")
     .dataSource(DataSource.hikariDataSource)
-    .cleanDisabled(false)
+    .cleanDisabled(true)
     .cleanOnValidationError(true)
     .load()
 
