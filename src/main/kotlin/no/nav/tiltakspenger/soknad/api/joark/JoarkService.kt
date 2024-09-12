@@ -15,6 +15,7 @@ class JoarkService(
         fnr: String,
         vedlegg: List<Vedlegg>,
         søknadId: SøknadId,
+        callId: String,
     ): String {
         val journalpost = Journalpost.Søknadspost.from(
             fnr = fnr,
@@ -22,6 +23,6 @@ class JoarkService(
             pdf = pdf,
             vedlegg = vedlegg,
         )
-        return joarkClient.opprettJournalpost(journalpost, søknadId)
+        return joarkClient.opprettJournalpost(journalpost, søknadId, callId)
     }
 }

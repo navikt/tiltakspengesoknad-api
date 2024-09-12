@@ -37,6 +37,7 @@ class SøknadJobbServiceImpl(
                         acr = søknad.acr,
                         innsendingTidspunkt = LocalDateTime.now(),
                         søknadId = søknad.id,
+                        callId = correlationId.toString(),
                     )
                 } catch (e: Exception) {
                     log.error { "Feil under journalføring av søknad : ${søknad.id}" }

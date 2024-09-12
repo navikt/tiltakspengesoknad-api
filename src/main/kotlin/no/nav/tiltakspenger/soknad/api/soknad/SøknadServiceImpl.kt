@@ -29,6 +29,7 @@ class SøknadServiceImpl(
         acr: String,
         innsendingTidspunkt: LocalDateTime,
         søknadId: SøknadId,
+        callId: String,
     ): Pair<String, SøknadDTO> {
         val vedleggsnavn = vedlegg.map { it.filnavn }
         val søknadDTO = SøknadDTO.toDTO(
@@ -45,7 +46,7 @@ class SøknadServiceImpl(
         log.info { "Generering av søknadsPDF OK" }
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         log.info { "Vedleggskonvertering OK" }
-        val journalpostId = joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer, søknadId = søknadId)
+        val journalpostId = joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer, søknadId = søknadId, callId = callId)
         return Pair(journalpostId, søknadDTO)
     }
 

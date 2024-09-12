@@ -40,6 +40,7 @@ class JoarkClient(
     suspend fun opprettJournalpost(
         dokumentInnhold: Journalpost,
         søknadId: SøknadId,
+        callId: String,
     ): String {
         try {
             log.info("Henter credentials for å arkivere i Joark")
@@ -48,7 +49,7 @@ class JoarkClient(
             val res = client.post("$joarkEndpoint/$joarkPath") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
-                header("Nav-Callid", søknadId.toString())
+                header("Nav-Callid", callId)
                 parameter("forsoekFerdigstill", false)
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)

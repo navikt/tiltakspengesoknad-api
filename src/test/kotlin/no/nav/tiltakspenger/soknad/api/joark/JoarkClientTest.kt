@@ -48,6 +48,7 @@ internal class JoarkClientTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
                 søknadId = søknadId,
+                callId = "123",
             )
 
             resp shouldBe journalpostId
@@ -85,6 +86,7 @@ internal class JoarkClientTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
                 søknadId = søknadId,
+                callId = "123",
             )
 
             resp shouldBe journalpostId
@@ -116,6 +118,7 @@ internal class JoarkClientTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
                 søknadId = søknadId,
+                callId = "123",
             )
             resp shouldBe journalpostId
         }
@@ -148,6 +151,7 @@ internal class JoarkClientTest {
                 joarkClient.opprettJournalpost(
                     dokumentInnhold = dokument,
                     søknadId = søknadId,
+                    callId = "123",
                 )
             }
         }
@@ -185,6 +189,7 @@ internal class JoarkClientTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
                 søknadId = søknadId,
+                callId = "123",
             )
 
             resp shouldBe journalpostId
@@ -223,6 +228,7 @@ internal class JoarkClientTest {
                 joarkClient.opprettJournalpost(
                     dokumentInnhold = dokument,
                     søknadId = søknadId,
+                    callId = "123",
                 )
             }.message shouldBe "Fikk 201 Created fra Joark, men vi fikk ingen journalpostId. response=JoarkResponse(journalpostId=null, journalpostferdigstilt=null, dokumenter=[Dokumenter(dokumentInfoId=485227498, tittel=Søknad om tiltakspenger)])"
         }
