@@ -33,7 +33,7 @@ internal class SøknadServiceTest {
         coEvery { mock.lagPdf(any()) }
     }
     private val mockJoarkService = mockk<JoarkService>().also { mock ->
-        coEvery { mock.sendPdfTilJoark(any(), any(), any(), any(), any()) }
+        coEvery { mock.sendPdfTilJoark(any(), any(), any(), any(), any(), any()) }
     }
 
     private val gyldigSpørsmålsbesvarelser = spørsmålsbesvarelser()

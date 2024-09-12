@@ -1,8 +1,9 @@
 package no.nav.tiltakspenger.soknad.api.domain
 
-import no.nav.tiltakspenger.libs.common.SøknadId
-import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
+import no.nav.tiltakspenger.soknad.api.deserialize
+import no.nav.tiltakspenger.soknad.api.serialize
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
+import java.security.InvalidParameterException
 import java.time.LocalDateTime
 
 data class Personopplysninger(
@@ -12,7 +13,7 @@ data class Personopplysninger(
 )
 
 data class SøknadDTO(
-    val id: String = SøknadId.random().toString(),
+    val id: String,
     val acr: String,
     val versjon: String,
     val spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
@@ -22,25 +23,38 @@ data class SøknadDTO(
 ) {
     companion object {
         fun toDTO(
+            id: String,
             acr: String,
             spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
             vedleggsnavn: List<String>,
             fnr: String,
-            person: PersonDTO,
+            fornavn: String,
+            etternavn: String,
             innsendingTidspunkt: LocalDateTime,
         ): SøknadDTO {
             return SøknadDTO(
+                id = id,
                 acr = acr,
                 versjon = "4",
                 spørsmålsbesvarelser = spørsmålsbesvarelser,
                 vedleggsnavn = vedleggsnavn,
                 personopplysninger = Personopplysninger(
                     ident = fnr,
-                    fornavn = person.fornavn,
-                    etternavn = person.etternavn,
+                    fornavn = fornavn,
+                    etternavn = etternavn,
                 ),
                 innsendingTidspunkt = innsendingTidspunkt,
             )
         }
     }
 }
+
+fun String.toSøknadDbJson(): SøknadDTO {
+    try {
+        return deserialize(this)
+    } catch (exception: Exception) {
+        throw InvalidParameterException("Det oppstod en feil ved parsing av json for søknad: " + exception.message)
+    }
+}
+
+fun SøknadDTO.toDbJson(): String = serialize(this)

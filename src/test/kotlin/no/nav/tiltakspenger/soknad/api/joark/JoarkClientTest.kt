@@ -13,6 +13,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
 import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test
 
 internal class JoarkClientTest {
     private val journalpostId = "1"
+    private val søknadId = SøknadId.random()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
@@ -45,7 +47,8 @@ internal class JoarkClientTest {
         runTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
-                callId = "test",
+                søknadId = søknadId,
+                callId = "123",
             )
 
             resp shouldBe journalpostId
@@ -82,7 +85,8 @@ internal class JoarkClientTest {
         runTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
-                callId = "test",
+                søknadId = søknadId,
+                callId = "123",
             )
 
             resp shouldBe journalpostId
@@ -113,7 +117,8 @@ internal class JoarkClientTest {
         runTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
-                callId = "test",
+                søknadId = søknadId,
+                callId = "123",
             )
             resp shouldBe journalpostId
         }
@@ -145,7 +150,8 @@ internal class JoarkClientTest {
             shouldThrow<RuntimeException> {
                 joarkClient.opprettJournalpost(
                     dokumentInnhold = dokument,
-                    callId = "test",
+                    søknadId = søknadId,
+                    callId = "123",
                 )
             }
         }
@@ -182,7 +188,8 @@ internal class JoarkClientTest {
         runTest {
             val resp = joarkClient.opprettJournalpost(
                 dokumentInnhold = dokument,
-                callId = "test",
+                søknadId = søknadId,
+                callId = "123",
             )
 
             resp shouldBe journalpostId
@@ -220,7 +227,8 @@ internal class JoarkClientTest {
             shouldThrow<IllegalStateException> {
                 joarkClient.opprettJournalpost(
                     dokumentInnhold = dokument,
-                    callId = "test",
+                    søknadId = søknadId,
+                    callId = "123",
                 )
             }.message shouldBe "Fikk 201 Created fra Joark, men vi fikk ingen journalpostId. response=JoarkResponse(journalpostId=null, journalpostferdigstilt=null, dokumenter=[Dokumenter(dokumentInfoId=485227498, tittel=Søknad om tiltakspenger)])"
         }

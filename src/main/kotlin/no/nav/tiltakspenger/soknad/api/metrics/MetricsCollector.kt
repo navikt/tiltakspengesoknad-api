@@ -1,7 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.metrics
 
 import io.prometheus.client.Counter
-import io.prometheus.client.Gauge
 import io.prometheus.client.Summary
 
 class MetricsCollector {
@@ -35,12 +34,6 @@ class MetricsCollector {
         .name("tiltakspenger_soknad_antall_feil_ved_hent_tiltak")
         .namespace(NAMESPACE)
         .help("Antall ganger tiltak-kall har feilet")
-        .register()
-
-    val ANTALL_SØKNADER_SOM_PROSESSERES = Gauge.build()
-        .name("tiltakspenger_soknad_antall_soknader_som_prosesseres")
-        .namespace(NAMESPACE)
-        .help("Antall søknader som prosesseres akkurat nå")
         .register()
 
     val SØKNADSMOTTAK_LATENCY_SECONDS = Summary.build()

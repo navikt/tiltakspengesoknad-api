@@ -1,9 +1,12 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
+import no.nav.tiltakspenger.soknad.api.deserialize
 import no.nav.tiltakspenger.soknad.api.isSameOrAfter
 import no.nav.tiltakspenger.soknad.api.isSameOrBefore
+import no.nav.tiltakspenger.soknad.api.serialize
 import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import no.nav.tiltakspenger.soknad.api.util.StringSanitizer
+import java.security.InvalidParameterException
 import java.time.LocalDate
 
 data class Periode(
@@ -174,3 +177,13 @@ data class SpørsmålsbesvarelserDTO(
 ) {
     fun valider(): List<String> = valider(this)
 }
+
+fun String.toSpørsmålsbesvarelserDbJson(): SpørsmålsbesvarelserDTO {
+    try {
+        return deserialize(this)
+    } catch (exception: Exception) {
+        throw InvalidParameterException("Det oppstod en feil ved parsing av json for spm: " + exception.message)
+    }
+}
+
+fun SpørsmålsbesvarelserDTO.toDbJson(): String = serialize(this)

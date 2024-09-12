@@ -22,6 +22,7 @@ import io.ktor.server.routing.routing
 import io.prometheus.client.hotspot.DefaultExports
 import mu.KotlinLogging
 import no.nav.security.token.support.v2.asIssuerProps
+import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookup
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupClient
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupFeil
@@ -30,6 +31,7 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvClient
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
+import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.db.flywayMigrate
 import no.nav.tiltakspenger.soknad.api.featuretoggling.setupUnleash
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
@@ -45,6 +47,8 @@ import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.SøknadJobbServiceImpl
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonHttpklient
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
@@ -82,6 +86,19 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     log.info { "Unleash server url er: ${environment.config.property("unleash.unleash_server_api_url").getString()}" }
     log.info { "Redirect feature er enabled: ${unleash.isEnabled("REDIRECT_TIL_GAMMEL_SOKNAD")}" }
 
+    val pdlEndpoint = environment.config.property("endpoints.pdl").getString()
+    val pdlScope = environment.config.property("scope.pdl").getString()
+    val oauth2CredentialsClient = checkNotNull(ClientConfig(environment.config, httpClientWithRetry()).clients["azure"])
+    val personGateway =
+        PersonHttpklient(
+            pdlEndpoint,
+        ) {
+            AccessToken(
+                oauth2CredentialsClient.clientCredentials(pdlScope).accessToken
+                    ?: throw IllegalStateException("Responsen fra token-exchange mangler accessToken"),
+            )
+        }
+    val søknadRepo = SøknadRepoImpl()
     val pdlService = PdlService(environment.config)
     val søknadService: SøknadService = SøknadServiceImpl(
         pdfService = PdfServiceImpl(
@@ -92,6 +109,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         ),
         joarkService = JoarkService(environment.config),
     )
+    val søknadJobbService = SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService)
     val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
@@ -99,7 +117,6 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         ),
     )
     val tiltakService = TiltakService(environment.config)
-    val søknadRepo = SøknadRepoImpl()
 
     setupRouting(
         pdlService = pdlService,
@@ -133,7 +150,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
             runCheckFactory = runCheckFactory,
             tasks =
             listOf { correlationId ->
-                søknadService.journalførLagredeSøknader(correlationId)
+                søknadJobbService.journalførLagredeSøknader(correlationId)
             },
         )
 

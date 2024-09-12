@@ -15,10 +15,14 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import mu.KotlinLogging
+import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.pdl.INDIVIDSTONAD
 import org.slf4j.LoggerFactory
+
+// https://confluence.adeo.no/display/BOA/opprettJournalpost
+// swagger: https://dokarkiv-q2.dev.intern.nav.no/swagger-ui/index.html#/
 
 internal const val joarkPath = "rest/journalpostapi/v1/journalpost"
 
@@ -35,6 +39,7 @@ class JoarkClient(
 
     suspend fun opprettJournalpost(
         dokumentInnhold: Journalpost,
+        søknadId: SøknadId,
         callId: String,
     ): String {
         try {
@@ -61,7 +66,7 @@ class JoarkClient(
                             bruker = dokumentInnhold.bruker,
                             // sak = dokumentInnhold.sak,
                             dokumenter = dokumentInnhold.dokumenter,
-                            eksternReferanseId = callId,
+                            eksternReferanseId = søknadId.toString(),
                         ),
                     ),
                 )
@@ -95,9 +100,19 @@ class JoarkClient(
             }
         } catch (throwable: Throwable) {
             if (throwable is ClientRequestException && throwable.response.status == HttpStatusCode.Conflict) {
-                log.warn("Søknaden har allerede blitt journalført (409 Conflict)")
-                val response = throwable.response.call.body<JoarkResponse>()
-                return response.journalpostId.orEmpty()
+                log.info("Søknaden har allerede blitt journalført (409 Conflict)")
+                try {
+                    val response = throwable.response.call.body<JoarkResponse>()
+                    if (response.journalpostId.isNullOrEmpty()) {
+                        log.error("Vi fikk ingen journalpostId i responsen fra joark for søknad : $søknadId")
+                    } else {
+                        log.info("Søknad fantes allerede i joark med journalpost med id: ${response.journalpostId}")
+                    }
+                    return response.journalpostId.orEmpty()
+                } catch (e: Exception) {
+                    log.error("Kunne ikke hente journalpostId fra response", e)
+                    return ""
+                }
             }
             if (throwable is IllegalStateException) {
                 log.error("Vi fikk en IllegalStateException i JoarkClient", throwable)

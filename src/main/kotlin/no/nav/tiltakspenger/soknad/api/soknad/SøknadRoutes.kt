@@ -6,7 +6,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
-import io.ktor.server.plugins.callid.callId
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -21,7 +20,6 @@ import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
-import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
@@ -36,37 +34,18 @@ fun Route.søknadRoutes(
 ) {
     post(SØKNAD_PATH) {
         val requestTimer = metricsCollector.SØKNADSMOTTAK_LATENCY_SECONDS.startTimer()
-        metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.inc()
         try {
             val innsendingTidspunkt = LocalDateTime.now()
             val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
             avService.gjørVirussjekkAvVedlegg(vedlegg)
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"
-            val subjectToken = call.token()
-            val person = pdlService.hentPersonaliaMedBarn(fødselsnummer, subjectToken, call.callId!!)
-            val journalpostId =
-                søknadService.opprettDokumenterOgArkiverIJoark(
-                    søknad,
-                    fødselsnummer,
-                    person,
-                    vedlegg,
-                    acr,
-                    innsendingTidspunkt,
-                    call.callId!!,
-                )
-            val søknadResponse = SøknadResponse(
-                journalpostId = journalpostId,
-                innsendingTidspunkt = innsendingTidspunkt,
-            )
-            metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
-            metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
-            requestTimer.observeDuration()
 
             Either.catch {
                 søknadRepo.lagre(
                     mapSøknad(
                         spm = søknad,
+                        acr = acr,
                         fnr = fødselsnummer,
                         vedlegg = vedlegg,
                     ),
@@ -75,9 +54,18 @@ fun Route.søknadRoutes(
                 securelog.error("Feil ved lagring av søknad", it)
             }
 
+            // Dette kan flyttes ut til funksjoner med try/catch og logging
+            // Kan legge til egen teller som teller antall søknader som er journalført og sendt til vedtak
+            metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
+            requestTimer.observeDuration()
+
+            val søknadResponse = SøknadResponse(
+                journalpostId = "ikkeJournalførtEnda",
+                innsendingTidspunkt = innsendingTidspunkt,
+            )
+
             call.respond(status = HttpStatusCode.Created, message = søknadResponse)
         } catch (exception: Exception) {
-            metricsCollector.ANTALL_SØKNADER_SOM_PROSESSERES.dec()
             when (exception) {
                 is CannotTransformContentToTypeException,
                 is BadRequestException,
