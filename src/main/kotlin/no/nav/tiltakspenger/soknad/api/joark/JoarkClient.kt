@@ -110,7 +110,7 @@ class JoarkClient(
                     return response.journalpostId.orEmpty()
                 } catch (e: Exception) {
                     log.error("Kunne ikke hente journalpostId fra response", e)
-                    throw e
+                    return ""
                 }
             }
             if (throwable is IllegalStateException) {
