@@ -91,20 +91,6 @@ class JoarkClient(
                     return journalpostId
                 }
 
-                HttpStatusCode.Conflict -> {
-                    val response = res.call.body<JoarkResponse>()
-
-                    val journalpostId = if (response.journalpostId.isNullOrEmpty()) {
-                        log.error("Fikk 409 Conflict fra Joark, men vi fikk ingen journalpostId. response=$response")
-                        throw IllegalStateException("Fikk 409 Conflict fra Joark, men vi fikk ingen journalpostId. response=$response")
-                    } else {
-                        response.journalpostId
-                    }
-
-                    log.info("Søknad fantes allerede i joark med journalpost med id: $journalpostId")
-                    return journalpostId
-                }
-
                 else -> {
                     val body = res.bodyAsText()
                     log.error("Fikk respons fra Joark, men forventet 201 CREATED. Status: $status, body: $body")
@@ -113,9 +99,19 @@ class JoarkClient(
             }
         } catch (throwable: Throwable) {
             if (throwable is ClientRequestException && throwable.response.status == HttpStatusCode.Conflict) {
-                log.warn("Søknaden har allerede blitt journalført (409 Conflict)")
-                val response = throwable.response.call.body<JoarkResponse>()
-                return response.journalpostId.orEmpty()
+                log.info("Søknaden har allerede blitt journalført (409 Conflict)")
+                try {
+                    val response = throwable.response.call.body<JoarkResponse>()
+                    if (response.journalpostId.isNullOrEmpty()) {
+                        log.error("Vi fikk ingen journalpostId i responsen fra joark for søknad : $søknadId")
+                    } else {
+                        log.info("Søknad fantes allerede i joark med journalpost med id: ${response.journalpostId}")
+                    }
+                    return response.journalpostId.orEmpty()
+                } catch (e: Exception) {
+                    log.error("Kunne ikke hente journalpostId fra response", e)
+                    throw e
+                }
             }
             if (throwable is IllegalStateException) {
                 log.error("Vi fikk en IllegalStateException i JoarkClient", throwable)
