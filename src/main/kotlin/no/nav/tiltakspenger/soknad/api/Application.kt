@@ -53,6 +53,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
+import no.nav.tiltakspenger.soknad.api.vedtak.VedtakServiceImpl
 import java.util.UUID.randomUUID
 
 fun main(args: Array<String>) {
@@ -109,7 +110,8 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         ),
         joarkService = JoarkService(environment.config),
     )
-    val søknadJobbService = SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService)
+    val vedtakService = VedtakServiceImpl(environment.config)
+    val søknadJobbService = SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService, vedtakService)
     val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
@@ -151,6 +153,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
             tasks =
             listOf { correlationId ->
                 søknadJobbService.journalførLagredeSøknader(correlationId)
+                søknadJobbService.sendJournalgørteSøknaderTilVedtak(correlationId)
             },
         )
 

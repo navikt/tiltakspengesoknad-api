@@ -7,7 +7,7 @@ import io.ktor.http.content.streamProvider
 import mu.KotlinLogging
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.deserialize
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
+import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.pdf.PdfService
 import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
@@ -30,9 +30,9 @@ class SøknadServiceImpl(
         innsendingTidspunkt: LocalDateTime,
         søknadId: SøknadId,
         callId: String,
-    ): Pair<String, SøknadDTO> {
+    ): Pair<String, Søknad> {
         val vedleggsnavn = vedlegg.map { it.filnavn }
-        val søknadDTO = SøknadDTO.toDTO(
+        val søknad = Søknad.toSøknad(
             id = søknadId.toString(),
             spørsmålsbesvarelser = spørsmålsbesvarelser,
             fnr = fnr,
@@ -42,12 +42,12 @@ class SøknadServiceImpl(
             innsendingTidspunkt = innsendingTidspunkt,
             vedleggsnavn = vedleggsnavn,
         )
-        val pdf = pdfService.lagPdf(søknadDTO)
+        val pdf = pdfService.lagPdf(søknad)
         log.info { "Generering av søknadsPDF OK" }
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         log.info { "Vedleggskonvertering OK" }
-        val journalpostId = joarkService.sendPdfTilJoark(pdf = pdf, søknadDTO = søknadDTO, fnr = fnr, vedlegg = vedleggSomPdfer, søknadId = søknadId, callId = callId)
-        return Pair(journalpostId, søknadDTO)
+        val journalpostId = joarkService.sendPdfTilJoark(pdf = pdf, søknad = søknad, fnr = fnr, vedlegg = vedleggSomPdfer, søknadId = søknadId, callId = callId)
+        return Pair(journalpostId, søknad)
     }
 
     override suspend fun taInnSøknadSomMultipart(søknadSomMultipart: MultiPartData): Pair<SpørsmålsbesvarelserDTO, List<Vedlegg>> {

@@ -1,6 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.joark
 
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
+import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.objectMapper
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.util.Base64
@@ -42,7 +42,7 @@ sealed class Journalpost {
             private const val BREVKODE_FOR_SØKNAD = "NAV 76-13.45"
             fun from(
                 fnr: String,
-                søknadDTO: SøknadDTO,
+                søknad: Søknad,
                 pdf: ByteArray,
                 vedlegg: List<Vedlegg>,
             ) =
@@ -51,14 +51,14 @@ sealed class Journalpost {
                     dokumenter = mutableListOf(
                         lagHoveddokument(
                             pdf = pdf,
-                            søknadDTO = søknadDTO,
+                            søknad = søknad,
                         ),
                     ).apply {
                         this.addAll(lagVedleggsdokumenter(vedlegg))
                     },
                 )
 
-            private fun lagHoveddokument(pdf: ByteArray, søknadDTO: SøknadDTO): JournalpostDokument =
+            private fun lagHoveddokument(pdf: ByteArray, søknad: Søknad): JournalpostDokument =
                 JournalpostDokument(
                     tittel = SØKNADSPOSTTITTEL,
                     // dokumentKategori = DokumentKategori.SOK,
@@ -67,7 +67,7 @@ sealed class Journalpost {
                         DokumentVariant.ArkivPDF(fysiskDokument = Base64.getEncoder().encodeToString(pdf)),
                         DokumentVariant.OriginalJson(
                             fysiskDokument = Base64.getEncoder()
-                                .encodeToString(objectMapper.writeValueAsString(søknadDTO).toByteArray()),
+                                .encodeToString(objectMapper.writeValueAsString(søknad).toByteArray()),
                         ),
                     ),
                 )

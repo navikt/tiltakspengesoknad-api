@@ -8,12 +8,14 @@ import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonGateway
 import no.nav.tiltakspenger.soknad.api.soknad.log
+import no.nav.tiltakspenger.soknad.api.vedtak.VedtakService
 import java.time.LocalDateTime
 
 class SøknadJobbServiceImpl(
     private val søknadRepo: SøknadRepo,
     private val personGateway: PersonGateway,
     private val søknadService: SøknadService,
+    private val vedtakService: VedtakService,
 ) : SøknadJobbService {
     override suspend fun journalførLagredeSøknader(correlationId: CorrelationId) {
         søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført()
@@ -62,7 +64,14 @@ class SøknadJobbServiceImpl(
         if (applicationProfile() == Profile.DEV) {
             søknadRepo.hentAlleSøknadDbDtoSomErJournalførtMenIkkeSendtTilVedtak()
                 .forEach { søknad ->
-                    log.info { "Vi skal sende søknad til vedtak: ${søknad.id}" }
+                    checkNotNull(søknad.søknad) { "Søknad har ikke blitt journalført" }
+                    try {
+                        vedtakService.sendSøknad(søknad.søknad, correlationId)
+                        log.info { "Vi har sendt søknad ${søknad.id} til vedtak: " }
+                        søknadRepo.oppdater(søknad.copy(sendtTilVedtak = LocalDateTime.now()))
+                    } catch (e: Exception) {
+                        log.error { "Feil ved sending av søknad til vedtak: ${søknad.id}" }
+                    }
                 }
         }
     }
