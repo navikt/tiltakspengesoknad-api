@@ -2,14 +2,14 @@ package no.nav.tiltakspenger.soknad.api.soknad.validering
 
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.domain.Personopplysninger
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
+import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
 import java.time.LocalDateTime
 
 fun søknad(
     spørsmålsbesvarelser: SpørsmålsbesvarelserDTO = spørsmålsbesvarelser(),
     personopplysninger: Personopplysninger = personopplysninger(),
-) = SøknadDTO(
+) = Søknad(
     id = SøknadId.random().toString(),
     versjon = "4",
     acr = "Level4",

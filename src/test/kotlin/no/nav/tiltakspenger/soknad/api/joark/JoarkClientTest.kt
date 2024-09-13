@@ -236,7 +236,7 @@ internal class JoarkClientTest {
 
     private val dokument = Journalpost.Søknadspost.from(
         fnr = "ident",
-        søknadDTO = søknad(),
+        søknad = søknad(),
         pdf = "dette er pdf innholdet".toByteArray(),
         vedlegg = listOf(
             Vedlegg(

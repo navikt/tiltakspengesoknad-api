@@ -7,6 +7,7 @@ endpoints:
   joark: https://dokarkiv.prod-fss-pub.nais.io
   tiltakspengerarena: https://tiltakspenger-arena.prod-fss-pub.nais.io
   tiltakspengertiltak: http://tiltakspenger-tiltak
+  tiltakspengervedtak: http://tiltakspenger-vedtak
   av: http://clamav.nais-system/scan
 outboundExternalUrls:
   pdl: pdl-api.prod-fss-pub.nais.io
@@ -20,6 +21,7 @@ audience:
 scope:
   pdl: api://prod-fss.pdl.pdl-api/.default
   joark: api://prod-fss.teamdokumenthandtering.dokarkiv/.default
+  vedtak: api://dev-gcp.tpts.tiltakspenger-vedtak/.default
 unleash:
   environment: production
 sqlInstances:

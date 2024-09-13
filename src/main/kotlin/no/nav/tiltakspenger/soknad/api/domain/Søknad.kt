@@ -12,7 +12,7 @@ data class Personopplysninger(
     val etternavn: String,
 )
 
-data class SøknadDTO(
+data class Søknad(
     val id: String,
     val acr: String,
     val versjon: String,
@@ -22,7 +22,7 @@ data class SøknadDTO(
     val innsendingTidspunkt: LocalDateTime,
 ) {
     companion object {
-        fun toDTO(
+        fun toSøknad(
             id: String,
             acr: String,
             spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
@@ -31,8 +31,8 @@ data class SøknadDTO(
             fornavn: String,
             etternavn: String,
             innsendingTidspunkt: LocalDateTime,
-        ): SøknadDTO {
-            return SøknadDTO(
+        ): Søknad {
+            return Søknad(
                 id = id,
                 acr = acr,
                 versjon = "4",
@@ -49,7 +49,7 @@ data class SøknadDTO(
     }
 }
 
-fun String.toSøknadDbJson(): SøknadDTO {
+fun String.toSøknadDbJson(): Søknad {
     try {
         return deserialize(this)
     } catch (exception: Exception) {
@@ -57,4 +57,4 @@ fun String.toSøknadDbJson(): SøknadDTO {
     }
 }
 
-fun SøknadDTO.toDbJson(): String = serialize(this)
+fun Søknad.toDbJson(): String = serialize(this)

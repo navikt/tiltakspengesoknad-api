@@ -1,14 +1,14 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
 import no.nav.tiltakspenger.libs.common.SøknadId
-import no.nav.tiltakspenger.soknad.api.domain.SøknadDTO
+import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.time.LocalDateTime
 
 data class SøknadDbDTO(
     val id: SøknadId,
     val versjon: String,
-    val søknad: SøknadDTO?,
+    val søknad: Søknad?,
     val søknadSpm: SpørsmålsbesvarelserDTO,
     val vedlegg: List<Vedlegg>,
     val acr: String,

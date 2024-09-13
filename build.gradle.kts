@@ -11,7 +11,7 @@ val prometheusVersion = "0.16.0"
 val apacheCommonsTextVersion = "1.12.0"
 val unleashVersion = "9.2.4"
 val pdfboxVersion = "3.0.3"
-val felleslibVersion = "0.0.215"
+val felleslibVersion = "0.0.216"
 val flywayVersjon = "10.18.0"
 val testContainersVersion = "1.20.1"
 
@@ -40,6 +40,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.jetbrains:annotations:24.1.0")
     implementation("com.natpryce:konfig:1.6.10.0")
+    implementation("com.github.navikt.tiltakspenger-libs:soknad-dtos:$felleslibVersion")
     implementation("com.github.navikt.tiltakspenger-libs:tiltak-dtos:$felleslibVersion")
     implementation("com.github.navikt.tiltakspenger-libs:common:$felleslibVersion")
     implementation("com.github.navikt.tiltakspenger-libs:jobber:$felleslibVersion")
@@ -82,7 +83,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
     // DB
-    implementation("org.flywaydb:flyway-core:$flywayVersjon")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayVersjon")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.postgresql:postgresql:42.7.4")
