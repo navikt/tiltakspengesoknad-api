@@ -13,7 +13,7 @@ class VedtakServiceImpl(
     private val log = KotlinLogging.logger {}
     private val secureLog = KotlinLogging.logger("tjenestekall")
 
-    override suspend fun sendSøknad(søknad: Søknad, correlationId: CorrelationId) {
-        vedtakClientImpl.sendSøknad(søknadMapper(søknad), correlationId)
+    override suspend fun sendSøknad(søknad: Søknad, journalpostId: String, correlationId: CorrelationId) {
+        vedtakClientImpl.sendSøknad(søknadMapper(søknad, journalpostId), correlationId)
     }
 }

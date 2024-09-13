@@ -64,10 +64,11 @@ class SøknadJobbServiceImpl(
         if (applicationProfile() == Profile.DEV) {
             søknadRepo.hentAlleSøknadDbDtoSomErJournalførtMenIkkeSendtTilVedtak()
                 .forEach { søknad ->
-                    checkNotNull(søknad.søknad) { "Søknad har ikke blitt journalført" }
+                    checkNotNull(søknad.søknad) { "Kan ikke sende til vedtak da det mangler søknad" }
+                    checkNotNull(søknad.journalpostId) { "Kan ikke sende til vedtak da det mangler journalpostId" }
                     try {
-                        vedtakService.sendSøknad(søknad.søknad, correlationId)
-                        log.info { "Vi har sendt søknad ${søknad.id} til vedtak: " }
+                        vedtakService.sendSøknad(søknad.søknad, søknad.journalpostId, correlationId)
+                        log.info { "Vi har sendt søknad ${søknad.id} til vedtak" }
                         søknadRepo.oppdater(søknad.copy(sendtTilVedtak = LocalDateTime.now()))
                     } catch (e: Exception) {
                         log.error { "Feil ved sending av søknad til vedtak: ${søknad.id}" }

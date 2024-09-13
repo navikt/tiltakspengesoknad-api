@@ -1,7 +1,6 @@
 package no.nav.tiltakspenger.soknad.api.vedtak
 
 import no.nav.tiltakspenger.libs.soknad.BarnetilleggDTO
-import no.nav.tiltakspenger.libs.soknad.DokumentInfoDTO
 import no.nav.tiltakspenger.libs.soknad.FraOgMedDatoSpmDTO
 import no.nav.tiltakspenger.libs.soknad.JaNeiSpmDTO
 import no.nav.tiltakspenger.libs.soknad.PeriodeSpmDTO
@@ -20,7 +19,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadflyktninger
 import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadover67
 import java.time.LocalDate
 
-fun søknadMapper(søknad: Søknad): SøknadDTO {
+fun søknadMapper(søknad: Søknad, jounalpostId: String): SøknadDTO {
     val soknad = if (!søknad.spørsmålsbesvarelser.mottarAndreUtbetalinger) {
         søknad.copy(
             spørsmålsbesvarelser = søknad.spørsmålsbesvarelser.copy(
@@ -36,16 +35,10 @@ fun søknadMapper(søknad: Søknad): SøknadDTO {
         søknad
     }
 
-    val vedlegg: List<DokumentInfoDTO> = emptyList()
-    val dokInfo = DokumentInfoDTO(
-        journalpostId = "",
-        dokumentInfoId = "",
-        filnavn = "tiltakspenger-soknad.json",
-    )
     return SøknadDTO(
         søknadId = soknad.id,
         versjon = soknad.versjon,
-        dokInfo = dokInfo,
+        journalpostId = jounalpostId,
         personopplysninger = PersonopplysningerDTO(
             ident = soknad.personopplysninger.ident,
             fornavn = soknad.personopplysninger.fornavn,
@@ -81,7 +74,7 @@ fun søknadMapper(søknad: Søknad): SøknadDTO {
                 ),
             )
         },
-        vedlegg = vedlegg,
+        vedlegg = søknad.vedleggsnavn.size,
         kvp = mapPeriodeSpm(
             mottar = soknad.spørsmålsbesvarelser.kvalifiseringsprogram.deltar,
             periode = soknad.spørsmålsbesvarelser.kvalifiseringsprogram.periode,
