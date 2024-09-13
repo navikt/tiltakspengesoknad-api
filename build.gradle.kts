@@ -83,7 +83,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
     // DB
-//    implementation("org.flywaydb:flyway-core:$flywayVersjon")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayVersjon")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.postgresql:postgresql:42.7.4")
