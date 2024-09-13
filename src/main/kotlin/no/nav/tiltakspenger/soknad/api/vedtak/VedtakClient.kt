@@ -23,7 +23,7 @@ class VedtakClient(
     private val httpClient: HttpClient = httpClientWithRetry(timeout = 10L),
 ) {
     private val endPoint = config.property("endpoints.tiltakspengervedtak").getString()
-    private val scope = config.property("scope.tiltakspengervedtak").getString()
+    private val scope = config.property("scope.vedtak").getString()
     private val oauth2Client = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
     private val log = KotlinLogging.logger {}
 
