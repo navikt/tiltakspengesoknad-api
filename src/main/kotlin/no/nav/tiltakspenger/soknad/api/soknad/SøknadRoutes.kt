@@ -48,6 +48,7 @@ fun Route.søknadRoutes(
                         acr = acr,
                         fnr = fødselsnummer,
                         vedlegg = vedlegg,
+                        innsendingTidspunkt = innsendingTidspunkt,
                     ),
                 )
             }.onLeft {

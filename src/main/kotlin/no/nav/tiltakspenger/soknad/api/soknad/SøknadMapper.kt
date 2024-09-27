@@ -9,8 +9,8 @@ fun mapSøknad(
     acr: String,
     fnr: String,
     vedlegg: List<Vedlegg>,
+    innsendingTidspunkt: LocalDateTime,
 ): SøknadDbDTO {
-    val nå = LocalDateTime.now()
     return SøknadDbDTO(
         id = SøknadId.random(),
         versjon = "1",
@@ -24,6 +24,6 @@ fun mapSøknad(
         sendtTilVedtak = null,
         journalført = null,
         journalpostId = null,
-        opprettet = nå,
+        opprettet = innsendingTidspunkt,
     )
 }
