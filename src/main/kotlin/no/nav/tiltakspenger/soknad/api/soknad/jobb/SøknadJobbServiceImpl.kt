@@ -37,7 +37,7 @@ class SøknadJobbServiceImpl(
                         etternavn = navn.etternavn,
                         vedlegg = søknad.vedlegg,
                         acr = søknad.acr,
-                        innsendingTidspunkt = LocalDateTime.now(),
+                        innsendingTidspunkt = søknad.opprettet,
                         søknadId = søknad.id,
                         callId = correlationId.toString(),
                     )
