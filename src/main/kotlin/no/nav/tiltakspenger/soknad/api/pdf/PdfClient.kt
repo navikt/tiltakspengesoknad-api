@@ -46,8 +46,8 @@ class PdfClient(
                 setBody(objectMapper.writeValueAsString(søknad))
             }.body()
         } catch (throwable: Throwable) {
-            log.error("Kallet til pdfgen feilet $throwable")
-            throw RuntimeException("Kallet til pdfgen feilet $throwable")
+            log.error("Feilet å lage PDF for søknad ${søknad.id}", throwable)
+            throw RuntimeException("Feilet å lage PDF for søknad ${søknad.id}", throwable)
         }
     }
 
@@ -66,22 +66,26 @@ class PdfClient(
                     val resultatPdf = PdfTools.slåSammenPdfer(enkeltsider)
                     Vedlegg(it.filnavn, "application/pdf", resultatPdf)
                 }
+
                 IMAGE_PNG -> {
                     LOG.info("Oppdaget PNG-vedlegg, konverterer til PDF")
                     val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.PNG, it.dokument))
                     Vedlegg("$${it.filnavn}-konvertert.pdf", "application/pdf", pdfFraBilde)
                 }
+
                 IMAGE_JPEG -> {
                     LOG.info("Oppdaget JPEG-vedlegg, konverterer til PDF")
                     val pdfFraBilde = genererPdfFraBilde(Bilde(ContentType.Image.JPEG, it.dokument))
                     Vedlegg("$${it.filnavn}-konvertert.pdf", "application/pdf", pdfFraBilde)
                 }
+
                 else -> {
                     throw UnsupportedContentException("Ugyldig filformat")
                 }
             }
         }
     }
+
     private suspend fun genererPdfFraBilde(bilde: Bilde): ByteArray {
         try {
             return client.post("$pdfEndpoint/$pdfgenImagePath") {
@@ -91,8 +95,8 @@ class PdfClient(
                 setBody(ByteArrayContent(bilde.data))
             }.body()
         } catch (throwable: Throwable) {
-            log.error("Kallet til pdfgen feilet $throwable")
-            throw RuntimeException("Kallet til pdfgen feilet $throwable")
+            log.error("Feilet å generere PDF fra bilde med Content-Type ${bilde.type}", throwable)
+            throw RuntimeException("Feilet å generere PDF fra bilde med Content-Type ${bilde.type}", throwable)
         }
     }
 }
