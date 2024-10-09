@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val javaVersion = JavaVersion.VERSION_21
-val mockkVersion = "1.13.12"
+val mockkVersion = "1.13.13"
 val ktorVersion = "2.3.12"
 val kotestVersion = "5.9.1"
 val jacksonVersion = "2.18.0"
