@@ -6,7 +6,9 @@ data class SøkerFraPDL(
     val navn: List<Navn>,
     val adressebeskyttelse: List<Adressebeskyttelse>,
     val foedselsdato: List<Fødsel>,
-    val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
+
+    // KEW Denne er midlertidig fjernet siden den ikke brukes per nå: https://trello.com/c/NQzRwuNf/1129-fjern-foreldre-barn-relasjon-i-personquery-mot-pdl
+    // val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
     val doedsfall: List<Dødsfall>,
 )
 
@@ -39,7 +41,6 @@ data class SøkerRespons(
             mellomnavn = navn.mellomnavn,
             etternavn = navn.etternavn,
             fødselsdato = fødsel.foedselsdato,
-            forelderBarnRelasjon = person.forelderBarnRelasjon,
             adressebeskyttelseGradering = adressebeskyttelseGradering,
             erDød = false,
         )
