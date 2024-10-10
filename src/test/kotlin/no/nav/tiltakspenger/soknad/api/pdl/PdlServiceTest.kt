@@ -82,8 +82,7 @@ internal class PdlServiceTest {
                 hentPerson = SøkerFraPDL(
                     navn = listOf(mockNavn()),
                     adressebeskyttelse = emptyList(),
-                    // KEW Denne er midlertidig fjernet siden den ikke brukes per nå: https://trello.com/c/NQzRwuNf/1129-fjern-foreldre-barn-relasjon-i-personquery-mot-pdl
-                    // forelderBarnRelasjon = forelderBarnRelasjon,
+                    forelderBarnRelasjon = forelderBarnRelasjon,
                     doedsfall = emptyList(),
                     foedselsdato = listOf(mockFødsel()),
                 ),
