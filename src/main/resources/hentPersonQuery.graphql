@@ -9,16 +9,6 @@ query($ident: ID!){
                 ...metadataDetails
             }
         }
-        forelderBarnRelasjon {
-            relatertPersonsIdent
-            relatertPersonsRolle
-            folkeregistermetadata {
-                ...folkeregistermetadataDetails
-            }
-            metadata {
-                ...metadataDetails
-            }
-        }
         navn(historikk: false) {
             fornavn
             mellomnavn

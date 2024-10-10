@@ -8,6 +8,7 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
@@ -81,7 +82,8 @@ internal class PdlServiceTest {
                 hentPerson = SøkerFraPDL(
                     navn = listOf(mockNavn()),
                     adressebeskyttelse = emptyList(),
-                    forelderBarnRelasjon = forelderBarnRelasjon,
+                    // KEW Denne er midlertidig fjernet siden den ikke brukes per nå: https://trello.com/c/NQzRwuNf/1129-fjern-foreldre-barn-relasjon-i-personquery-mot-pdl
+                    // forelderBarnRelasjon = forelderBarnRelasjon,
                     doedsfall = emptyList(),
                     foedselsdato = listOf(mockFødsel()),
                 ),
@@ -166,7 +168,7 @@ internal class PdlServiceTest {
                 coEvery { mock.fetchSøker(any(), any(), any()) } returns Result.success(
                     mockSøkerRespons(
                         forelderBarnRelasjon = listOf(
-                            mockForelderBarnRelasjon(),
+//                            mockForelderBarnRelasjon(),
                         ),
                     ),
                 )
@@ -177,7 +179,7 @@ internal class PdlServiceTest {
                 callId = "test",
             )
             coVerify { mockedTokenXClient.fetchSøker(testFødselsnummer, token, "test") }
-            coVerify { mockedCredentialsClient.fetchBarn(testBarnFødselsnummer, "test") }
+//            coVerify { mockedCredentialsClient.fetchBarn(testBarnFødselsnummer, "test") }
         }
     }
 
@@ -242,6 +244,7 @@ internal class PdlServiceTest {
         }
     }
 
+    @Disabled // Kew, denne er disablet frem til forelderBarnRelasjon skal brukes igjen
     @Test
     fun `hentPersonaliaMedBarn skal returnere barn fra forelderBarnRelasjon som er under 16 år`() {
         val token = "token"
@@ -268,6 +271,7 @@ internal class PdlServiceTest {
         }
     }
 
+    @Disabled // Kew, denne er disablet frem til forelderBarnRelasjon skal brukes igjen
     @Test
     fun `hentPersonaliaMedBarn skal kun returnere fødselsdato på barn som er STRENGT_FORTROLIG`() {
         val token = "token"
@@ -299,6 +303,7 @@ internal class PdlServiceTest {
         }
     }
 
+    @Disabled // Kew, denne er disablet frem til forelderBarnRelasjon skal brukes igjen
     @Test
     fun `hentPersonaliaMedBarn skal kun returnere fødselsdato på barn som er FORTROLIG`() {
         val token = "token"
@@ -330,6 +335,7 @@ internal class PdlServiceTest {
         }
     }
 
+    @Disabled // Kew, denne er disablet frem til forelderBarnRelasjon skal brukes igjen
     @Test
     fun `hentPersonaliaMedBarn skal kun returnere fødselsdato på barn som er STRENGT_FORTROLIG_UTLAND`() {
         val token = "token"
@@ -361,6 +367,7 @@ internal class PdlServiceTest {
         }
     }
 
+    @Disabled // Kew, denne er disablet frem til forelderBarnRelasjon skal brukes igjen
     @Test
     fun `hentPersonaliaMedBarn skal returnere barn med fornavn, mellomnavn og etternavn, når barnet er UGRADERT`() {
         val token = "token"
@@ -399,6 +406,7 @@ internal class PdlServiceTest {
         etternavn = this.data?.hentPerson?.navn?.first()!!.etternavn,
     )
 
+    @Disabled // Kew, denne er disablet frem til forelderBarnRelasjon skal brukes igjen
     @Test
     fun `hentPersonaliaMedBarn skal filtrere vekk barn som er over 16 år på styrendeDato`() {
         val token = "token"
