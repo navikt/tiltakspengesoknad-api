@@ -30,7 +30,7 @@ class VedtakClient(
     suspend fun sendSøknad(søknadDTO: SøknadDTO, correlationId: CorrelationId) {
         val grantRequest = GrantRequest.clientCredentials(scope)
         val token = oauth2Client.accessToken(grantRequest).accessToken ?: throw RuntimeException("Failed to get access token")
-        val httpResponse = httpClient.preparePost("$endPoint/rivers/soknad") {
+        val httpResponse = httpClient.preparePost("$endPoint/soknad") {
             header("Nav-Call-Id", correlationId.toString())
             bearerAuth(token)
             accept(ContentType.Application.Json)
