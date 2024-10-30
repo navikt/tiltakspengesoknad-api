@@ -54,6 +54,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
 import no.nav.tiltakspenger.soknad.api.vedtak.VedtakServiceImpl
+import java.time.Instant
 import java.util.UUID.randomUUID
 
 fun main(args: Array<String>) {
@@ -71,6 +72,8 @@ fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+// Referert fra application.conf
+@Suppress("unused")
 fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector()) {
     val log = KotlinLogging.logger {}
     log.info { "starting server" }
@@ -90,15 +93,14 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     val pdlEndpoint = environment.config.property("endpoints.pdl").getString()
     val pdlScope = environment.config.property("scope.pdl").getString()
     val oauth2CredentialsClient = checkNotNull(ClientConfig(environment.config, httpClientWithRetry()).clients["azure"])
-    val personGateway =
-        PersonHttpklient(
-            pdlEndpoint,
-        ) {
-            AccessToken(
-                oauth2CredentialsClient.clientCredentials(pdlScope).accessToken
-                    ?: throw IllegalStateException("Responsen fra token-exchange mangler accessToken"),
-            )
-        }
+    val personGateway = PersonHttpklient(pdlEndpoint) {
+        AccessToken(
+            token = oauth2CredentialsClient.clientCredentials(pdlScope).accessToken
+                ?: throw IllegalStateException("Responsen fra token-exchange mangler accessToken"),
+            // Kommentar jah: Denne brukes i tiltakspenger-vedtak, men ikke i tiltakspenger-soknad-api. Siden den er en int i tokensupport og en instant i AccessToken, hardkoder vi den bare til 1 time nå.
+            expiresAt = Instant.now().plusSeconds(3600),
+        ) {}
+    }
     val søknadRepo = SøknadRepoImpl()
     val pdlService = PdlService(environment.config)
     val søknadService: SøknadService = SøknadServiceImpl(
