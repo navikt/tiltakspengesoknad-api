@@ -52,7 +52,7 @@ spec:
       rules:
         - application: tiltakspenger-tiltak
         - application: tiltakspenger-pdfgen
-        - application: tiltakspenger-vedtak
+        - application: tiltakspenger-saksbehandling-api
         - application: clamav
           namespace: nais-system
       external:
