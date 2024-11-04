@@ -97,7 +97,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         AccessToken(
             token = oauth2CredentialsClient.clientCredentials(pdlScope).accessToken
                 ?: throw IllegalStateException("Responsen fra token-exchange mangler accessToken"),
-            // Kommentar jah: Denne brukes i tiltakspenger-vedtak, men ikke i tiltakspenger-soknad-api. Siden den er en int i tokensupport og en instant i AccessToken, hardkoder vi den bare til 1 time nå.
+            // Kommentar jah: Denne brukes i tiltakspenger-saksbehandling-api, men ikke i tiltakspenger-soknad-api. Siden den er en int i tokensupport og en instant i AccessToken, hardkoder vi den bare til 1 time nå.
             expiresAt = Instant.now().plusSeconds(3600),
         ) {}
     }

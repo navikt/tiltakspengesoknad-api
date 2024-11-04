@@ -27,23 +27,6 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
-    <appender name="audit" class="com.papertrailapp.logback.Syslog4jAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%m%n%xEx</pattern>
-        </layout>
-
-        <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
-            <host>audit.nais</host>
-            <port>6514</port>
-            <ident>tiltakspenger-vedtak</ident>
-            <maxMessageLength>128000</maxMessageLength>
-        </syslogConfig>
-    </appender>
-
-    <logger level="INFO" name="audit" additivity="false">
-        <appender-ref ref="audit"/>
-    </logger>
-
     <logger name="io.ktor.auth.jwt" level="TRACE"/>
 
     <logger name="tjenestekall" level="DEBUG" additivity="false">
