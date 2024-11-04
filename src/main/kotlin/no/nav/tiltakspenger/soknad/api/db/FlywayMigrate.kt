@@ -10,7 +10,7 @@ private fun flyway(): Flyway =
         else -> gcpFlyway()
     }
 
-private fun localFlyway() = Flyway
+internal fun localFlyway() = Flyway
     .configure()
     .loggers("slf4j")
     .encoding("UTF-8")
@@ -26,15 +26,9 @@ private fun gcpFlyway() = Flyway
     .encoding("UTF-8")
     .dataSource(DataSource.hikariDataSource)
     .cleanDisabled(true)
-    .cleanOnValidationError(true)
+    .cleanOnValidationError(false)
     .load()
 
 fun flywayMigrate() {
     flyway().migrate()
-}
-
-fun flywayCleanAndMigrate() {
-    val flyway = flyway()
-    flyway.clean()
-    flyway.migrate()
 }

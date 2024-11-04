@@ -3,7 +3,7 @@ package no.nav.tiltakspenger.soknad.api.repository
 import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.db.PostgresTestcontainer
-import no.nav.tiltakspenger.soknad.api.db.flywayCleanAndMigrate
+import no.nav.tiltakspenger.soknad.api.db.localFlyway
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadDbDTO
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.validering.spørsmålsbesvarelser
@@ -82,4 +82,10 @@ internal class SøknadRepoTest {
         søknadRepo.oppdater(søknadSendtTilVedtak)
         søknadRepo.hentAlleSøknadDbDtoSomErJournalførtMenIkkeSendtTilVedtak().size shouldBe 0
     }
+}
+
+private fun flywayCleanAndMigrate() {
+    val flyway = localFlyway()
+    flyway.clean()
+    flyway.migrate()
 }
