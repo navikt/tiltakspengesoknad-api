@@ -50,6 +50,7 @@ class SøknadServiceImpl(
         return Pair(journalpostId, søknad)
     }
 
+    // TODO post-mvp jah: Denne er tilstandsløs og kan flyttes ut av service. Kan ligge som en egen funksjon i en klasse i routes.
     override suspend fun taInnSøknadSomMultipart(søknadSomMultipart: MultiPartData): Pair<SpørsmålsbesvarelserDTO, List<Vedlegg>> {
         lateinit var spørsmålsbesvarelserDTO: SpørsmålsbesvarelserDTO
         val vedleggListe = mutableListOf<Vedlegg>()

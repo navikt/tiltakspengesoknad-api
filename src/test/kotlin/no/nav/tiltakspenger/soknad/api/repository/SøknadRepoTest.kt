@@ -3,8 +3,9 @@ package no.nav.tiltakspenger.soknad.api.repository
 import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.db.PostgresTestcontainer
-import no.nav.tiltakspenger.soknad.api.db.localFlyway
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadDbDTO
+import no.nav.tiltakspenger.soknad.api.db.gcpFlyway
+import no.nav.tiltakspenger.soknad.api.soknad.Applikasjonseier
+import no.nav.tiltakspenger.soknad.api.soknad.Søknad
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.validering.spørsmålsbesvarelser
 import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
@@ -24,7 +25,8 @@ internal class SøknadRepoTest {
 
     @BeforeEach
     fun setup() {
-        flywayCleanAndMigrate()
+        // Vi ønsker ikke kjøre lokale migreringsskript for testene.
+        gcpFlyway().migrate()
     }
 
     @Test
@@ -34,7 +36,7 @@ internal class SøknadRepoTest {
         val fnr = "12345678901"
         val spm = spørsmålsbesvarelser()
         val søknad = søknad()
-        val søknadDbDTO = SøknadDbDTO(
+        val søknadDbDTO = Søknad(
             id = id,
             versjon = "1",
             søknad = null,
@@ -55,6 +57,7 @@ internal class SøknadRepoTest {
             journalført = null,
             journalpostId = null,
             opprettet = nå,
+            eier = Applikasjonseier.Arena,
         )
 
         søknadRepo.lagre(søknadDbDTO)
@@ -82,10 +85,4 @@ internal class SøknadRepoTest {
         søknadRepo.oppdater(søknadSendtTilVedtak)
         søknadRepo.hentAlleSøknadDbDtoSomErJournalførtMenIkkeSendtTilVedtak().size shouldBe 0
     }
-}
-
-private fun flywayCleanAndMigrate() {
-    val flyway = localFlyway()
-    flyway.clean()
-    flyway.migrate()
 }

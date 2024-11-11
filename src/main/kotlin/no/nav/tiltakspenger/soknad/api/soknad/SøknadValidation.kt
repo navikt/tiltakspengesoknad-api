@@ -274,6 +274,7 @@ fun validerBarnetillegg(barnetillegg: Barnetillegg): List<String> {
     }
     val harEtBarnMedFødselsdatoFramITid = manueltRegistrerteBarn.any { it.fødselsdato.isSameOrAfter(LocalDate.now().plusDays(1)) }
     if (harEtBarnMedForLangtNavn) {
+        // TODO post-mvp jah: Seriously? 25 tegn maks etternavn? Denne feilen inntraff i prod 2. oktober.
         feilmeldinger.add("Manuelt registrert barn er ugyldig: fornavn, mellomnavn eller etternavn overskrider maksgrense på 25 tegn")
     }
     if (harEtBarnMedFødselsdatoFramITid) {

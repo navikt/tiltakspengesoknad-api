@@ -1,6 +1,5 @@
 package no.nav.tiltakspenger.soknad.api.soknad
 
-import arrow.core.Either
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -19,7 +18,6 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
-import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
@@ -27,45 +25,50 @@ private val securelog = KotlinLogging.logger("tjenestekall")
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
-    søknadRepo: SøknadRepo,
+    nySøknadService: NySøknadService,
     avService: AvService,
-    pdlService: PdlService,
     metricsCollector: MetricsCollector,
 ) {
     post(SØKNAD_PATH) {
         val requestTimer = metricsCollector.SØKNADSMOTTAK_LATENCY_SECONDS.startTimer()
         try {
             val innsendingTidspunkt = LocalDateTime.now()
-            val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
+            val (brukersBesvarelser, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
             avService.gjørVirussjekkAvVedlegg(vedlegg)
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"
 
-            Either.catch {
-                søknadRepo.lagre(
-                    mapSøknad(
-                        spm = søknad,
-                        acr = acr,
-                        fnr = fødselsnummer,
-                        vedlegg = vedlegg,
-                        innsendingTidspunkt = innsendingTidspunkt,
-                    ),
-                )
-            }.onLeft {
-                securelog.error("Feil ved lagring av søknad", it)
-            }
-
-            // Dette kan flyttes ut til funksjoner med try/catch og logging
-            // Kan legge til egen teller som teller antall søknader som er journalført og sendt til vedtak
-            metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
-            requestTimer.observeDuration()
-
-            val søknadResponse = SøknadResponse(
-                journalpostId = "ikkeJournalførtEnda",
+            val command = NySøknadCommand(
+                brukersBesvarelser = brukersBesvarelser,
+                acr = acr,
+                fnr = fødselsnummer,
+                vedlegg = vedlegg,
                 innsendingTidspunkt = innsendingTidspunkt,
             )
+            nySøknadService.nySøknad(command).fold(
+                {
+                    metricsCollector.ANTALL_FEILEDE_INNSENDINGER_COUNTER.inc()
+                    requestTimer.observeDuration()
+                    call.respondText(
+                        text = "Internal server error",
+                        contentType = ContentType.Text.Plain,
+                        status = HttpStatusCode.InternalServerError,
+                    )
+                },
+                { // Dette kan flyttes ut til funksjoner med try/catch og logging
+                    // Kan legge til egen teller som teller antall søknader som er journalført og sendt til vedtak
+                    metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
+                    requestTimer.observeDuration()
 
-            call.respond(status = HttpStatusCode.Created, message = søknadResponse)
+                    val søknadResponse = SøknadResponse(
+                        // TODO post-mvp jah: Dette kan vi vel ikke returnere?
+                        journalpostId = "ikkeJournalførtEnda",
+                        innsendingTidspunkt = innsendingTidspunkt,
+                    )
+
+                    call.respond(status = HttpStatusCode.Created, message = søknadResponse)
+                },
+            )
         } catch (exception: Exception) {
             when (exception) {
                 is CannotTransformContentToTypeException,

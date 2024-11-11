@@ -43,7 +43,7 @@ import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
 import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
+import no.nav.tiltakspenger.soknad.api.soknad.NySøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
@@ -112,6 +112,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         ),
         joarkService = JoarkService(environment.config),
     )
+    val nySøknadService = NySøknadService(søknadRepo)
     val vedtakService = VedtakServiceImpl(environment.config)
     val søknadJobbService = SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService, vedtakService)
     val avService: AvService = AvServiceImpl(
@@ -126,9 +127,9 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         pdlService = pdlService,
         søknadService = søknadService,
         tiltakService = tiltakService,
-        søknadRepo = søknadRepo,
         avService = avService,
         metricsCollector = metricsCollector,
+        nySøknadService = nySøknadService,
     )
 
     val runCheckFactory =
@@ -171,8 +172,8 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
 internal fun Application.setupRouting(
     pdlService: PdlService,
     søknadService: SøknadService,
+    nySøknadService: NySøknadService,
     tiltakService: TiltakService,
-    søknadRepo: SøknadRepo,
     avService: AvService,
     metricsCollector: MetricsCollector,
 ) {
@@ -187,9 +188,8 @@ internal fun Application.setupRouting(
             søknadRoutes(
                 søknadService = søknadService,
                 avService = avService,
-                pdlService = pdlService,
                 metricsCollector = metricsCollector,
-                søknadRepo = søknadRepo,
+                nySøknadService = nySøknadService,
             )
             tiltakRoutes(
                 tiltakService = tiltakService,

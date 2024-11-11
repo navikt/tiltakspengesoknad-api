@@ -18,7 +18,7 @@ internal fun localFlyway() = Flyway
     .dataSource(DataSource.hikariDataSource)
     .load()
 
-private fun gcpFlyway() = Flyway
+internal fun gcpFlyway() = Flyway
     .configure()
     .loggers("slf4j")
     .encoding("UTF-8")

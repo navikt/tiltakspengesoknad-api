@@ -5,7 +5,7 @@ import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import java.time.LocalDateTime
 
-data class SøknadDbDTO(
+data class Søknad(
     val id: SøknadId,
     val versjon: String,
     val søknad: Søknad?,
@@ -19,4 +19,5 @@ data class SøknadDbDTO(
     val journalført: LocalDateTime?,
     val journalpostId: String?,
     val opprettet: LocalDateTime,
+    val eier: Applikasjonseier,
 )

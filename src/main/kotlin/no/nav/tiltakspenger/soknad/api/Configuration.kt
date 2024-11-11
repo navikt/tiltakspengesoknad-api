@@ -67,6 +67,7 @@ object Configuration {
     fun logbackConfigurationFile() = config()[Key("logback.configurationFile", stringType)]
 
     fun isNais() = applicationProfile() != Profile.LOCAL
+    fun isProd() = applicationProfile() == Profile.PROD
 
     fun electorPath(): String = config()[Key("ELECTOR_PATH", stringType)]
 

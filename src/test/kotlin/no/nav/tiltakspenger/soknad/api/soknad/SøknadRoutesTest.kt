@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 internal class SøknadRoutesTest {
+
     private val pdlServiceMock = mockk<PdlService>().also { mock ->
         coEvery { mock.hentPersonaliaMedBarn(any(), any(), any()) } returns PersonDTO(
             fornavn = "fornavn",
@@ -36,21 +37,24 @@ internal class SøknadRoutesTest {
     private val avServiceMock = mockk<AvService>().also { mock ->
         coEvery { mock.gjørVirussjekkAvVedlegg(any()) } returns Unit
     }
+    companion object {
+        private val mockOAuth2Server = MockOAuth2Server()
 
-    private val mockOAuth2Server = MockOAuth2Server()
+        @JvmStatic
+        @BeforeAll
+        fun setup(): Unit = mockOAuth2Server.start(8080)
 
-    @BeforeAll
-    fun setup() = mockOAuth2Server.start(8080)
+        @JvmStatic
+        @AfterAll
+        fun after(): Unit = mockOAuth2Server.shutdown()
+    }
 
-    @AfterAll
-    fun after() = mockOAuth2Server.shutdown()
-
-    fun issueTestToken(acr: String = "idporten-loa-high", expiry: Long = 3600): SignedJWT {
+    private fun issueTestToken(acr: String = "idporten-loa-high", expiry: Long = 3600): SignedJWT {
         return mockOAuth2Server.issueToken(
             issuerId = "tokendings",
             audience = "audience",
             claims = mapOf(
-                "acr" to "$acr",
+                "acr" to acr,
                 "pid" to "123",
             ),
             expiry = expiry,
@@ -182,17 +186,35 @@ internal class SøknadRoutesTest {
     fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
         val søknadServiceMock = mockk<SøknadService>().also { mock ->
             coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns Pair("123", mockk())
+            coEvery {
+                mock.opprettDokumenterOgArkiverIJoark(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                )
+            } returns Pair("123", mockk())
         }
 
-        val repoMock = mockk<SøknadRepo>().also { mock ->
+        val søknadRepoMock = mockk<SøknadRepo>().also { mock ->
             coEvery { mock.lagre(any()) } returns Unit
         }
+        val nySøknadService = NySøknadService(søknadRepoMock)
 
         val token = issueTestToken()
 
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock, søknadRepo = repoMock)
+            configureTestApplication(
+                søknadService = søknadServiceMock,
+                avService = avServiceMock,
+                pdlService = pdlServiceMock,
+                nySøknadService = nySøknadService,
+            )
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(

@@ -10,10 +10,9 @@ import no.nav.tiltakspenger.soknad.api.domain.toSøknadDbJson
 import no.nav.tiltakspenger.soknad.api.vedlegg.toDbJson
 import no.nav.tiltakspenger.soknad.api.vedlegg.vedleggDbJson
 import org.intellij.lang.annotations.Language
-import java.util.*
 
-class SøknadRepoImpl() : SøknadRepo {
-    override fun lagre(dto: SøknadDbDTO) {
+class SøknadRepoImpl : SøknadRepo {
+    override fun lagre(dto: Søknad) {
         sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
@@ -33,6 +32,10 @@ class SøknadRepoImpl() : SøknadRepo {
                             "journalfort" to dto.journalført,
                             "journalpostId" to dto.journalpostId,
                             "opprettet" to dto.opprettet,
+                            "eier" to when (dto.eier) {
+                                Applikasjonseier.Arena -> "arena"
+                                Applikasjonseier.Tiltakspenger -> "tp"
+                            },
                         ),
                     ).asUpdate,
                 )
@@ -40,7 +43,7 @@ class SøknadRepoImpl() : SøknadRepo {
         }
     }
 
-    override fun oppdater(dto: SøknadDbDTO) {
+    override fun oppdater(dto: Søknad) {
         sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
@@ -60,7 +63,7 @@ class SøknadRepoImpl() : SøknadRepo {
             }
         }
     }
-    override fun hentAlleSøknadDbDtoSomIkkeErJournalført(): List<SøknadDbDTO> {
+    override fun hentAlleSøknadDbDtoSomIkkeErJournalført(): List<Søknad> {
         return sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
@@ -76,7 +79,7 @@ class SøknadRepoImpl() : SøknadRepo {
         }
     }
 
-    override fun hentAlleSøknadDbDtoSomErJournalførtMenIkkeSendtTilVedtak(): List<SøknadDbDTO> {
+    override fun hentAlleSøknadDbDtoSomErJournalførtMenIkkeSendtTilVedtak(): List<Søknad> {
         return sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
@@ -94,8 +97,8 @@ class SøknadRepoImpl() : SøknadRepo {
         }
     }
 
-    private fun Row.toSøknadDbDto(): SøknadDbDTO {
-        return SøknadDbDTO(
+    private fun Row.toSøknadDbDto(): Søknad {
+        return Søknad(
             id = SøknadId.fromString(string("id")),
             versjon = string("versjon"),
             søknad = stringOrNull("søknad")?.toSøknadDbJson(),
@@ -109,6 +112,11 @@ class SøknadRepoImpl() : SøknadRepo {
             journalført = localDateTimeOrNull("journalført"),
             journalpostId = stringOrNull("journalpostId"),
             opprettet = localDateTime("opprettet"),
+            eier = when (val e = string("eier")) {
+                "arena" -> Applikasjonseier.Arena
+                "tp" -> Applikasjonseier.Tiltakspenger
+                else -> throw IllegalStateException("Ukjent eier i databasen: $e. Forventet: ['arena','tp']")
+            },
         )
     }
 
@@ -128,7 +136,8 @@ class SøknadRepoImpl() : SøknadRepo {
             sendt_til_vedtak,
             journalført,
             journalpostId,
-            opprettet
+            opprettet,
+            eier
         ) values (
             :id,
             :versjon,
@@ -142,7 +151,8 @@ class SøknadRepoImpl() : SøknadRepo {
             :sendtTilVedtak,
             :journalfort,
             :journalpostId,
-            :opprettet
+            :opprettet,
+            :eier
         )
         """.trimIndent()
 
