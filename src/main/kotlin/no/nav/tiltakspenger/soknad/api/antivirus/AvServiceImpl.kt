@@ -19,6 +19,7 @@ class AvServiceImpl(
                 securelog.info { "Fant skadevare i vedlegg ${it.filnavn}" }
             }
             if (it.resultat === Status.ERROR) {
+                // TODO post-mvp jah: Så hvis vi ikke klarer å scanne en fil, godtar vi den bare. Er dette ønsket oppførsel? Hva sier ROSen om dette? Finner ingen innslag i loggen.
                 securelog.info { "Noe gikk galt under virusscan av fil ${it.filnavn}" }
             }
         }

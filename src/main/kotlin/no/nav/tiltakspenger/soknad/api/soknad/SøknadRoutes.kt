@@ -65,7 +65,7 @@ fun Route.søknadRoutes(
                         journalpostId = "ikkeJournalførtEnda",
                         innsendingTidspunkt = innsendingTidspunkt,
                     )
-
+                    log.info { "Søknad mottatt og lagret. Acr: $acr. Antall vedlegg: ${vedlegg.size}. Innsendingstidspunkt: $innsendingTidspunkt" }
                     call.respond(status = HttpStatusCode.Created, message = søknadResponse)
                 },
             )
