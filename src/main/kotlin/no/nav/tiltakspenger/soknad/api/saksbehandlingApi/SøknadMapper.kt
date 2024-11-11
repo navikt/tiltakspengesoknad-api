@@ -1,4 +1,4 @@
-package no.nav.tiltakspenger.soknad.api.vedtak
+package no.nav.tiltakspenger.soknad.api.saksbehandlingApi
 
 import no.nav.tiltakspenger.libs.soknad.BarnetilleggDTO
 import no.nav.tiltakspenger.libs.soknad.FraOgMedDatoSpmDTO

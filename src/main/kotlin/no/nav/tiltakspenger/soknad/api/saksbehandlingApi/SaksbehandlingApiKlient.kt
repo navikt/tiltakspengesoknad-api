@@ -1,4 +1,4 @@
-package no.nav.tiltakspenger.soknad.api.vedtak
+package no.nav.tiltakspenger.soknad.api.saksbehandlingApi
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
@@ -10,7 +10,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
-import mu.KotlinLogging
 import no.nav.tiltakspenger.libs.common.CorrelationId
 import no.nav.tiltakspenger.libs.soknad.SøknadDTO
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
@@ -18,19 +17,19 @@ import no.nav.tiltakspenger.soknad.api.auth.oauth.GrantRequest
 import no.nav.tiltakspenger.soknad.api.httpClientCIO
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
-class VedtakClient(
+class SaksbehandlingApiKlient(
     config: ApplicationConfig,
     private val httpClient: HttpClient = httpClientWithRetry(timeout = 10L),
 ) {
-    private val endPoint = config.property("endpoints.tiltakspengervedtak").getString()
+    private val endpoint = config.property("endpoints.tiltakspengervedtak").getString()
     private val scope = config.property("scope.vedtak").getString()
     private val oauth2Client = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
-    private val log = KotlinLogging.logger {}
 
     suspend fun sendSøknad(søknadDTO: SøknadDTO, correlationId: CorrelationId) {
         val grantRequest = GrantRequest.clientCredentials(scope)
-        val token = oauth2Client.accessToken(grantRequest).accessToken ?: throw RuntimeException("Failed to get access token")
-        val httpResponse = httpClient.preparePost("$endPoint/soknad") {
+        val token =
+            oauth2Client.accessToken(grantRequest).accessToken ?: throw RuntimeException("Failed to get access token")
+        val httpResponse = httpClient.preparePost("$endpoint/soknad") {
             header("Nav-Call-Id", correlationId.toString())
             bearerAuth(token)
             accept(ContentType.Application.Json)
@@ -39,7 +38,7 @@ class VedtakClient(
         }.execute()
         when (httpResponse.status) {
             HttpStatusCode.OK -> return
-            else -> throw RuntimeException("error (responseCode=${httpResponse.status.value}) from Vedtak")
+            else -> throw RuntimeException("error (responseCode=${httpResponse.status.value}) from saksbehandling-api")
         }
     }
 }

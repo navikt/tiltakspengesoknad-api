@@ -12,6 +12,7 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import mu.KotlinLogging
+import no.nav.tiltakspenger.libs.logging.sikkerlogg
 import no.nav.tiltakspenger.soknad.api.SØKNAD_PATH
 import no.nav.tiltakspenger.soknad.api.acr
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
@@ -21,7 +22,6 @@ import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
-private val securelog = KotlinLogging.logger("tjenestekall")
 
 fun Route.søknadRoutes(
     søknadService: SøknadService,
@@ -56,7 +56,7 @@ fun Route.søknadRoutes(
                     )
                 },
                 { // Dette kan flyttes ut til funksjoner med try/catch og logging
-                    // Kan legge til egen teller som teller antall søknader som er journalført og sendt til vedtak
+                    // Kan legge til egen teller som teller antall søknader som er journalført og sendt til saksbehandling-apo
                     metricsCollector.ANTALL_SØKNADER_MOTTATT_COUNTER.inc()
                     requestTimer.observeDuration()
 
@@ -65,7 +65,6 @@ fun Route.søknadRoutes(
                         journalpostId = "ikkeJournalførtEnda",
                         innsendingTidspunkt = innsendingTidspunkt,
                     )
-                    log.info { "Søknad mottatt og lagret. Acr: $acr. Antall vedlegg: ${vedlegg.size}. Innsendingstidspunkt: $innsendingTidspunkt" }
                     call.respond(status = HttpStatusCode.Created, message = søknadResponse)
                 },
             )
@@ -79,7 +78,7 @@ fun Route.søknadRoutes(
                 is UninitializedPropertyAccessException,
                 is RequestValidationException,
                 -> {
-                    securelog.error("Ugyldig søknad ${exception.message}", exception)
+                    sikkerlogg.error("Ugyldig søknad ${exception.message}", exception)
                     metricsCollector.ANTALL_FEILEDE_INNSENDINGER_COUNTER.inc()
                     metricsCollector.ANTALL_UGYLDIGE_SØKNADER_COUNTER.inc()
                     requestTimer.observeDuration()

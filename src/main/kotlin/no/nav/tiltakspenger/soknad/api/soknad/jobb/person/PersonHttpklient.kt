@@ -2,9 +2,9 @@ package no.nav.tiltakspenger.soknad.api.soknad.jobb.person
 
 import arrow.core.flatMap
 import com.fasterxml.jackson.module.kotlin.readValue
-import mu.KotlinLogging
 import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.common.Fnr
+import no.nav.tiltakspenger.libs.logging.sikkerlogg
 import no.nav.tiltakspenger.libs.personklient.pdl.FellesPersonklient
 import no.nav.tiltakspenger.libs.personklient.pdl.FellesPersonklientError
 import no.nav.tiltakspenger.libs.personklient.pdl.FellesPersonklientError.AdressebeskyttelseKunneIkkeAvklares
@@ -27,7 +27,7 @@ class PersonHttpklient(
     private val personklient =
         FellesPersonklient.create(
             endepunkt = endepunkt,
-            sikkerlogg = KotlinLogging.logger("tjenestekall"),
+            sikkerlogg = sikkerlogg,
         )
 
     override suspend fun hentNavnForFnr(

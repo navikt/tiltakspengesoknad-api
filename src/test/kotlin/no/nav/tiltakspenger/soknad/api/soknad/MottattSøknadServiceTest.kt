@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
-internal class SøknadServiceTest {
+internal class MottattSøknadServiceTest {
     private val mockPdfService = mockk<PdfService>().also { mock ->
         coEvery { mock.lagPdf(any()) }
     }

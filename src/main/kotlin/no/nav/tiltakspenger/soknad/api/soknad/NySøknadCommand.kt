@@ -13,8 +13,8 @@ data class NySøknadCommand(
 ) {
     fun toDomain(
         eier: Applikasjonseier,
-    ): Søknad {
-        return Søknad(
+    ): MottattSøknad {
+        return MottattSøknad(
             id = SøknadId.random(),
             versjon = "1",
             søknad = null,

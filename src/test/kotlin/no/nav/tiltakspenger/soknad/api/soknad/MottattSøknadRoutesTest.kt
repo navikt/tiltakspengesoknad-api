@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
-internal class SøknadRoutesTest {
+internal class MottattSøknadRoutesTest {
 
     private val pdlServiceMock = mockk<PdlService>().also { mock ->
         coEvery { mock.hentPersonaliaMedBarn(any(), any(), any()) } returns PersonDTO(

@@ -27,6 +27,7 @@ import no.nav.tiltakspenger.libs.jobber.LeaderPodLookup
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupClient
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupFeil
 import no.nav.tiltakspenger.libs.jobber.RunCheckFactory
+import no.nav.tiltakspenger.libs.logging.sikkerlogg
 import no.nav.tiltakspenger.soknad.api.antivirus.AvClient
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
@@ -43,6 +44,7 @@ import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
 import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
+import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SendSøknadTilSaksbehandlingApiService
 import no.nav.tiltakspenger.soknad.api.soknad.NySøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
@@ -53,18 +55,16 @@ import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
-import no.nav.tiltakspenger.soknad.api.vedtak.VedtakServiceImpl
 import java.time.Instant
 import java.util.UUID.randomUUID
 
 fun main(args: Array<String>) {
     System.setProperty("logback.configurationFile", Configuration.logbackConfigurationFile())
     val log = KotlinLogging.logger {}
-    val securelog = KotlinLogging.logger("tjenestekall")
 
     Thread.setDefaultUncaughtExceptionHandler { _, e ->
         log.error { "Uncaught exception logget i securelog" }
-        securelog.error(e) { e.message }
+        sikkerlogg.error(e) { e.message }
     }
 
     DefaultExports.initialize()
@@ -113,8 +113,8 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         joarkService = JoarkService(environment.config),
     )
     val nySøknadService = NySøknadService(søknadRepo)
-    val vedtakService = VedtakServiceImpl(environment.config)
-    val søknadJobbService = SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService, vedtakService)
+    val sendSøknadTilSaksbehandlingApiService = SendSøknadTilSaksbehandlingApiService(environment.config)
+    val søknadJobbService = SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService, sendSøknadTilSaksbehandlingApiService)
     val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
@@ -156,7 +156,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
             tasks =
             listOf { correlationId ->
                 søknadJobbService.journalførLagredeSøknader(correlationId)
-                søknadJobbService.sendJournalgørteSøknaderTilVedtak(correlationId)
+                søknadJobbService.sendJournalførteSøknaderTilSaksbehandlingApi(correlationId)
             },
         )
 

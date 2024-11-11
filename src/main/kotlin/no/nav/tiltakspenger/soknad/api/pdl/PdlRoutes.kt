@@ -7,15 +7,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
-import mu.KotlinLogging
+import no.nav.tiltakspenger.libs.logging.sikkerlogg
 import no.nav.tiltakspenger.soknad.api.PERSONALIA_PATH
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.token
 import java.time.LocalDate
-
-val secureLog = KotlinLogging.logger("tjenestekall")
 
 fun Route.pdlRoutes(pdlService: PdlService, tiltakService: TiltakService, metricsCollector: MetricsCollector) {
     get(PERSONALIA_PATH) {
@@ -42,7 +40,7 @@ fun Route.pdlRoutes(pdlService: PdlService, tiltakService: TiltakService, metric
             call.respond(personDTO)
         } catch (e: Exception) {
             metricsCollector.ANTALL_FEIL_VED_HENT_PERSONALIA.inc()
-            secureLog.error("Feil under pdlRoute", e)
+            sikkerlogg.error("Feil under pdlRoute", e)
             call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
         }
     }

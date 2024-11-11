@@ -12,7 +12,7 @@ import no.nav.tiltakspenger.soknad.api.vedlegg.vedleggDbJson
 import org.intellij.lang.annotations.Language
 
 class SøknadRepoImpl : SøknadRepo {
-    override fun lagre(dto: Søknad) {
+    override fun lagre(dto: MottattSøknad) {
         sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
@@ -43,7 +43,7 @@ class SøknadRepoImpl : SøknadRepo {
         }
     }
 
-    override fun oppdater(dto: Søknad) {
+    override fun oppdater(dto: MottattSøknad) {
         sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
@@ -63,7 +63,7 @@ class SøknadRepoImpl : SøknadRepo {
             }
         }
     }
-    override fun hentAlleSøknadDbDtoSomIkkeErJournalført(): List<Søknad> {
+    override fun hentAlleSøknadDbDtoSomIkkeErJournalført(): List<MottattSøknad> {
         return sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
@@ -79,7 +79,7 @@ class SøknadRepoImpl : SøknadRepo {
         }
     }
 
-    override fun hentAlleSøknadDbDtoSomErJournalførtMenIkkeSendtTilVedtak(): List<Søknad> {
+    override fun hentSøknaderSomSkalSendesTilSaksbehandlingApi(): List<MottattSøknad> {
         return sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
@@ -88,6 +88,7 @@ class SøknadRepoImpl : SøknadRepo {
                            select * from søknad 
                              where journalført is not null 
                              and sendt_til_vedtak is null
+                             and eier = 'tp'
                         """.trimIndent(),
                     ).map { row ->
                         row.toSøknadDbDto()
@@ -97,8 +98,8 @@ class SøknadRepoImpl : SøknadRepo {
         }
     }
 
-    private fun Row.toSøknadDbDto(): Søknad {
-        return Søknad(
+    private fun Row.toSøknadDbDto(): MottattSøknad {
+        return MottattSøknad(
             id = SøknadId.fromString(string("id")),
             versjon = string("versjon"),
             søknad = stringOrNull("søknad")?.toSøknadDbJson(),

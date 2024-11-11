@@ -14,7 +14,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
-import mu.KotlinLogging
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 import no.nav.tiltakspenger.soknad.api.objectMapper
@@ -33,7 +32,6 @@ class JoarkClient(
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val securelog = KotlinLogging.logger("tjenestekall")
 
     private val joarkEndpoint = config.property("endpoints.joark").getString()
 

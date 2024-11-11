@@ -4,5 +4,5 @@ import no.nav.tiltakspenger.libs.common.CorrelationId
 
 interface SøknadJobbService {
     suspend fun journalførLagredeSøknader(correlationId: CorrelationId)
-    suspend fun sendJournalgørteSøknaderTilVedtak(correlationId: CorrelationId)
+    suspend fun sendJournalførteSøknaderTilSaksbehandlingApi(correlationId: CorrelationId)
 }
