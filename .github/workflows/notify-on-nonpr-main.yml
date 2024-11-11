@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Post message
         env:
-          WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          WEBHOOK_URL: ${{ secrets.SLACK_ON_PUSH_WEBHOOK_URL }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           curl -X POST --data "{\"text\": \"Push til main: $GITHUB_ACTOR på $GITHUB_REPOSITORY - $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA - ${{ env.COMMIT_MESSAGE }}\"}" $WEBHOOK_URL
