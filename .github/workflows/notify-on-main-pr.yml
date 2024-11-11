@@ -22,4 +22,4 @@ jobs:
           PR_URL: ${{ github.event.pull_request.url }}
           PR_STATE: ${{ github.event.pull_request.state }}
         run: |
-          curl -X POST --data "{\"text\": \"Pull request $PR_STATE: $GITHUB_ACTOR på $GITHUB_REPOSITORY - $PR_URL - PR_TITLE\"}" $WEBHOOK_URL
+          curl -X POST --data "{\"text\": \"Pull request $PR_STATE: $GITHUB_ACTOR på $GITHUB_REPOSITORY - $PR_URL - $PR_TITLE\"}" $WEBHOOK_URL
