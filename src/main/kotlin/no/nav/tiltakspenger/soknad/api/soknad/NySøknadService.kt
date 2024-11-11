@@ -18,9 +18,10 @@ class NySøknadService(
         } else {
             Applikasjonseier.Tiltakspenger
         }
-        val søknad = nySøknadCommand.toDomain(eier)
+        val søknad: MottattSøknad = nySøknadCommand.toDomain(eier)
         return Either.catch {
             søknadRepo.lagre(søknad)
+            log.info { "Søknad mottatt og lagret. SøknadId: ${søknad.id}. Acr: ${nySøknadCommand.acr}. Antall vedlegg: ${nySøknadCommand.vedlegg.size}. Innsendingstidspunkt: $nySøknadCommand.innsendingTidspunkt" }
         }.mapLeft {
             log.error(RuntimeException("Trigger stacktrace for enklere debug.")) { "Feil under lagring av søknad. Se sikkerlogg for mer kontekst. Antall vedlegg: ${nySøknadCommand.vedlegg.size}. Innsendingstidspunkt: ${nySøknadCommand.innsendingTidspunkt}" }
             sikkerlogg.error(it) { "Feil under lagring av søknad. Antall vedlegg: ${nySøknadCommand.vedlegg.size}. Innsendingstidspunkt: ${nySøknadCommand.innsendingTidspunkt}. Fnr: ${nySøknadCommand.fnr}. " }
