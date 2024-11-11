@@ -16,8 +16,6 @@ internal fun localFlyway() = Flyway
     .encoding("UTF-8")
     .locations("db/migration", "db/local-migration")
     .dataSource(DataSource.hikariDataSource)
-    .cleanDisabled(false)
-    .cleanOnValidationError(true)
     .load()
 
 private fun gcpFlyway() = Flyway
@@ -25,8 +23,6 @@ private fun gcpFlyway() = Flyway
     .loggers("slf4j")
     .encoding("UTF-8")
     .dataSource(DataSource.hikariDataSource)
-    .cleanDisabled(true)
-    .cleanOnValidationError(false)
     .load()
 
 fun flywayMigrate() {
