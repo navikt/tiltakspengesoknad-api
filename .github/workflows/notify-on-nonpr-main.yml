@@ -2,8 +2,6 @@ name: Post slack notification on main push
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   notify:
