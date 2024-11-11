@@ -2,6 +2,10 @@ name: Post slack notification on pull request
 
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - closed
     branches:
       - main
 
@@ -14,6 +18,8 @@ jobs:
       - name: Post message
         env:
           WEBHOOK_URL: ${{ secrets.SLACK_ON_PUSH_WEBHOOK_URL }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+          PR_STATE: ${{ github.event.pull_request.state }}
         run: |
-          curl -X POST --data "{\"text\": \"Ny pull request: $GITHUB_ACTOR på $GITHUB_REPOSITORY - $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA - ${{ env.COMMIT_MESSAGE }}\"}" $WEBHOOK_URL
+          curl -X POST --data "{\"text\": \"Pull request $PR_STATE: $GITHUB_ACTOR på $GITHUB_REPOSITORY - $PR_URL - $PR_TITLE\"}" $WEBHOOK_URL
