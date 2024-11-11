@@ -17,5 +17,6 @@ jobs:
         env:
           WEBHOOK_URL: ${{ secrets.SLACK_ON_PUSH_WEBHOOK_URL }}
           PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.url }}
         run: |
-          curl -X POST --data "{\"text\": \"Pull request åpnet: $GITHUB_ACTOR på $GITHUB_REPOSITORY - $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA - ${{ env.PR_TITLE }}\"}" $WEBHOOK_URL
+          curl -X POST --data "{\"text\": \"Pull request åpnet: $GITHUB_ACTOR på $GITHUB_REPOSITORY - $PR_URL - PR_TITLE\"}" $WEBHOOK_URL
