@@ -19,6 +19,5 @@ jobs:
           WEBHOOK_URL: ${{ secrets.SLACK_ON_PUSH_WEBHOOK_URL }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
-          PR_STATE: ${{ github.event.pull_request.state }}
         run: |
           curl -X POST --data "{\"text\": \"Pull request åpnet: $GITHUB_ACTOR på $GITHUB_REPOSITORY - $PR_URL - $PR_TITLE\"}" $WEBHOOK_URL
