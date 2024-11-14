@@ -67,8 +67,7 @@ private fun HttpClient.config(timeout: Long) = this.config {
     install(Logging) {
         logger = object : Logger {
             override fun log(message: String) {
-                LOG.info("HttpClient detaljer logget til securelog")
-                sikkerlogg.info(message)
+                sikkerlogg.debug(message)
             }
         }
         level = LogLevel.INFO
