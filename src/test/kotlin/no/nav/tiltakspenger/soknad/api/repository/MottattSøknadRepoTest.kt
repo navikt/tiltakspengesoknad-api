@@ -2,8 +2,8 @@ package no.nav.tiltakspenger.soknad.api.repository
 
 import io.kotest.matchers.shouldBe
 import no.nav.tiltakspenger.libs.common.SøknadId
+import no.nav.tiltakspenger.soknad.api.db.DataSource
 import no.nav.tiltakspenger.soknad.api.db.PostgresTestcontainer
-import no.nav.tiltakspenger.soknad.api.db.gcpFlyway
 import no.nav.tiltakspenger.soknad.api.soknad.Applikasjonseier
 import no.nav.tiltakspenger.soknad.api.soknad.MottattSøknad
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
@@ -11,6 +11,7 @@ import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.validering.spørsmålsbesvarelser
 import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
+import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -26,8 +27,16 @@ internal class MottattSøknadRepoTest {
 
     @BeforeEach
     fun setup() {
-        // Vi ønsker ikke kjøre lokale migreringsskript for testene.
-        gcpFlyway().migrate()
+        Flyway.configure()
+            .dataSource(DataSource.hikariDataSource)
+            .loggers("slf4j")
+            .encoding("UTF-8")
+            .cleanDisabled(false)
+            .load()
+            .run {
+                clean()
+                migrate()
+            }
     }
 
     @Test
