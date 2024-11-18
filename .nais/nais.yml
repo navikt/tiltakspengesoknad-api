@@ -98,3 +98,7 @@ spec:
       memory: 2048Mi
     requests:
       memory: 512Mi
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
