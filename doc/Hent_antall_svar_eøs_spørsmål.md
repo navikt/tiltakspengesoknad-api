@@ -4,20 +4,20 @@
 
 ```
 SELECT
-TO_CHAR(DATE_TRUNC('month', opprettet), 'YYYY-MM') AS mnd,    -- Extract month from the timestamp
+TO_CHAR(DATE_TRUNC('month', opprettet), 'YYYY-MM') AS mnd,
 COUNT(*) FILTER (WHERE eøs = TRUE) AS antall_ja,
-COUNT(*) FILTER (WHERE eøs = FALSE) AS antall_nei -- Count of true            -- Count of rows
+COUNT(*) FILTER (WHERE eøs = FALSE) AS antall_nei 
 FROM (
-SELECT
-opprettet,
-(jsonb_array_elements(søknadspm->'barnetillegg'->'registrerteBarnSøktBarnetilleggFor')->>'oppholdInnenforEøs')::BOOLEAN AS eøs
-FROM søknad
-UNION ALL
-SELECT
-opprettet,
-(jsonb_array_elements(søknadspm->'barnetillegg'->'manueltRegistrerteBarnSøktBarnetilleggFor')->>'oppholdInnenforEøs')::BOOLEAN AS eøs
-FROM søknad
-) extracted_data                -- Convert spm to boolean
+    SELECT
+    opprettet,
+    (jsonb_array_elements(søknadspm->'barnetillegg'->'registrerteBarnSøktBarnetilleggFor')->>'oppholdInnenforEøs')::BOOLEAN AS eøs
+    FROM søknad
+    UNION ALL
+    SELECT
+    opprettet,
+    (jsonb_array_elements(søknadspm->'barnetillegg'->'manueltRegistrerteBarnSøktBarnetilleggFor')->>'oppholdInnenforEøs')::BOOLEAN AS eøs
+    FROM søknad
+) extracted_data 
 GROUP BY TO_CHAR(DATE_TRUNC('month', opprettet), 'YYYY-MM') -- Group by month and boolean value
 ORDER BY mnd
 ```
