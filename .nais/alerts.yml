@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: tiltakspenger-soknad-api-alerts
+  namespace: tpts
+  labels:
+    team: tpts
+spec:
+  groups:
+    - name: tiltakspenger-soknad-api-alerts
+      rules:
+        - alert: Mottak av søknad har feilet
+          expr: sum(increase(tpts_tiltakspenger_soknad_antall_soknader_feilet_total{namespace="tpts"}[2m])) by (app, namespace) > 0
+          for: 30s
+          annotations:
+            consequence: '\{{ $labels.app }} har ikke klart å ta imot en eller flere søknader de siste 2 minuttene'
+            action: "Sjekk loggene til app {{ $labels.app }} i namespace {{ $labels.namespace }}, for å se hvorfor søknad ikke har blitt tatt imot"
+          labels:
+            namespace: tpts
+            severity: warning
+            send_resolved: "false"
+        - alert: Henting av tiltak i søknaden har feilet
+          expr: sum(increase(tpts_tiltakspenger_soknad_antall_feil_ved_hent_tiltak_total{namespace="tpts"}[2m])) by (app, namespace) > 0
+          for: 30s
+          annotations:
+            consequence: '\{{ $labels.app }} har ikke klart å hente tiltak for en eller flere personer de siste 2 minuttene'
+            action: "Sjekk loggene til app {{ $labels.app }} i namespace {{ $labels.namespace }}, for å se hvorfor søknad ikke får hentet tiltak"
+          labels:
+            namespace: tpts
+            severity: warning
+            send_resolved: "false"
+        - alert: Henting av personalia i søknaden har feilet
+          expr: sum(increase(tpts_tiltakspenger_soknad_antall_feil_ved_hent_personalia_total{namespace="tpts"}[2m])) by (app, namespace) > 0
+          for: 30s
+          annotations:
+            consequence: '\{{ $labels.app }} har ikke klart å hente personalia for en eller flere personer de siste 2 minuttene'
+            action: "Sjekk loggene til app {{ $labels.app }} i namespace {{ $labels.namespace }}, for å se hvorfor søknad ikke får hentet personalia"
+          labels:
+            namespace: tpts
+            severity: warning
+            send_resolved: "false"
