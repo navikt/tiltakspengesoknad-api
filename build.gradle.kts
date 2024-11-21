@@ -13,7 +13,7 @@ val unleashVersion = "9.2.4"
 val pdfboxVersion = "3.0.3"
 val felleslibVersion = "0.0.280"
 val flywayVersjon = "10.21.0"
-val testContainersVersion = "1.20.3"
+val testContainersVersion = "1.20.4"
 
 plugins {
     application
