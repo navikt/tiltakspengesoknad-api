@@ -12,7 +12,7 @@ val apacheCommonsTextVersion = "1.12.0"
 val unleashVersion = "9.2.5"
 val pdfboxVersion = "3.0.3"
 val felleslibVersion = "0.0.282"
-val flywayVersjon = "10.22.0"
+val flywayVersjon = "11.0.0"
 val testContainersVersion = "1.20.4"
 
 plugins {
