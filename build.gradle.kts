@@ -179,6 +179,12 @@ tasks {
             )
         }
     }
+
+    register<Copy>("gitHooks") {
+        from(file(".scripts/pre-commit"))
+        into(file(".git/hooks"))
+    }
+
     /*
     analyzeClassesDependencies {
         warnUsedUndeclared = true
@@ -189,12 +195,4 @@ tasks {
         warnUnusedDeclared = true
     }
      */
-}
-
-task("addPreCommitGitHookOnBuild") {
-    println("⚈ ⚈ ⚈ Running Add Pre Commit Git Hook Script on Build ⚈ ⚈ ⚈")
-    exec {
-        commandLine("cp", "./.scripts/pre-commit", "./.git/hooks")
-    }
-    println("✅ Added Pre Commit Git Hook Script.")
 }
