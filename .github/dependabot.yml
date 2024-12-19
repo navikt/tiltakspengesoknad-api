@@ -11,8 +11,7 @@ updates:
     directory: "/"
     schedule:
       interval: daily
-    # set limit to 1 as auto-merge seems to fail if more than 1
-    open-pull-requests-limit: 100
+    open-pull-requests-limit: 10
     registries:
       - tiltakspenger-libs
     assignees:

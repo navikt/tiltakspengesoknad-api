@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Post message
         env:
-          WEBHOOK_URL: ${{ secrets.SLACK_ON_PUSH_WEBHOOK_URL }}
+          WEBHOOK_URL: ${{ secrets.SLACK_PR_WEBHOOK_URL }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
         run: |
