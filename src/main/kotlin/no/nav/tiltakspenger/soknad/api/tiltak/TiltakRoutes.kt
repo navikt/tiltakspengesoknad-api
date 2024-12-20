@@ -40,7 +40,7 @@ fun Route.tiltakRoutes(tiltakService: TiltakService, metricsCollector: MetricsCo
             call.respond(tiltakDto)
         } catch (e: Exception) {
             sikkerlogg.error { e.stackTraceToString() }
-            metricsCollector.ANTALL_FEIL_VED_HENT_TILTAK.inc()
+            metricsCollector.antallFeilVedHentTiltakCounter.inc()
             call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
         }
     }

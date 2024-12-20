@@ -25,8 +25,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-internal const val pdfgenPath = "api/v1/genpdf/tpts"
-internal const val pdfgenImagePath = "api/v1/genpdf/image/tpts"
+internal const val PDFGEN_PATH = "api/v1/genpdf/tpts"
+internal const val PDFGEN_IMAGE_PATH = "api/v1/genpdf/image/tpts"
 internal const val SOKNAD_TEMPLATE = "soknad"
 
 class PdfClient(
@@ -39,7 +39,7 @@ class PdfClient(
     override suspend fun genererPdf(søknad: Søknad): ByteArray {
         try {
             log.info("Starter generering av søknadspdf")
-            return client.post("$pdfEndpoint/$pdfgenPath/$SOKNAD_TEMPLATE") {
+            return client.post("$pdfEndpoint/$PDFGEN_PATH/$SOKNAD_TEMPLATE") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", UUID.randomUUID())
                 contentType(ContentType.Application.Json)
@@ -88,7 +88,7 @@ class PdfClient(
 
     private suspend fun genererPdfFraBilde(bilde: Bilde): ByteArray {
         try {
-            return client.post("$pdfEndpoint/$pdfgenImagePath") {
+            return client.post("$pdfEndpoint/$PDFGEN_IMAGE_PATH") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", UUID.randomUUID())
                 contentType(bilde.type)

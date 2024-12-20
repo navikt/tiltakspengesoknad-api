@@ -48,5 +48,7 @@ data class AvSjekkResultat(
 )
 
 enum class Status {
-    FOUND, OK, ERROR
+    FOUND,
+    OK,
+    ERROR,
 }

@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val javaVersion = JavaVersion.VERSION_21
@@ -19,7 +20,6 @@ plugins {
     application
     distribution
     kotlin("jvm") version "2.1.0"
-    // id("ca.cutterslade.analyze") version "1.9.1"
     id("com.diffplug.spotless") version "6.25.0"
 }
 
@@ -103,10 +103,12 @@ dependencies {
     // Caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.1.0")
+    testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.mockk:mockk-dsl-jvm:$mockkVersion")
     testImplementation("org.skyscreamer:jsonassert:1.5.3")
@@ -118,6 +120,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-json:$kotestVersion")
     testImplementation("io.kotest:kotest-extensions:$kotestVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:$kotlinxCoroutinesVersion")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-io-core-jvm:0.6.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
@@ -136,21 +139,20 @@ apply(plugin = "com.diffplug.spotless")
 
 spotless {
     kotlin {
-        ktlint("0.48.2")
+        ktlint()
+            .editorConfigOverride(
+                mapOf(
+                    "ktlint_standard_max-line-length" to "off",
+                ),
+            )
     }
 }
 
 tasks {
     kotlin {
-        compileKotlin {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_21)
-            }
-        }
-        compileTestKotlin {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_21)
-            }
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+            freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
         }
     }
 
@@ -172,11 +174,9 @@ tasks {
         systemProperty("junit.jupiter.testinstance.lifecycle.default", "per_class")
 
         testLogging {
-            events = setOf(
-                org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
-                org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
-                org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
-            )
+            // We only want to log failed and skipped tests when running Gradle.
+            events("skipped", "failed")
+            exceptionFormat = TestExceptionFormat.FULL
         }
     }
 
@@ -184,15 +184,4 @@ tasks {
         from(file(".scripts/pre-commit"))
         into(file(".git/hooks"))
     }
-
-    /*
-    analyzeClassesDependencies {
-        warnUsedUndeclared = true
-        warnUnusedDeclared = true
-    }
-    analyzeTestClassesDependencies {
-        warnUsedUndeclared = true
-        warnUnusedDeclared = true
-    }
-     */
 }

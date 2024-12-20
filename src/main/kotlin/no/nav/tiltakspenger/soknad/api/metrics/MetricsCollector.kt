@@ -4,41 +4,41 @@ import io.prometheus.client.Counter
 import io.prometheus.client.Summary
 
 class MetricsCollector {
-    private val NAMESPACE = "tpts"
+    private val namespace = "tpts"
 
-    val ANTALL_SØKNADER_MOTTATT_COUNTER = Counter.build()
+    val antallSøknaderMottattCounter: Counter = Counter.build()
         .name("tiltakspenger_soknad_antall_soknader_mottatt")
-        .namespace(NAMESPACE)
+        .namespace(namespace)
         .help("Antall søknader mottatt")
         .register()
 
-    val ANTALL_UGYLDIGE_SØKNADER_COUNTER = Counter.build()
+    val antallUgyldigeSøknaderCounter: Counter = Counter.build()
         .name("tiltakspenger_soknad_antall_ugyldige_soknader")
-        .namespace(NAMESPACE)
+        .namespace(namespace)
         .help("Antall ugyldige søknader forsøkt sendt inn")
         .register()
 
-    val ANTALL_FEILEDE_INNSENDINGER_COUNTER = Counter.build()
+    val antallFeiledeInnsendingerCounter: Counter = Counter.build()
         .name("tiltakspenger_soknad_antall_soknader_feilet")
-        .namespace(NAMESPACE)
+        .namespace(namespace)
         .help("Antall feilede søknadsinnsendinger")
         .register()
 
-    val ANTALL_FEIL_VED_HENT_PERSONALIA = Counter.build()
+    val antallFeilVedHentPersonaliaCounter: Counter = Counter.build()
         .name("tiltakspenger_soknad_antall_feil_ved_hent_personalia")
-        .namespace(NAMESPACE)
+        .namespace(namespace)
         .help("Antall ganger personalia-kall har feilet")
         .register()
 
-    val ANTALL_FEIL_VED_HENT_TILTAK = Counter.build()
+    val antallFeilVedHentTiltakCounter: Counter = Counter.build()
         .name("tiltakspenger_soknad_antall_feil_ved_hent_tiltak")
-        .namespace(NAMESPACE)
+        .namespace(namespace)
         .help("Antall ganger tiltak-kall har feilet")
         .register()
 
-    val SØKNADSMOTTAK_LATENCY_SECONDS = Summary.build()
+    val søknadsmottakLatencySeconds: Summary = Summary.build()
         .name("tiltakspenger_soknad_soknadsmottak_latency_seconds")
-        .namespace(NAMESPACE)
+        .namespace(namespace)
         .help("Hvor lang tid det tar å prosessere en søknad (i sekunder)")
         .register()
 }

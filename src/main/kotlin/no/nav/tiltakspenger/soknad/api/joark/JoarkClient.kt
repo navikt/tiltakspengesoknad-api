@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory
 // https://confluence.adeo.no/display/BOA/opprettJournalpost
 // swagger: https://dokarkiv-q2.dev.intern.nav.no/swagger-ui/index.html#/
 
-internal const val joarkPath = "rest/journalpostapi/v1/journalpost"
+internal const val JOARK_PATH = "rest/journalpostapi/v1/journalpost"
 
 class JoarkClient(
     private val config: ApplicationConfig,
@@ -44,7 +44,7 @@ class JoarkClient(
             log.info("Henter credentials for å arkivere i Joark")
             val token = joarkCredentialsClient.getToken()
             log.info("Hent credentials til arkiv OK. Starter journalføring av søknad")
-            val res = client.post("$joarkEndpoint/$joarkPath") {
+            val res = client.post("$joarkEndpoint/$JOARK_PATH") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
                 header("Nav-Callid", callId)
