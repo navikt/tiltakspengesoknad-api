@@ -1,6 +1,17 @@
 version: "3.7"
 
 services:
+  postgresSoknad:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: soknad
+    ports:
+      - 5436:5432
+    volumes:
+      - postgres-soknad-data:/var/lib/postgresql/data
   auth:
     image: "ghcr.io/navikt/mock-oauth2-server:0.5.1"
     container_name: auth
@@ -29,3 +40,6 @@ services:
                 }
             ]
         }
+
+volumes:
+  postgres-soknad-data: #

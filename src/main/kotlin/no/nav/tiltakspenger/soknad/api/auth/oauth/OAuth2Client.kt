@@ -46,7 +46,7 @@ class OAuth2Client(private val httpClient: HttpClient, private val wellKnownUrl:
 
     suspend fun tokenExchange(token: String, audience: String) = accessToken(GrantRequest.tokenExchange(token, audience))
 
-    suspend fun clientCredentials(scope: String) = accessToken(GrantRequest.clientCredentials(scope))
+    suspend fun clientCredentials(scope: String): OAuth2AccessTokenResponse = accessToken(GrantRequest.clientCredentials(scope))
 
     suspend fun accessToken(grantRequest: GrantRequest) =
         if (cacheConfig.enabled) {

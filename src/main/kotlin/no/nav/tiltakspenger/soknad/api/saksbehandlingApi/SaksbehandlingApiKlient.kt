@@ -18,17 +18,18 @@ import no.nav.tiltakspenger.soknad.api.httpClientCIO
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
 class SaksbehandlingApiKlient(
+    // TODO jah: [ApplicationConfig] bør ikke sendes inn hit. Send heller endepunktet og en funksjon for å hente token.
     config: ApplicationConfig,
+    private val endpoint: String,
+    private val scope: String,
     private val httpClient: HttpClient = httpClientWithRetry(timeout = 10L),
 ) {
-    private val endpoint = config.property("endpoints.tiltakspengervedtak").getString()
-    private val scope = config.property("scope.vedtak").getString()
     private val oauth2Client = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
 
     suspend fun sendSøknad(søknadDTO: SøknadDTO, correlationId: CorrelationId) {
         val grantRequest = GrantRequest.clientCredentials(scope)
         val token =
-            oauth2Client.accessToken(grantRequest).accessToken ?: throw RuntimeException("Failed to get access token")
+            oauth2Client.accessToken(grantRequest).access_token ?: throw RuntimeException("Failed to get access token")
         val httpResponse = httpClient.preparePost("$endpoint/soknad") {
             header("Nav-Call-Id", correlationId.toString())
             bearerAuth(token)

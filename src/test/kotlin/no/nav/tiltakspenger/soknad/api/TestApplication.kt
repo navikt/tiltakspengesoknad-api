@@ -4,7 +4,7 @@ import io.ktor.server.application.install
 import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.callid.callIdMdc
-import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService

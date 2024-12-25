@@ -1,5 +1,6 @@
 package no.nav.tiltakspenger.soknad.api
 
+import com.natpryce.konfig.Configuration
 import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
@@ -23,12 +24,12 @@ object Configuration {
                 "logback.configurationFile" to "egenLogback.xml",
             ),
         )
-
     private val localProperties =
         ConfigurationMap(
             mapOf(
                 "application.profile" to Profile.LOCAL.toString(),
                 "logback.configurationFile" to "logback.local.xml",
+                "DB_JDBC_URL" to "jdbc:postgresql://host.docker.internal:5436/soknad?user=postgres&password=test",
             ),
         )
     private val devProperties =
@@ -44,8 +45,8 @@ object Configuration {
             ),
         )
 
-    private fun config() =
-        when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
+    private fun config(): Configuration {
+        return when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
             "dev-gcp" ->
                 ConfigurationProperties.systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
 
@@ -56,6 +57,7 @@ object Configuration {
                 ConfigurationProperties.systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
             }
         }
+    }
 
     fun applicationProfile() =
         when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
