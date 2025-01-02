@@ -9,12 +9,16 @@ import io.ktor.http.content.MultiPartData
 import io.ktor.http.content.PartData
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.utils.io.core.Input
+import io.ktor.utils.io.core.endOfInput
+import io.ktor.utils.io.jvm.nio.toByteReadChannel
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.Buffer
+import kotlinx.io.asByteChannel
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.pdf.PdfService
 import no.nav.tiltakspenger.soknad.api.soknad.validering.defaultPeriode
@@ -51,11 +55,11 @@ internal class MottattSøknadServiceTest {
 
     @Test
     fun `taInnSøknadSomMultipart leser inn MultiPartData med gyldig søknad to vedlegg`() {
-        val input: Input = mockk()
-        every { input.endOfInput } returns true
-        justRun { input.release() }
         mockkStatic("no.nav.tiltakspenger.soknad.api.util.DetectKt")
         every { sjekkContentType(any()) } returns Detect.APPLICATON_PDF
+
+        val buffer1 = Buffer()
+        val buffer2 = Buffer()
 
         val mockMultiPartData = MockMultiPartData(
             mutableListOf(
@@ -71,8 +75,8 @@ internal class MottattSøknadServiceTest {
                     },
                 ),
                 PartData.FileItem(
-                    { input },
-                    { input.release() },
+                    { buffer1.asByteChannel().toByteReadChannel() },
+                    { buffer1.close() },
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/pdf")
                         append(
@@ -82,8 +86,8 @@ internal class MottattSøknadServiceTest {
                     },
                 ),
                 PartData.FileItem(
-                    { input },
-                    { input.release() },
+                    { buffer2.asByteChannel().toByteReadChannel() },
+                    { buffer2.close() },
                     Headers.build {
                         append(HttpHeaders.ContentType, "application/pdf")
                         append(
@@ -106,7 +110,7 @@ internal class MottattSøknadServiceTest {
     fun `taInnSøknadSomMultipart gir feil ved ugyldig søknad`() {
         val input: Input = mockk()
         every { input.endOfInput } returns true
-        justRun { input.release() }
+        justRun { input.close() }
         mockkStatic("no.nav.tiltakspenger.soknad.api.util.DetectKt")
         every { sjekkContentType(any()) } returns Detect.APPLICATON_PDF
 
@@ -193,11 +197,18 @@ internal class MottattSøknadServiceTest {
 
         runBlocking {
             val (spørsmålsbesvarelser) = søknadService.taInnSøknadSomMultipart(mockMultiPartData)
-            assertEquals(spørsmålsbesvarelser.tiltak.arrangør, """&amp;lt;script&amp;gt;arrangør&amp;lt;\\\/script&amp;gt;""")
+            assertEquals(
+                spørsmålsbesvarelser.tiltak.arrangør,
+                """&amp;lt;script&amp;gt;arrangør&amp;lt;\\\/script&amp;gt;""",
+            )
             assertEquals(spørsmålsbesvarelser.tiltak.type, """&amp;lt;script&amp;gt;type&amp;lt;\\\/script&amp;gt;""")
-            assertEquals(spørsmålsbesvarelser.tiltak.typeNavn, """&amp;lt;script&amp;gt;typeNavn&amp;lt;\\\/script&amp;gt;""")
+            assertEquals(
+                spørsmålsbesvarelser.tiltak.typeNavn,
+                """&amp;lt;script&amp;gt;typeNavn&amp;lt;\\\/script&amp;gt;""",
+            )
 
-            val manueltRegistrertBarn = spørsmålsbesvarelser.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.get(0)
+            val manueltRegistrertBarn =
+                spørsmålsbesvarelser.barnetillegg.manueltRegistrerteBarnSøktBarnetilleggFor.get(0)
             assertEquals(manueltRegistrertBarn.fornavn, "&amp;lt;script&amp;gt;a")
             assertEquals(manueltRegistrertBarn.mellomnavn, "&amp;lt;script&amp;gt;b")
             assertEquals(manueltRegistrertBarn.etternavn, "&amp;lt;script&amp;gt;c")

@@ -3,11 +3,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val javaVersion = JavaVersion.VERSION_21
 val mockkVersion = "1.13.14"
-val ktorVersion = "2.3.12"
+val ktorVersion = "3.0.3"
 val kotestVersion = "5.9.1"
 val jacksonVersion = "2.18.2"
 val kotlinxCoroutinesVersion = "1.10.1"
-val tokenSupportVersion = "5.0.5"
+val tokenSupportVersion = "5.0.13"
 val prometheusVersion = "0.16.0"
 val apacheCommonsTextVersion = "1.13.0"
 val unleashVersion = "9.2.6"
@@ -91,7 +91,7 @@ dependencies {
     implementation("com.github.seratch:kotliquery:1.9.0")
 
     // TokenX
-    implementation("no.nav.security:token-validation-ktor-v2:$tokenSupportVersion")
+    implementation("no.nav.security:token-validation-ktor-v3:$tokenSupportVersion")
     implementation("no.nav.security:token-client-core:$tokenSupportVersion")
 
     // PDF handling

@@ -13,7 +13,7 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.callid.callIdMdc
-import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.request.httpMethod
@@ -21,7 +21,7 @@ import io.ktor.server.request.path
 import io.ktor.server.routing.routing
 import io.prometheus.client.hotspot.DefaultExports
 import mu.KotlinLogging
-import no.nav.security.token.support.v2.asIssuerProps
+import no.nav.security.token.support.v3.asIssuerProps
 import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookup
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupClient
@@ -44,6 +44,7 @@ import no.nav.tiltakspenger.soknad.api.pdf.PdfClient
 import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
+import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SaksbehandlingApiKlient
 import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SendSøknadTilSaksbehandlingApiService
 import no.nav.tiltakspenger.soknad.api.soknad.NySøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
@@ -94,8 +95,9 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     val pdlScope = environment.config.property("scope.pdl").getString()
     val oauth2CredentialsClient = checkNotNull(ClientConfig(environment.config, httpClientWithRetry()).clients["azure"])
     val personGateway = PersonHttpklient(pdlEndpoint) {
+        val clientCredentials = oauth2CredentialsClient.clientCredentials(pdlScope)
         AccessToken(
-            token = oauth2CredentialsClient.clientCredentials(pdlScope).accessToken
+            token = clientCredentials.access_token
                 ?: throw IllegalStateException("Responsen fra token-exchange mangler accessToken"),
             // Kommentar jah: Denne brukes i tiltakspenger-saksbehandling-api, men ikke i tiltakspenger-soknad-api. Siden den er en int i tokensupport og en instant i AccessToken, hardkoder vi den bare til 1 time nå.
             expiresAt = Instant.now().plusSeconds(3600),
@@ -113,8 +115,15 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         joarkService = JoarkService(environment.config),
     )
     val nySøknadService = NySøknadService(søknadRepo)
-    val sendSøknadTilSaksbehandlingApiService = SendSøknadTilSaksbehandlingApiService(environment.config)
-    val søknadJobbService = SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService, sendSøknadTilSaksbehandlingApiService)
+    val saksbehandlingApiKlient = SaksbehandlingApiKlient(
+        config = environment.config,
+        endpoint = if (Configuration.isNais()) environment.config.property("endpoints.tiltakspengervedtak").getString() else "http://host.docker.internal:8080",
+        scope = if (Configuration.isNais()) environment.config.property("scope.vedtak").getString() else "localhost",
+    )
+    val sendSøknadTilSaksbehandlingApiService = SendSøknadTilSaksbehandlingApiService(saksbehandlingApiKlient)
+
+    val søknadJobbService =
+        SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService, sendSøknadTilSaksbehandlingApiService)
     val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
@@ -160,10 +169,10 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
             },
         )
 
-    environment.monitor.subscribe(ApplicationStarted) {
+    monitor.subscribe(ApplicationStarted) {
         log.info { "Starter server" }
     }
-    environment.monitor.subscribe(ApplicationStopped) {
+    monitor.subscribe(ApplicationStopped) {
         stoppableTasks.stop()
         log.info { "Stopper server" }
     }
