@@ -55,7 +55,8 @@ fun Route.søknadRoutes(
                         status = HttpStatusCode.InternalServerError,
                     )
                 },
-                { // Dette kan flyttes ut til funksjoner med try/catch og logging
+                {
+                    // Dette kan flyttes ut til funksjoner med try/catch og logging
                     // Kan legge til egen teller som teller antall søknader som er journalført og sendt til saksbehandling-apo
                     metricsCollector.antallSøknaderMottattCounter.inc()
                     requestTimer.observeDuration()

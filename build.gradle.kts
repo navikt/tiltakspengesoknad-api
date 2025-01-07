@@ -20,7 +20,7 @@ plugins {
     application
     distribution
     kotlin("jvm") version "2.1.0"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "7.0.0"
 }
 
 repositories {
@@ -143,6 +143,8 @@ spotless {
             .editorConfigOverride(
                 mapOf(
                     "ktlint_standard_max-line-length" to "off",
+                    "ktlint_standard_function-signature" to "disabled",
+                    "ktlint_standard_function-expression-body" to "disabled",
                 ),
             )
     }
