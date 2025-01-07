@@ -9,6 +9,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    config.linkerd.io/proxy-outbound-connect-timeout: 3000ms
 spec:
   image: {{ image }}
   port: 8080
