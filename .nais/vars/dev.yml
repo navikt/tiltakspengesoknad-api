@@ -4,7 +4,7 @@ cluster: dev-gcp
 endpoints:
   pdl: https://pdl-api.dev-fss-pub.nais.io/graphql
   pdf: http://tiltakspenger-pdfgen
-  joark: https://dokarkiv.dev-fss-pub.nais.io
+  joark: https://dokarkiv-q2.dev-fss-pub.nais.io
   tiltakspengerarena: https://tiltakspenger-arena.dev-fss-pub.nais.io
   tiltakspengertiltak: http://tiltakspenger-tiltak
   tiltakspengervedtak: http://tiltakspenger-saksbehandling-api
@@ -12,7 +12,7 @@ endpoints:
 
 outboundExternalUrls:
   pdl: pdl-api.dev-fss-pub.nais.io
-  dokarkiv: dokarkiv.dev-fss-pub.nais.io
+  dokarkiv: dokarkiv-q2.dev-fss-pub.nais.io
   tiltakspengerarena: tiltakspenger-arena.dev-fss-pub.nais.io
 audience:
   pdl: dev-fss:pdl:pdl-api
@@ -21,7 +21,7 @@ audience:
   tiltakspengertiltak: dev-gcp:tpts:tiltakspenger-tiltak
 scope:
   pdl: api://dev-fss.pdl.pdl-api/.default
-  joark: api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default
+  joark: api://dev-fss.teamdokumenthandtering.dokarkiv/.default
   vedtak: api://dev-gcp.tpts.tiltakspenger-saksbehandling-api/.default
 unleash:
   environment: development
