@@ -22,7 +22,6 @@ import io.ktor.server.routing.routing
 import io.prometheus.client.hotspot.DefaultExports
 import mu.KotlinLogging
 import no.nav.security.token.support.v3.asIssuerProps
-import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookup
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupClient
 import no.nav.tiltakspenger.libs.jobber.LeaderPodLookupFeil
@@ -51,12 +50,13 @@ import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.SøknadJobbServiceImpl
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet.JournalforendeEnhetService
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet.arbeidsfordeling.ArbeidsfordelingClient
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonHttpklient
 import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
-import java.time.Instant
 import java.util.UUID.randomUUID
 
 fun main(args: Array<String>) {
@@ -94,15 +94,15 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     val pdlEndpoint = environment.config.property("endpoints.pdl").getString()
     val pdlScope = environment.config.property("scope.pdl").getString()
     val oauth2CredentialsClient = checkNotNull(ClientConfig(environment.config, httpClientWithRetry()).clients["azure"])
-    val personGateway = PersonHttpklient(pdlEndpoint) {
-        val clientCredentials = oauth2CredentialsClient.clientCredentials(pdlScope)
-        AccessToken(
-            token = clientCredentials.access_token
-                ?: throw IllegalStateException("Responsen fra token-exchange mangler accessToken"),
-            // Kommentar jah: Denne brukes i tiltakspenger-saksbehandling-api, men ikke i tiltakspenger-soknad-api. Siden den er en int i tokensupport og en instant i AccessToken, hardkoder vi den bare til 1 time nå.
-            expiresAt = Instant.now().plusSeconds(3600),
-        ) {}
+    val personHttpklient = PersonHttpklient(pdlEndpoint) {
+        oauth2CredentialsClient.clientCredentials(pdlScope)
     }
+    val norg2Endpoint = environment.config.property("endpoints.norg2").getString()
+    val norg2Scope = environment.config.property("audience.norg2").getString()
+    val arbeidsfordelingClient = ArbeidsfordelingClient(baseUrl = norg2Endpoint) {
+        oauth2CredentialsClient.clientCredentials(norg2Scope)
+    }
+    val journalforendeEnhetService = JournalforendeEnhetService(arbeidsfordelingClient)
     val søknadRepo = SøknadRepoImpl()
     val pdlService = PdlService(environment.config)
     val søknadService: SøknadService = SøknadServiceImpl(
@@ -123,7 +123,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     val sendSøknadTilSaksbehandlingApiService = SendSøknadTilSaksbehandlingApiService(saksbehandlingApiKlient)
 
     val søknadJobbService =
-        SøknadJobbServiceImpl(søknadRepo, personGateway, søknadService, sendSøknadTilSaksbehandlingApiService)
+        SøknadJobbServiceImpl(søknadRepo, personHttpklient, søknadService, sendSøknadTilSaksbehandlingApiService)
     val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,

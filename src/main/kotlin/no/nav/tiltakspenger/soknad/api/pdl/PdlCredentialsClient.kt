@@ -12,7 +12,6 @@ import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import mu.KotlinLogging
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
-import no.nav.tiltakspenger.soknad.api.extensions.getAccessTokenOrThrow
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
 class PdlCredentialsClient(
@@ -26,9 +25,7 @@ class PdlCredentialsClient(
 
     suspend fun fetchBarn(ident: String, callId: String): Result<SøkersBarnRespons> {
         log.info("Henter credentials for å snakke med PDL")
-        val clientCredentialsGrant = oauth2CredentialsClient.clientCredentials(pdlScope)
-        log.info("Credentials-respons mottatt")
-        val token = clientCredentialsGrant.getAccessTokenOrThrow()
+        val token = oauth2CredentialsClient.clientCredentials(pdlScope).token
         log.info("Hent credentials OK")
         return kotlin.runCatching {
             httpClient.post(pdlEndpoint) {

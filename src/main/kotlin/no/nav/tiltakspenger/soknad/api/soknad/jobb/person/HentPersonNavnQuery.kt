@@ -3,7 +3,7 @@ package no.nav.tiltakspenger.soknad.api.soknad.jobb.person
 import no.nav.tiltakspenger.libs.common.Fnr
 import no.nav.tiltakspenger.libs.personklient.pdl.GraphqlQuery
 
-fun hentPersonQuery(fnr: Fnr): GraphqlQuery {
+internal fun hentPersonNavnQuery(fnr: Fnr): GraphqlQuery {
     return GraphqlQuery(
         query = query,
         variables = mapOf(
@@ -15,15 +15,6 @@ fun hentPersonQuery(fnr: Fnr): GraphqlQuery {
 private val query = """
 query(${'$'}ident: ID!){
     hentPerson(ident: ${'$'}ident) {
-        adressebeskyttelse(historikk: false) {
-            gradering
-            folkeregistermetadata {
-                ...folkeregistermetadataDetails
-            }
-            metadata {
-                ...metadataDetails
-            }
-        }
         navn(historikk: false) {
             fornavn
             mellomnavn
@@ -35,12 +26,6 @@ query(${'$'}ident: ID!){
                 ...metadataDetails
             }
         }
-    },
-    hentGeografiskTilknytning(ident: ${'$'}ident) {
-        gtKommune
-        gtBydel
-        gtLand
-        gtType
     }
 }
 

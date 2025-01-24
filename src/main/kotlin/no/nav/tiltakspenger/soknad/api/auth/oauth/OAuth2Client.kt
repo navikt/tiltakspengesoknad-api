@@ -34,7 +34,9 @@ import no.nav.security.token.support.client.core.OAuth2ParameterNames.SUBJECT_TO
 import no.nav.security.token.support.client.core.auth.ClientAssertion
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.core.JwtTokenConstants.AUTHORIZATION_HEADER
+import no.nav.tiltakspenger.libs.common.AccessToken
 import java.net.URI
+import java.time.Instant
 
 class OAuth2Client(private val httpClient: HttpClient, private val wellKnownUrl: String, private val clientAuthProperties: ClientAuthenticationProperties, private val cacheConfig: OAuth2CacheConfig = OAuth2CacheConfig(true, 10, 5)) {
     private val wellKnown: WellKnown = runBlocking { httpClient.get(wellKnownUrl).body() }
@@ -46,7 +48,12 @@ class OAuth2Client(private val httpClient: HttpClient, private val wellKnownUrl:
 
     suspend fun tokenExchange(token: String, audience: String) = accessToken(GrantRequest.tokenExchange(token, audience))
 
-    suspend fun clientCredentials(scope: String): OAuth2AccessTokenResponse = accessToken(GrantRequest.clientCredentials(scope))
+    suspend fun clientCredentials(scope: String) = AccessToken(
+        token = accessToken(GrantRequest.clientCredentials(scope))?.access_token
+            ?: throw IllegalStateException("Responsen fra token-exchange mangler accessToken"),
+        // Kommentar jah: Denne brukes i tiltakspenger-saksbehandling-api, men ikke i tiltakspenger-soknad-api. Siden den er en int i tokensupport og en instant i AccessToken, hardkoder vi den bare til 1 time nå.
+        expiresAt = Instant.now().plusSeconds(3600),
+    ) {}
 
     suspend fun accessToken(grantRequest: GrantRequest) =
         if (cacheConfig.enabled) {
