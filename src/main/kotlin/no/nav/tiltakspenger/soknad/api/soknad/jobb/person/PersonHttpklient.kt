@@ -1,6 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.soknad.jobb.person
 
 import arrow.core.flatMap
+import arrow.core.getOrElse
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.common.Fnr
@@ -19,18 +20,21 @@ import no.nav.tiltakspenger.libs.personklient.pdl.FellesPersonklientError.Respon
 import no.nav.tiltakspenger.libs.personklient.pdl.FellesPersonklientError.UkjentFeil
 import no.nav.tiltakspenger.libs.personklient.pdl.dto.avklarNavn
 import no.nav.tiltakspenger.soknad.api.objectMapper
+import no.nav.tiltakspenger.soknad.api.pdl.Adressebeskyttelse
+import no.nav.tiltakspenger.soknad.api.pdl.Navn
+import no.nav.tiltakspenger.soknad.api.pdl.avklarGradering
 
 class PersonHttpklient(
     endepunkt: String,
     private val getSystemToken: suspend () -> AccessToken,
-) : PersonGateway {
+) {
     private val personklient =
         FellesPersonklient.create(
             endepunkt = endepunkt,
             sikkerlogg = sikkerlogg,
         )
 
-    override suspend fun hentNavnForFnr(
+    suspend fun hentNavnForFnr(
         fnr: Fnr,
     ): no.nav.tiltakspenger.libs.personklient.pdl.dto.Navn {
         val body = objectMapper.writeValueAsString(hentPersonNavnQuery(fnr))
@@ -43,6 +47,24 @@ class PersonHttpklient(
                 it.logError()
             }.getOrNull()!!
     }
+
+    // tanken er å bruke denne i stedet for den over som kun henter navn
+    suspend fun hentPerson(
+        fnr: Fnr,
+    ): Person {
+        val body = objectMapper.writeValueAsString(hentPersonQuery(fnr))
+        val response = personklient.hentPerson(fnr, getSystemToken(), body)
+            .onLeft { it.logError() }
+            .getOrElse {
+                throw RuntimeException("Kunne ikke hente person fra PDL")
+            }
+        val data: PdlPersonResponseData = objectMapper.readValue<PdlPersonResponseData>(response)
+        return Person(
+            navn = no.nav.tiltakspenger.soknad.api.pdl.avklarNavn(data.hentPerson.navn),
+            adressebeskyttelseGradering = avklarGradering(data.hentPerson.adressebeskyttelse),
+            geografiskTilknytning = data.hentGeografiskTilknytning,
+        )
+    }
 }
 
 private data class PdlResponseData(
@@ -50,6 +72,16 @@ private data class PdlResponseData(
 ) {
     data class PdlPerson(
         val navn: List<no.nav.tiltakspenger.libs.personklient.pdl.dto.Navn>,
+    )
+}
+
+private data class PdlPersonResponseData(
+    val hentPerson: PdlPerson,
+    val hentGeografiskTilknytning: GeografiskTilknytning?,
+) {
+    data class PdlPerson(
+        val adressebeskyttelse: List<Adressebeskyttelse>,
+        val navn: List<Navn>,
     )
 }
 

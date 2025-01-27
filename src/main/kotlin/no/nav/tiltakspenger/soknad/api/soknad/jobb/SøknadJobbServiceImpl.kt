@@ -6,13 +6,13 @@ import no.nav.tiltakspenger.libs.logging.sikkerlogg
 import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SendSøknadTilSaksbehandlingApiService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
-import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonGateway
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonHttpklient
 import no.nav.tiltakspenger.soknad.api.soknad.log
 import java.time.LocalDateTime
 
 class SøknadJobbServiceImpl(
     private val søknadRepo: SøknadRepo,
-    private val personGateway: PersonGateway,
+    private val personHttpklient: PersonHttpklient,
     private val søknadService: SøknadService,
     private val sendSøknadTilSaksbehandlingApiService: SendSøknadTilSaksbehandlingApiService,
 ) : SøknadJobbService {
@@ -21,7 +21,7 @@ class SøknadJobbServiceImpl(
             log.info { "Journalfør søknad jobb: Prøver å journalføre søknad med søknadId ${søknad.id}" }
 
             val navn = try {
-                personGateway.hentNavnForFnr(Fnr.fromString(søknad.fnr))
+                personHttpklient.hentNavnForFnr(Fnr.fromString(søknad.fnr))
             } catch (e: Exception) {
                 log.error(RuntimeException("Trigger stacktrace for enklere debug.")) { "Journalfør søknad jobb: Feil ved henting av navn fra PDL for søknadId ${søknad.id}" }
                 sikkerlogg.error(e) { "Journalfør søknad jobb: Feil ved henting av navn fra PDL for søknadId ${søknad.id}" }
