@@ -8,22 +8,20 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.server.config.ApplicationConfig
-import io.mockk.coEvery
-import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.httpClientGeneric
 import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
+import java.time.Instant
 
 internal class JoarkClientTest {
     private val journalpostId = "1"
     private val søknadId = SøknadId.random()
+    private val baseurl = "http://dokarkiv"
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `joark svarer alt ok`() {
         val mock = MockEngine {
@@ -35,14 +33,10 @@ internal class JoarkClientTest {
         }
 
         val client = httpClientGeneric(mock)
-        val mockJoarkCredentialsClient = mockk<JoarkCredentialsClient>()
-        coEvery { mockJoarkCredentialsClient.getToken() } returns "token"
-        val config = ApplicationConfig("application.test.conf")
         val joarkClient = JoarkClient(
-            config = config,
             client = client,
-            joarkCredentialsClient = mockJoarkCredentialsClient,
-        )
+            baseUrl = baseurl,
+        ) { getMockToken() }
 
         runTest {
             val resp = joarkClient.opprettJournalpost(
@@ -55,7 +49,6 @@ internal class JoarkClientTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `joark svarer ikke ferdigstilt`() {
         val mock = MockEngine {
@@ -65,8 +58,6 @@ internal class JoarkClientTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
-        val mockJoarkCredentialsClient = mockk<JoarkCredentialsClient>()
-        coEvery { mockJoarkCredentialsClient.getToken() } returns "token"
 
 //        val joarkResonse = JoarkClient.JoarkResponse(
 //            journalpostId = journalpostId,
@@ -75,12 +66,10 @@ internal class JoarkClientTest {
 //        )
 
         val client = httpClientGeneric(mock)
-        val config = ApplicationConfig("application.test.conf")
         val joarkClient = JoarkClient(
-            config = config,
             client = client,
-            joarkCredentialsClient = mockJoarkCredentialsClient,
-        )
+            baseUrl = baseurl,
+        ) { getMockToken() }
 
         runTest {
             val resp = joarkClient.opprettJournalpost(
@@ -103,16 +92,11 @@ internal class JoarkClientTest {
             )
         }
 
-        val mockJoarkCredentialsClient = mockk<JoarkCredentialsClient>()
-        coEvery { mockJoarkCredentialsClient.getToken() } returns "token"
-
         val client = httpClientGeneric(mock)
-        val config = ApplicationConfig("application.test.conf")
         val joarkClient = JoarkClient(
-            config = config,
             client = client,
-            joarkCredentialsClient = mockJoarkCredentialsClient,
-        )
+            baseUrl = baseurl,
+        ) { getMockToken() }
 
         runTest {
             val resp = joarkClient.opprettJournalpost(
@@ -124,7 +108,6 @@ internal class JoarkClientTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `joark svarer med feil`() {
         val mock = MockEngine {
@@ -135,16 +118,11 @@ internal class JoarkClientTest {
             )
         }
 
-        val mockJoarkCredentialsClient = mockk<JoarkCredentialsClient>()
-        coEvery { mockJoarkCredentialsClient.getToken() } returns "token"
-
         val client = httpClientGeneric(mock)
-        val config = ApplicationConfig("application.test.conf")
         val joarkClient = JoarkClient(
-            config = config,
             client = client,
-            joarkCredentialsClient = mockJoarkCredentialsClient,
-        )
+            baseUrl = baseurl,
+        ) { getMockToken() }
 
         runTest {
             shouldThrow<RuntimeException> {
@@ -157,7 +135,6 @@ internal class JoarkClientTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `joark svarer med null i ferdigstilt`() {
         val mock = MockEngine {
@@ -168,9 +145,6 @@ internal class JoarkClientTest {
             )
         }
 
-        val mockJoarkCredentialsClient = mockk<JoarkCredentialsClient>()
-        coEvery { mockJoarkCredentialsClient.getToken() } returns "token"
-
 //        val joarkResonse = JoarkClient.JoarkResponse(
 //            journalpostId = journalpostId,
 //            journalpostferdigstilt = null,
@@ -178,12 +152,10 @@ internal class JoarkClientTest {
 //        )
 
         val client = httpClientGeneric(mock)
-        val config = ApplicationConfig("application.test.conf")
         val joarkClient = JoarkClient(
-            config = config,
             client = client,
-            joarkCredentialsClient = mockJoarkCredentialsClient,
-        )
+            baseUrl = baseurl,
+        ) { getMockToken() }
 
         runTest {
             val resp = joarkClient.opprettJournalpost(
@@ -206,9 +178,6 @@ internal class JoarkClientTest {
             )
         }
 
-        val mockJoarkCredentialsClient = mockk<JoarkCredentialsClient>()
-        coEvery { mockJoarkCredentialsClient.getToken() } returns "token"
-
         val joarkResonse = JoarkClient.JoarkResponse(
             journalpostId = null,
             journalpostferdigstilt = null,
@@ -216,12 +185,10 @@ internal class JoarkClientTest {
         )
 
         val client = httpClientGeneric(mock)
-        val config = ApplicationConfig("application.test.conf")
         val joarkClient = JoarkClient(
-            config = config,
             client = client,
-            joarkCredentialsClient = mockJoarkCredentialsClient,
-        )
+            baseUrl = baseurl,
+        ) { getMockToken() }
 
         runTest {
             shouldThrow<IllegalStateException> {
@@ -232,6 +199,10 @@ internal class JoarkClientTest {
                 )
             }.message shouldBe "Fikk 201 Created fra Joark, men vi fikk ingen journalpostId. response=JoarkResponse(journalpostId=null, journalpostferdigstilt=null, dokumenter=[Dokumenter(dokumentInfoId=485227498, tittel=Søknad om tiltakspenger)])"
         }
+    }
+
+    private suspend fun getMockToken(): AccessToken {
+        return AccessToken("token", Instant.now().plusSeconds(3600)) {}
     }
 
     private val dokument = Journalpost.Søknadspost.from(

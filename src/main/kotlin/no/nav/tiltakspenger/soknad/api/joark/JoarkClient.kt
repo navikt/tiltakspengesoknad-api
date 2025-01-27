@@ -13,7 +13,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.server.config.ApplicationConfig
+import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 import no.nav.tiltakspenger.soknad.api.objectMapper
@@ -26,14 +26,11 @@ import org.slf4j.LoggerFactory
 internal const val JOARK_PATH = "rest/journalpostapi/v1/journalpost"
 
 class JoarkClient(
-    private val config: ApplicationConfig,
     private val client: HttpClient = httpClientWithRetry(timeout = 30L),
-    private val joarkCredentialsClient: JoarkCredentialsClient = JoarkCredentialsClient(config),
+    private val baseUrl: String,
+    private val getToken: suspend () -> AccessToken,
 ) {
-
     private val log = LoggerFactory.getLogger(this::class.java)
-
-    private val joarkEndpoint = config.property("endpoints.joark").getString()
 
     suspend fun opprettJournalpost(
         dokumentInnhold: Journalpost,
@@ -42,9 +39,9 @@ class JoarkClient(
     ): String {
         try {
             log.info("Henter credentials for å arkivere i Joark")
-            val token = joarkCredentialsClient.getToken()
+            val token = getToken().token
             log.info("Hent credentials til arkiv OK. Starter journalføring av søknad")
-            val res = client.post("$joarkEndpoint/$JOARK_PATH") {
+            val res = client.post("$baseUrl/$JOARK_PATH") {
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
                 header("Nav-Callid", callId)

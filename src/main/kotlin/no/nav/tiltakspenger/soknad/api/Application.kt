@@ -35,6 +35,7 @@ import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.db.flywayMigrate
 import no.nav.tiltakspenger.soknad.api.featuretoggling.setupUnleash
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
+import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.jobber.TaskExecutor
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
@@ -103,6 +104,13 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         oauth2CredentialsClient.clientCredentials(norg2Scope)
     }
     val journalforendeEnhetService = JournalforendeEnhetService(arbeidsfordelingClient)
+
+    val joarkEndpoint = environment.config.property("endpoints.joark").getString()
+    val joarkScope = environment.config.property("scope.joark").getString()
+    val joarkClient = JoarkClient(baseUrl = joarkEndpoint) {
+        oauth2CredentialsClient.clientCredentials(joarkScope)
+    }
+
     val søknadRepo = SøknadRepoImpl()
     val pdlService = PdlService(environment.config)
     val søknadService: SøknadService = SøknadServiceImpl(
@@ -112,7 +120,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
                 client = httpClientCIO(timeout = 30L),
             ),
         ),
-        joarkService = JoarkService(environment.config),
+        joarkService = JoarkService(joarkClient),
     )
     val nySøknadService = NySøknadService(søknadRepo)
     val saksbehandlingApiKlient = SaksbehandlingApiKlient(

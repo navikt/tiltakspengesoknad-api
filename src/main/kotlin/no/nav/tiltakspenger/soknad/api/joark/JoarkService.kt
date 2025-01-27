@@ -1,13 +1,11 @@
 package no.nav.tiltakspenger.soknad.api.joark
 
-import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
 class JoarkService(
-    applicationConfig: ApplicationConfig,
-    private val joarkClient: JoarkClient = JoarkClient(applicationConfig),
+    private val joarkClient: JoarkClient,
 ) {
     suspend fun sendPdfTilJoark(
         pdf: ByteArray,
