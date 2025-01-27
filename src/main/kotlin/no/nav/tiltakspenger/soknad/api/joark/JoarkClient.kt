@@ -9,7 +9,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -33,7 +32,7 @@ class JoarkClient(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     suspend fun opprettJournalpost(
-        dokumentInnhold: Journalpost,
+        request: JournalpostRequest,
         søknadId: SøknadId,
         callId: String,
     ): String {
@@ -45,69 +44,24 @@ class JoarkClient(
                 accept(ContentType.Application.Json)
                 header("X-Correlation-ID", INDIVIDSTONAD)
                 header("Nav-Callid", callId)
-                parameter("forsoekFerdigstill", false)
+                parameter("forsoekFerdigstill", request.kanFerdigstilleAutomatisk())
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
-                setBody(
-                    objectMapper.writeValueAsString(
-                        JournalpostRequest(
-                            tittel = dokumentInnhold.tittel,
-                            journalpostType = dokumentInnhold.journalpostType,
-                            tema = dokumentInnhold.tema,
-                            kanal = dokumentInnhold.kanal,
-                            behandlingstema = dokumentInnhold.behandlingstema,
-                            // journalfoerendeEnhet = dokumentInnhold.journalfoerendeEnhet,
-                            avsenderMottaker = dokumentInnhold.avsenderMottaker,
-                            bruker = dokumentInnhold.bruker,
-                            // sak = dokumentInnhold.sak,
-                            dokumenter = dokumentInnhold.dokumenter,
-                            eksternReferanseId = søknadId.toString(),
-                        ),
-                    ),
-                )
+                setBody(objectMapper.writeValueAsString(request))
             }
+            val response = res.call.body<JoarkResponse>()
+            log.info("Vi har opprettet journalpost med id: ${response.journalpostId} for søknad $søknadId")
 
-            when (val status = res.status) {
-                HttpStatusCode.Created -> {
-                    val response = res.call.body<JoarkResponse>()
-
-                    val journalpostId = if (response.journalpostId.isNullOrEmpty()) {
-                        log.error("Fikk 201 Created fra Joark, men vi fikk ingen journalpostId. response=$response")
-                        throw IllegalStateException("Fikk 201 Created fra Joark, men vi fikk ingen journalpostId. response=$response")
-                    } else {
-                        response.journalpostId
-                    }
-
-                    // if ((response.journalpostferdigstilt == null) || (response.journalpostferdigstilt == false)) {
-                    //     log.error("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
-                    //     throw IllegalStateException("Kunne ikke ferdigstille journalføring for journalpostId: $journalpostId. response=$response")
-                    // }
-
-                    log.info("Vi har opprettet journalpost med id: $journalpostId")
-                    return journalpostId
-                }
-
-                else -> {
-                    val body = res.bodyAsText()
-                    log.error("Fikk respons fra Joark, men forventet 201 CREATED. Status: $status, body: $body")
-                    throw RuntimeException("Fikk respons fra Joark, men forventet 201 CREATED. Status: $status, body: $body")
-                }
+            if (request.kanFerdigstilleAutomatisk() && !response.journalpostferdigstilt) {
+                log.error("Journalpost ${response.journalpostId} for søknad $søknadId ble opprettet, men ikke ferdigstilt")
+                throw IllegalStateException("Journalpost kunne ikke ferdigstilles automatisk")
             }
+            return response.journalpostId
         } catch (throwable: Throwable) {
             if (throwable is ClientRequestException && throwable.response.status == HttpStatusCode.Conflict) {
-                log.info("Søknaden har allerede blitt journalført (409 Conflict)")
-                try {
-                    val response = throwable.response.call.body<JoarkResponse>()
-                    if (response.journalpostId.isNullOrEmpty()) {
-                        log.error("Vi fikk ingen journalpostId i responsen fra joark for søknad : $søknadId")
-                    } else {
-                        log.info("Søknad fantes allerede i joark med journalpost med id: ${response.journalpostId}")
-                    }
-                    return response.journalpostId.orEmpty()
-                } catch (e: Exception) {
-                    log.error("Kunne ikke hente journalpostId fra response", e)
-                    return ""
-                }
+                val response = throwable.response.call.body<JoarkResponse>()
+                log.info("Søknad med id $søknadId har allerede blitt journalført (409 Conflict) med journalpostId ${response.journalpostId}")
+                return response.journalpostId
             }
             if (throwable is IllegalStateException) {
                 log.error("Vi fikk en IllegalStateException i JoarkClient", throwable)
@@ -120,13 +74,7 @@ class JoarkClient(
     }
 
     data class JoarkResponse(
-        val journalpostId: String?,
-        val journalpostferdigstilt: Boolean?,
-        val dokumenter: List<Dokumenter>?,
-    )
-
-    data class Dokumenter(
-        val dokumentInfoId: String?,
-        val tittel: String?,
+        val journalpostId: String,
+        val journalpostferdigstilt: Boolean,
     )
 }

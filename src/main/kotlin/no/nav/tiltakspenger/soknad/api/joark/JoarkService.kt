@@ -14,12 +14,16 @@ class JoarkService(
         vedlegg: List<Vedlegg>,
         søknadId: SøknadId,
         callId: String,
+        journalforendeEnhet: String?,
+        saksnummer: String?,
     ): String {
-        val journalpost = Journalpost.Søknadspost.from(
+        val journalpost = JournalpostRequest.from(
             fnr = fnr,
             søknad = søknad,
             pdf = pdf,
             vedlegg = vedlegg,
+            journalforendeEnhet = journalforendeEnhet,
+            saksnummer = saksnummer,
         )
         return joarkClient.opprettJournalpost(journalpost, søknadId, callId)
     }
