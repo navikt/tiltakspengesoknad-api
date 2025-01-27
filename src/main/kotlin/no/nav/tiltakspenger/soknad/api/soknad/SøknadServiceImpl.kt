@@ -46,7 +46,16 @@ class SøknadServiceImpl(
         log.info { "Generering av søknadsPDF OK" }
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         log.info { "Vedleggskonvertering OK" }
-        val journalpostId = joarkService.sendPdfTilJoark(pdf = pdf, søknad = søknad, fnr = fnr, vedlegg = vedleggSomPdfer, søknadId = søknadId, callId = callId)
+        val journalpostId = joarkService.sendPdfTilJoark(
+            pdf = pdf,
+            søknad = søknad,
+            fnr = fnr,
+            vedlegg = vedleggSomPdfer,
+            søknadId = søknadId,
+            callId = callId,
+            journalforendeEnhet = null,
+            saksnummer = null,
+        )
         return Pair(journalpostId, søknad)
     }
 
