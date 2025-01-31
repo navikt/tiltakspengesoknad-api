@@ -51,16 +51,16 @@ internal class SøknadRepoTest {
 
         søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført().size shouldBe 0
 
-        val ikkeJournalforteSoknaderUtenSaksnummer = søknadRepo.hentIkkeJournalforteSoknaderUtenSaksnummer()
-        ikkeJournalforteSoknaderUtenSaksnummer.size shouldBe 1
+        val soknaderUtenSaksnummer = søknadRepo.hentSoknaderUtenSaksnummer()
+        soknaderUtenSaksnummer.size shouldBe 1
 
         // Oppdaterer med saksnummer
-        val soknadMedSaksnummer = ikkeJournalforteSoknaderUtenSaksnummer.first().copy(
+        val soknadMedSaksnummer = soknaderUtenSaksnummer.first().copy(
             saksnummer = "12345",
         )
         søknadRepo.oppdater(soknadMedSaksnummer)
 
-        søknadRepo.hentIkkeJournalforteSoknaderUtenSaksnummer().size shouldBe 0
+        søknadRepo.hentSoknaderUtenSaksnummer().size shouldBe 0
 
         val søknaderSomIkkeErJounalført = søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført()
         søknaderSomIkkeErJounalført.size shouldBe 1
@@ -96,7 +96,7 @@ internal class SøknadRepoTest {
         )
         søknadRepo.lagre(mottattSøknad)
 
-        søknadRepo.hentIkkeJournalforteSoknaderUtenSaksnummer().size shouldBe 0
+        søknadRepo.hentSoknaderUtenSaksnummer().size shouldBe 0
 
         val søknaderSomIkkeErJounalført = søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført()
         søknaderSomIkkeErJounalført.size shouldBe 1

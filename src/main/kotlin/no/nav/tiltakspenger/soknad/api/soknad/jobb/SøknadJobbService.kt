@@ -17,7 +17,7 @@ class SøknadJobbService(
     private val sendSøknadTilSaksbehandlingApiService: SendSøknadTilSaksbehandlingApiService,
 ) {
     suspend fun hentEllerOpprettSaksnummer(correlationId: CorrelationId) {
-        søknadRepo.hentIkkeJournalforteSoknaderUtenSaksnummer().forEach { soknad ->
+        søknadRepo.hentSoknaderUtenSaksnummer().forEach { soknad ->
             log.info { "Henter eller oppretter saksnummer for søknad med id ${soknad.id}" }
             val saksnummer = try {
                 sendSøknadTilSaksbehandlingApiService.hentEllerOpprettSaksnummer(

@@ -66,15 +66,14 @@ class SøknadRepo {
         }
     }
 
-    fun hentIkkeJournalforteSoknaderUtenSaksnummer(): List<MottattSøknad> {
+    fun hentSoknaderUtenSaksnummer(): List<MottattSøknad> {
         return sessionOf(DataSource.hikariDataSource).use {
             it.transaction { transaction ->
                 transaction.run(
                     queryOf(
                         """
                            select * from søknad 
-                             where journalført is null 
-                             and saksnummer is null
+                             where saksnummer is null
                              and eier = 'tp'
                         """.trimIndent(),
                     ).map { row ->
