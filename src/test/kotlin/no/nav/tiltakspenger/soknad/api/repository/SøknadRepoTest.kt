@@ -7,7 +7,7 @@ import no.nav.tiltakspenger.soknad.api.db.PostgresTestcontainer
 import no.nav.tiltakspenger.soknad.api.soknad.Applikasjonseier
 import no.nav.tiltakspenger.soknad.api.soknad.MottattSøknad
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
 import no.nav.tiltakspenger.soknad.api.soknad.validering.spørsmålsbesvarelser
 import no.nav.tiltakspenger.soknad.api.soknad.validering.søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
@@ -18,8 +18,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDateTime
 
 @Testcontainers
-internal class MottattSøknadRepoTest {
-    private val søknadRepo = SøknadRepoImpl()
+internal class SøknadRepoTest {
+    private val søknadRepo = SøknadRepo()
 
     init {
         PostgresTestcontainer.start()
@@ -48,6 +48,20 @@ internal class MottattSøknadRepoTest {
             eier = Applikasjonseier.Tiltakspenger,
         )
         søknadRepo.lagre(mottattSøknad)
+
+        søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført().size shouldBe 0
+
+        val ikkeJournalforteSoknaderUtenSaksnummer = søknadRepo.hentIkkeJournalforteSoknaderUtenSaksnummer()
+        ikkeJournalforteSoknaderUtenSaksnummer.size shouldBe 1
+
+        // Oppdaterer med saksnummer
+        val soknadMedSaksnummer = ikkeJournalforteSoknaderUtenSaksnummer.first().copy(
+            saksnummer = "12345",
+        )
+        søknadRepo.oppdater(soknadMedSaksnummer)
+
+        søknadRepo.hentIkkeJournalforteSoknaderUtenSaksnummer().size shouldBe 0
+
         val søknaderSomIkkeErJounalført = søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført()
         søknaderSomIkkeErJounalført.size shouldBe 1
 
@@ -60,6 +74,7 @@ internal class MottattSøknadRepoTest {
             journalpostId = "123",
         )
         søknadRepo.oppdater(journalførtSøknad)
+        søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført().size shouldBe 0
 
         // sender søknaden til saksbehandling-api
         val søknaderSomIkkeErSendtTilSaksbehandlingApi = søknadRepo.hentSøknaderSomSkalSendesTilSaksbehandlingApi()
@@ -80,6 +95,9 @@ internal class MottattSøknadRepoTest {
             eier = Applikasjonseier.Arena,
         )
         søknadRepo.lagre(mottattSøknad)
+
+        søknadRepo.hentIkkeJournalforteSoknaderUtenSaksnummer().size shouldBe 0
+
         val søknaderSomIkkeErJounalført = søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført()
         søknaderSomIkkeErJounalført.size shouldBe 1
 
@@ -92,6 +110,7 @@ internal class MottattSøknadRepoTest {
             journalpostId = "123",
         )
         søknadRepo.oppdater(journalførtSøknad)
+        søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført().size shouldBe 0
 
         // sender søknaden til saksbehandling-api
         val søknaderSomIkkeErSendtTilSaksbehandlingApi = søknadRepo.hentSøknaderSomSkalSendesTilSaksbehandlingApi()
@@ -129,5 +148,6 @@ internal class MottattSøknadRepoTest {
         journalpostId = null,
         opprettet = opprettet,
         eier = eier,
+        saksnummer = null,
     )
 }

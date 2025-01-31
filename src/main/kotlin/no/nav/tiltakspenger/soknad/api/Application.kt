@@ -47,10 +47,10 @@ import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
 import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SaksbehandlingApiKlient
 import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SendSøknadTilSaksbehandlingApiService
 import no.nav.tiltakspenger.soknad.api.soknad.NySøknadService
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepoImpl
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
-import no.nav.tiltakspenger.soknad.api.soknad.jobb.SøknadJobbServiceImpl
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.SøknadJobbService
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet.JournalforendeEnhetService
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet.arbeidsfordeling.ArbeidsfordelingClient
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonHttpklient
@@ -111,7 +111,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         oauth2CredentialsClient.clientCredentials(joarkScope)
     }
 
-    val søknadRepo = SøknadRepoImpl()
+    val søknadRepo = SøknadRepo()
     val pdlService = PdlService(environment.config)
     val søknadService: SøknadService = SøknadServiceImpl(
         pdfService = PdfServiceImpl(
@@ -123,15 +123,14 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
         joarkService = JoarkService(joarkClient),
     )
     val nySøknadService = NySøknadService(søknadRepo)
-    val saksbehandlingApiKlient = SaksbehandlingApiKlient(
-        config = environment.config,
-        endpoint = if (Configuration.isNais()) environment.config.property("endpoints.tiltakspengervedtak").getString() else "http://host.docker.internal:8080",
-        scope = if (Configuration.isNais()) environment.config.property("scope.vedtak").getString() else "localhost",
-    )
+    val saksbehandlingApiEndpoint = if (Configuration.isNais()) environment.config.property("endpoints.tiltakspengervedtak").getString() else "http://host.docker.internal:8080"
+    val saksbehandlingApiScope = if (Configuration.isNais()) environment.config.property("scope.vedtak").getString() else "localhost"
+    val saksbehandlingApiKlient = SaksbehandlingApiKlient(baseUrl = saksbehandlingApiEndpoint) {
+        oauth2CredentialsClient.clientCredentials(saksbehandlingApiScope)
+    }
     val sendSøknadTilSaksbehandlingApiService = SendSøknadTilSaksbehandlingApiService(saksbehandlingApiKlient)
 
-    val søknadJobbService =
-        SøknadJobbServiceImpl(søknadRepo, personHttpklient, søknadService, sendSøknadTilSaksbehandlingApiService)
+    val søknadJobbService = SøknadJobbService(søknadRepo, personHttpklient, søknadService, sendSøknadTilSaksbehandlingApiService)
     val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
@@ -172,6 +171,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
             runCheckFactory = runCheckFactory,
             tasks =
             listOf { correlationId ->
+                søknadJobbService.hentEllerOpprettSaksnummer(correlationId)
                 søknadJobbService.journalførLagredeSøknader(correlationId)
                 søknadJobbService.sendJournalførteSøknaderTilSaksbehandlingApi(correlationId)
             },
