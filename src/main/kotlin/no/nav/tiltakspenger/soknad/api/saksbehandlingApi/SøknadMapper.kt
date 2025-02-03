@@ -19,7 +19,11 @@ import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadflyktninger
 import no.nav.tiltakspenger.soknad.api.soknad.Supplerendestønadover67
 import java.time.LocalDate
 
-fun søknadMapper(søknad: Søknad, jounalpostId: String): SøknadDTO {
+fun søknadMapper(
+    søknad: Søknad,
+    jounalpostId: String,
+    saksnummer: String,
+): SøknadDTO {
     val soknad = if (!søknad.spørsmålsbesvarelser.mottarAndreUtbetalinger) {
         søknad.copy(
             spørsmålsbesvarelser = søknad.spørsmålsbesvarelser.copy(
@@ -119,6 +123,7 @@ fun søknadMapper(søknad: Søknad, jounalpostId: String): SøknadDTO {
             periode = soknad.spørsmålsbesvarelser.pensjonsordning.periode,
         ),
         opprettet = soknad.innsendingTidspunkt,
+        saksnummer = saksnummer,
     )
 }
 

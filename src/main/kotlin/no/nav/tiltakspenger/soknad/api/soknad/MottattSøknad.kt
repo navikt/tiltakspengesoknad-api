@@ -24,4 +24,5 @@ data class MottattSøknad(
     val journalpostId: String?,
     val opprettet: LocalDateTime,
     val eier: Applikasjonseier,
+    val saksnummer: String?,
 )

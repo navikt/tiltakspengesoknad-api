@@ -1,6 +1,7 @@
 package no.nav.tiltakspenger.soknad.api.saksbehandlingApi
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
@@ -9,30 +10,21 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.server.config.ApplicationConfig
+import no.nav.tiltakspenger.libs.common.AccessToken
 import no.nav.tiltakspenger.libs.common.CorrelationId
+import no.nav.tiltakspenger.libs.common.Fnr
 import no.nav.tiltakspenger.libs.soknad.SøknadDTO
-import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
-import no.nav.tiltakspenger.soknad.api.auth.oauth.GrantRequest
-import no.nav.tiltakspenger.soknad.api.httpClientCIO
 import no.nav.tiltakspenger.soknad.api.httpClientWithRetry
 
 class SaksbehandlingApiKlient(
-    // TODO jah: [ApplicationConfig] bør ikke sendes inn hit. Send heller endepunktet og en funksjon for å hente token.
-    config: ApplicationConfig,
-    private val endpoint: String,
-    private val scope: String,
     private val httpClient: HttpClient = httpClientWithRetry(timeout = 10L),
+    private val baseUrl: String,
+    private val getToken: suspend () -> AccessToken,
 ) {
-    private val oauth2Client = checkNotNull(ClientConfig(config, httpClientCIO()).clients["azure"])
-
     suspend fun sendSøknad(søknadDTO: SøknadDTO, correlationId: CorrelationId) {
-        val grantRequest = GrantRequest.clientCredentials(scope)
-        val token =
-            oauth2Client.accessToken(grantRequest).access_token ?: throw RuntimeException("Failed to get access token")
-        val httpResponse = httpClient.preparePost("$endpoint/soknad") {
+        val httpResponse = httpClient.preparePost("$baseUrl/soknad") {
             header("Nav-Call-Id", correlationId.toString())
-            bearerAuth(token)
+            bearerAuth(getToken().token)
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)
             setBody(søknadDTO)
@@ -42,4 +34,26 @@ class SaksbehandlingApiKlient(
             else -> throw RuntimeException("error (responseCode=${httpResponse.status.value}) from saksbehandling-api")
         }
     }
+
+    suspend fun hentEllerOpprettSaksnummer(fnr: Fnr, correlationId: CorrelationId): String {
+        val httpResponse = httpClient.preparePost("$baseUrl/saksnummer") {
+            header("Nav-Call-Id", correlationId.toString())
+            bearerAuth(getToken().token)
+            accept(ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
+            setBody(FnrDTO(fnr.verdi))
+        }.execute()
+        when (httpResponse.status) {
+            HttpStatusCode.OK -> return httpResponse.body<SaksnummerResponse>().saksnummer
+            else -> throw RuntimeException("saksbehandling-api svarte med feilkode ved henting av saksnummer: ${httpResponse.status.value}")
+        }
+    }
 }
+
+data class FnrDTO(
+    val fnr: String,
+)
+
+data class SaksnummerResponse(
+    val saksnummer: String,
+)

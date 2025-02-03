@@ -29,6 +29,7 @@ data class NySøknadCommand(
             journalpostId = null,
             opprettet = innsendingTidspunkt,
             eier = eier,
+            saksnummer = null,
         )
     }
 }
