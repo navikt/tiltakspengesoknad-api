@@ -12,7 +12,7 @@ import io.ktor.http.contentType
 import io.ktor.server.config.ApplicationConfig
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.objectMapper
-import no.nav.tiltakspenger.soknad.api.soknad.LOG
+import no.nav.tiltakspenger.soknad.api.soknad.routes.LOG
 import no.nav.tiltakspenger.soknad.api.util.Bilde
 import no.nav.tiltakspenger.soknad.api.util.Detect.APPLICATON_PDF
 import no.nav.tiltakspenger.soknad.api.util.Detect.IMAGE_JPEG

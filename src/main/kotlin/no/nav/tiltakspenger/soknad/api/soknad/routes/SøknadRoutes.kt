@@ -1,8 +1,7 @@
-package no.nav.tiltakspenger.soknad.api.soknad
+package no.nav.tiltakspenger.soknad.api.soknad.routes
 
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.CannotTransformContentToTypeException
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
@@ -19,12 +18,13 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.antivirus.MalwareFoundException
 import no.nav.tiltakspenger.soknad.api.fødselsnummer
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
+import no.nav.tiltakspenger.soknad.api.soknad.NySøknadCommand
+import no.nav.tiltakspenger.soknad.api.soknad.NySøknadService
 import java.time.LocalDateTime
 
 val LOG = KotlinLogging.logger { }
 
 fun Route.søknadRoutes(
-    søknadService: SøknadService,
     nySøknadService: NySøknadService,
     avService: AvService,
     metricsCollector: MetricsCollector,
@@ -33,7 +33,7 @@ fun Route.søknadRoutes(
         val requestTimer = metricsCollector.søknadsmottakLatencySeconds.startTimer()
         try {
             val innsendingTidspunkt = LocalDateTime.now()
-            val (brukersBesvarelser, vedlegg) = søknadService.taInnSøknadSomMultipart(call.receiveMultipart())
+            val (brukersBesvarelser, vedlegg) = taInnSøknadSomMultipart(call.receiveMultipart())
             avService.gjørVirussjekkAvVedlegg(vedlegg)
             val fødselsnummer = call.fødselsnummer() ?: throw IllegalStateException("Mangler fødselsnummer")
             val acr = call.acr() ?: "Ingen Level"

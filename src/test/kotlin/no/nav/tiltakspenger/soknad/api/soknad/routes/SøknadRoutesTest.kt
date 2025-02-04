@@ -1,4 +1,4 @@
-package no.nav.tiltakspenger.soknad.api.soknad
+package no.nav.tiltakspenger.soknad.api.soknad.routes
 
 import com.nimbusds.jwt.SignedJWT
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -13,17 +13,20 @@ import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.tiltakspenger.soknad.api.antivirus.AvService
 import no.nav.tiltakspenger.soknad.api.configureTestApplication
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.PersonDTO
+import no.nav.tiltakspenger.soknad.api.soknad.NySøknadService
+import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
-internal class MottattSøknadRoutesTest {
+internal class SøknadRoutesTest {
 
     private val pdlServiceMock = mockk<PdlService>().also { mock ->
         coEvery { mock.hentPersonaliaMedBarn(any(), any(), any()) } returns PersonDTO(
@@ -63,12 +66,8 @@ internal class MottattSøknadRoutesTest {
 
     @Test
     fun `post med ugyldig token skal gi 401`() {
-        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-            coEvery { mock.taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
-        }
-
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock)
+            configureTestApplication()
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ugyldigtoken")
                 setBody(
@@ -85,14 +84,10 @@ internal class MottattSøknadRoutesTest {
 
     @Test
     fun `post med token som har ugyldig acr claim skal gi 401`() {
-        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-            coEvery { mock.taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
-        }
-
         val token = issueTestToken(acr = "Level3")
 
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock)
+            configureTestApplication()
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(
@@ -109,14 +104,10 @@ internal class MottattSøknadRoutesTest {
 
     @Test
     fun `post med token som har expiret utenfor leeway skal gi 401`() {
-        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-            coEvery { mock.taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
-        }
-
         val token = issueTestToken(expiry = -60L)
 
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock)
+            configureTestApplication()
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(
@@ -133,14 +124,12 @@ internal class MottattSøknadRoutesTest {
 
     @Test
     fun `post på soknad-endepunkt skal svare med 400 hvis taInnSøknadSomMultipart svarer med BadRequest`() {
-        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-            coEvery { mock.taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
-        }
-
+        mockkStatic("no.nav.tiltakspenger.soknad.api.soknad.routes.SoknadRequestMapperKt")
+        coEvery { taInnSøknadSomMultipart(any()) } throws BadRequestException("1")
         val token = issueTestToken()
 
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock)
+            configureTestApplication()
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(
@@ -157,17 +146,15 @@ internal class MottattSøknadRoutesTest {
 
     @Test
     fun `post på soknad-endepunkt skal svare med 400 hvis søknadJson ikke er gyldig`() {
-        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-            coEvery { mock.taInnSøknadSomMultipart(any()) } throws RequestValidationException(
-                "søknadJson",
-                listOf("Kvalifisering fra dato må være tidligere eller lik til dato"),
-            )
-        }
-
+        mockkStatic("no.nav.tiltakspenger.soknad.api.soknad.routes.SoknadRequestMapperKt")
+        coEvery { taInnSøknadSomMultipart(any()) } throws RequestValidationException(
+            "søknadJson",
+            listOf("Kvalifisering fra dato må være tidligere eller lik til dato"),
+        )
         val token = issueTestToken()
 
         testApplication {
-            configureTestApplication(søknadService = søknadServiceMock)
+            configureTestApplication()
             val response = client.post("/soknad") {
                 header("Authorization", "Bearer ${token.serialize()}")
                 setBody(
@@ -183,24 +170,9 @@ internal class MottattSøknadRoutesTest {
     }
 
     @Test
-    fun `post på soknad-endepunkt skal svare med 204 No Content ved gyldig søknad `() {
-        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-            coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-            coEvery {
-                mock.opprettDokumenterOgArkiverIJoark(
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                )
-            } returns Pair("123", mockk())
-        }
-
+    fun `post på soknad-endepunkt skal svare med 201 Created ved gyldig søknad `() {
+        mockkStatic("no.nav.tiltakspenger.soknad.api.soknad.routes.SoknadRequestMapperKt")
+        coEvery { taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
         val søknadRepoMock = mockk<SøknadRepo>().also { mock ->
             coEvery { mock.lagre(any()) } returns Unit
         }
@@ -210,7 +182,6 @@ internal class MottattSøknadRoutesTest {
 
         testApplication {
             configureTestApplication(
-                søknadService = søknadServiceMock,
                 avService = avServiceMock,
                 pdlService = pdlServiceMock,
                 nySøknadService = nySøknadService,
@@ -228,58 +199,4 @@ internal class MottattSøknadRoutesTest {
             assertEquals(HttpStatusCode.Created, response.status)
         }
     }
-
-//    @Test
-//    fun `post på soknad-endepunkt skal svare med 500 hvis journalføringen feiler`() {
-//        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-//            coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-//            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any(), any()) } throws IllegalStateException("blabla")
-//        }
-//
-//        val token = issueTestToken()
-//
-//        testApplication {
-//            configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
-//            val response = client.post("/soknad") {
-//                header("Authorization", "Bearer ${token.serialize()}")
-//                setBody(
-//                    MultiPartFormDataContent(
-//                        formData {},
-//                        "WebAppBoundary",
-//                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
-//                    ),
-//                )
-//            }
-//            assertEquals(HttpStatusCode.InternalServerError, response.status)
-//        }
-//    }
-//
-//    @Test
-//    fun `post på soknad-endepunkt skal svare med 500 hvis man ikke får hentet personalia fra PDL`() {
-//        val søknadServiceMock = mockk<SøknadService>().also { mock ->
-//            coEvery { mock.taInnSøknadSomMultipart(any()) } returns Pair(mockk(), emptyList())
-//            coEvery { mock.opprettDokumenterOgArkiverIJoark(any(), any(), any(), any(), any(), any(), any(), any()) } returns Pair("123", mockk())
-//        }
-//
-//        val pdlServiceMock = mockk<PdlService>().also { mock ->
-//            coEvery { mock.hentPersonaliaMedBarn(any(), any(), any()) } throws IllegalStateException("blabla")
-//        }
-//
-//        val token = issueTestToken()
-//
-//        testApplication {
-//            configureTestApplication(søknadService = søknadServiceMock, avService = avServiceMock, pdlService = pdlServiceMock)
-//            val response = client.post("/soknad") {
-//                header("Authorization", "Bearer ${token.serialize()}")
-//                setBody(
-//                    MultiPartFormDataContent(
-//                        formData {},
-//                        "WebAppBoundary",
-//                        ContentType.MultiPart.FormData.withParameter("boundary", "WebAppBoundary"),
-//                    ),
-//                )
-//            }
-//            assertEquals(HttpStatusCode.InternalServerError, response.status)
-//        }
-//    }
 }

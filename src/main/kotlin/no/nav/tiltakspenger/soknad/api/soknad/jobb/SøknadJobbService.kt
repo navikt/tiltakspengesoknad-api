@@ -3,24 +3,26 @@ package no.nav.tiltakspenger.soknad.api.soknad.jobb
 import no.nav.tiltakspenger.libs.common.CorrelationId
 import no.nav.tiltakspenger.libs.common.Fnr
 import no.nav.tiltakspenger.libs.logging.sikkerlogg
-import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SendSøknadTilSaksbehandlingApiService
+import no.nav.tiltakspenger.soknad.api.log
+import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SaksbehandlingApiKlient
+import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.søknadMapper
+import no.nav.tiltakspenger.soknad.api.soknad.Applikasjonseier
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforing.JournalforingService
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonHttpklient
-import no.nav.tiltakspenger.soknad.api.soknad.log
 import java.time.LocalDateTime
 
 class SøknadJobbService(
     private val søknadRepo: SøknadRepo,
     private val personHttpklient: PersonHttpklient,
-    private val søknadService: SøknadService,
-    private val sendSøknadTilSaksbehandlingApiService: SendSøknadTilSaksbehandlingApiService,
+    private val journalforingService: JournalforingService,
+    private val saksbehandlingApiKlient: SaksbehandlingApiKlient,
 ) {
     suspend fun hentEllerOpprettSaksnummer(correlationId: CorrelationId) {
         søknadRepo.hentSoknaderUtenSaksnummer().forEach { soknad ->
             log.info { "Henter eller oppretter saksnummer for søknad med id ${soknad.id}" }
             val saksnummer = try {
-                sendSøknadTilSaksbehandlingApiService.hentEllerOpprettSaksnummer(
+                saksbehandlingApiKlient.hentEllerOpprettSaksnummer(
                     Fnr.fromString(soknad.fnr),
                     correlationId,
                 )
@@ -36,6 +38,10 @@ class SøknadJobbService(
     suspend fun journalførLagredeSøknader(correlationId: CorrelationId) {
         søknadRepo.hentAlleSøknadDbDtoSomIkkeErJournalført().forEach { søknad ->
             log.info { "Journalfør søknad jobb: Prøver å journalføre søknad med søknadId ${søknad.id}" }
+            if (søknad.eier == Applikasjonseier.Tiltakspenger && søknad.saksnummer.isNullOrEmpty()) {
+                log.error { "Søknad med id ${søknad.id} mangler saksnummer, kan ikke journalføre" }
+                throw IllegalStateException("Kan ikke journalføre søknad som mangler saksnummer")
+            }
 
             val navn = try {
                 personHttpklient.hentNavnForFnr(Fnr.fromString(søknad.fnr))
@@ -45,7 +51,7 @@ class SøknadJobbService(
                 return@forEach
             }
             val (journalpostId, søknadDto) = try {
-                søknadService.opprettDokumenterOgArkiverIJoark(
+                journalforingService.opprettDokumenterOgArkiverIJoark(
                     spørsmålsbesvarelser = søknad.søknadSpm,
                     fnr = søknad.fnr,
                     fornavn = navn.fornavn,
@@ -54,6 +60,7 @@ class SøknadJobbService(
                     acr = søknad.acr,
                     innsendingTidspunkt = søknad.opprettet,
                     søknadId = søknad.id,
+                    saksnummer = søknad.saksnummer,
                     callId = correlationId.toString(),
                 )
             } catch (e: Exception) {
@@ -81,10 +88,12 @@ class SøknadJobbService(
             checkNotNull(søknad.saksnummer) { "Send søknad til saksbehandling-api jobb: Søknad ${søknad.id} mangler saksnummer" }
             try {
                 val sendtTilSaksbehandlingApi = LocalDateTime.now()
-                sendSøknadTilSaksbehandlingApiService.sendSøknad(
-                    søknad = søknad.søknad,
-                    journalpostId = søknad.journalpostId,
-                    saksnummer = søknad.saksnummer,
+                saksbehandlingApiKlient.sendSøknad(
+                    søknadDTO = søknadMapper(
+                        søknad = søknad.søknad,
+                        jounalpostId = søknad.journalpostId,
+                        saksnummer = søknad.saksnummer,
+                    ),
                     correlationId = correlationId,
                 )
                 log.info { "Send søknad til saksbehandling-api jobb: Søknad ${søknad.id} er sendt til saksbehandling-api - prøver lagre utsendingstidspuktet" }

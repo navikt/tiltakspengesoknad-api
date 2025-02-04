@@ -9,6 +9,7 @@ enum class Tema(val value: String) {
     TILTAKSPENGER("IND"),
 }
 
+const val JOURNALFORENDE_ENHET_AUTOMATISK_BEHANDLING = "9999"
 private const val TITTEL = "Søknad om tiltakspenger"
 private const val BREVKODE_FOR_SØKNAD = "NAV 76-13.45"
 
@@ -30,10 +31,9 @@ data class JournalpostRequest private constructor(
             søknad: Søknad,
             pdf: ByteArray,
             vedlegg: List<Vedlegg>,
-            journalforendeEnhet: String?,
             saksnummer: String?,
         ) = JournalpostRequest(
-            journalfoerendeEnhet = journalforendeEnhet,
+            journalfoerendeEnhet = saksnummer?.let { JOURNALFORENDE_ENHET_AUTOMATISK_BEHANDLING },
             avsenderMottaker = AvsenderMottaker(id = fnr),
             bruker = Bruker(id = fnr),
             sak = saksnummer?.let {

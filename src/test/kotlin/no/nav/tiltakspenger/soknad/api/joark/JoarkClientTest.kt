@@ -67,7 +67,7 @@ internal class JoarkClientTest {
 
         runTest {
             val resp = joarkClient.opprettJournalpost(
-                request = journalpostRequest("1234", "saksnummer"),
+                request = journalpostRequest("saksnummer"),
                 søknadId = søknadId,
                 callId = "123",
             )
@@ -95,7 +95,7 @@ internal class JoarkClientTest {
         runTest {
             shouldThrow<RuntimeException> {
                 joarkClient.opprettJournalpost(
-                    request = journalpostRequest("1234", "saksnummer"),
+                    request = journalpostRequest("saksnummer"),
                     søknadId = søknadId,
                     callId = "123",
                 )
@@ -161,7 +161,6 @@ internal class JoarkClientTest {
     }
 
     private fun journalpostRequest(
-        journalforendeEnhet: String? = null,
         saksnummer: String? = null,
     ) = JournalpostRequest.from(
         fnr = "ident",
@@ -174,7 +173,6 @@ internal class JoarkClientTest {
                 dokument = "vedleggInnhold".toByteArray(),
             ),
         ),
-        journalforendeEnhet = journalforendeEnhet,
         saksnummer = saksnummer,
     )
 
