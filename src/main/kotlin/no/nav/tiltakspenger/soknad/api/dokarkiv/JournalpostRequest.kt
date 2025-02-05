@@ -1,4 +1,4 @@
-package no.nav.tiltakspenger.soknad.api.joark
+package no.nav.tiltakspenger.soknad.api.dokarkiv
 
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.objectMapper

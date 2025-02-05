@@ -33,10 +33,10 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.db.flywayMigrate
+import no.nav.tiltakspenger.soknad.api.dokarkiv.DokarkivClient
+import no.nav.tiltakspenger.soknad.api.dokarkiv.DokarkivService
 import no.nav.tiltakspenger.soknad.api.featuretoggling.setupUnleash
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
-import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
-import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.jobber.TaskExecutor
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.metrics.metricRoutes
@@ -104,10 +104,10 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     }
     val journalforendeEnhetService = JournalforendeEnhetService(arbeidsfordelingClient)
 
-    val joarkEndpoint = environment.config.property("endpoints.joark").getString()
-    val joarkScope = environment.config.property("scope.joark").getString()
-    val joarkClient = JoarkClient(baseUrl = joarkEndpoint) {
-        oauth2CredentialsClient.clientCredentials(joarkScope)
+    val dokarkivEndpoint = environment.config.property("endpoints.dokarkiv").getString()
+    val dokarkivScope = environment.config.property("scope.dokarkiv").getString()
+    val dokarkivClient = DokarkivClient(baseUrl = dokarkivEndpoint) {
+        oauth2CredentialsClient.clientCredentials(dokarkivScope)
     }
 
     val journalforingService = JournalforingService(
@@ -117,7 +117,7 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
                 client = httpClientCIO(timeout = 30L),
             ),
         ),
-        joarkService = JoarkService(joarkClient),
+        dokarkivService = DokarkivService(dokarkivClient),
     )
 
     val søknadRepo = SøknadRepo()

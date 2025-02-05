@@ -1,13 +1,13 @@
-package no.nav.tiltakspenger.soknad.api.joark
+package no.nav.tiltakspenger.soknad.api.dokarkiv
 
 import no.nav.tiltakspenger.libs.common.SøknadId
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
 import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 
-class JoarkService(
-    private val joarkClient: JoarkClient,
+class DokarkivService(
+    private val dokarkivClient: DokarkivClient,
 ) {
-    suspend fun sendPdfTilJoark(
+    suspend fun sendPdfTilDokarkiv(
         pdf: ByteArray,
         søknad: Søknad,
         fnr: String,
@@ -23,6 +23,6 @@ class JoarkService(
             vedlegg = vedlegg,
             saksnummer = saksnummer,
         )
-        return joarkClient.opprettJournalpost(journalpost, søknadId, callId)
+        return dokarkivClient.opprettJournalpost(journalpost, søknadId, callId)
     }
 }

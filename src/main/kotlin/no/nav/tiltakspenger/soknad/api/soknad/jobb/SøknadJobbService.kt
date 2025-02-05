@@ -51,7 +51,7 @@ class SøknadJobbService(
                 return@forEach
             }
             val (journalpostId, søknadDto) = try {
-                journalforingService.opprettDokumenterOgArkiverIJoark(
+                journalforingService.opprettDokumenterOgArkiverIDokarkiv(
                     spørsmålsbesvarelser = søknad.søknadSpm,
                     fnr = søknad.fnr,
                     fornavn = navn.fornavn,
@@ -64,8 +64,8 @@ class SøknadJobbService(
                     callId = correlationId.toString(),
                 )
             } catch (e: Exception) {
-                log.error(RuntimeException("Trigger stacktrace for enklere debug.")) { "Journalfør søknad jobb: Feil under journalføring mot Joark for søknadId ${søknad.id}" }
-                sikkerlogg.error(e) { "Journalfør søknad jobb: Feil under journalføring mot Joark for søknadId ${søknad.id}" }
+                log.error(RuntimeException("Trigger stacktrace for enklere debug.")) { "Journalfør søknad jobb: Feil under journalføring mot Dokarkiv for søknadId ${søknad.id}" }
+                sikkerlogg.error(e) { "Journalfør søknad jobb: Feil under journalføring mot Dokarkiv for søknadId ${søknad.id}" }
                 return@forEach
             }
             søknadRepo.oppdater(

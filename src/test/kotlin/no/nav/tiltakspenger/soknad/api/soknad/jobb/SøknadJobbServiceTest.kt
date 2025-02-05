@@ -10,9 +10,9 @@ import kotlinx.coroutines.runBlocking
 import no.nav.tiltakspenger.libs.common.CorrelationId
 import no.nav.tiltakspenger.soknad.api.db.DataSource
 import no.nav.tiltakspenger.soknad.api.db.PostgresTestcontainer
-import no.nav.tiltakspenger.soknad.api.joark.JOURNALFORENDE_ENHET_AUTOMATISK_BEHANDLING
-import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
-import no.nav.tiltakspenger.soknad.api.joark.JoarkService
+import no.nav.tiltakspenger.soknad.api.dokarkiv.DokarkivClient
+import no.nav.tiltakspenger.soknad.api.dokarkiv.DokarkivService
+import no.nav.tiltakspenger.soknad.api.dokarkiv.JOURNALFORENDE_ENHET_AUTOMATISK_BEHANDLING
 import no.nav.tiltakspenger.soknad.api.pdf.PdfService
 import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SaksbehandlingApiKlient
 import no.nav.tiltakspenger.soknad.api.soknad.Applikasjonseier
@@ -33,9 +33,9 @@ class SøknadJobbServiceTest {
     private val søknadRepo = SøknadRepo()
     private val personHttpklient = mockk<PersonHttpklient>()
     private val pdfService = mockk<PdfService>()
-    private val joarkClient = mockk<JoarkClient>()
-    private val joarkService = JoarkService(joarkClient)
-    private val journalforingService = JournalforingService(pdfService, joarkService)
+    private val dokarkivClient = mockk<DokarkivClient>()
+    private val dokarkivService = DokarkivService(dokarkivClient)
+    private val journalforingService = JournalforingService(pdfService, dokarkivService)
     private val saksbehandlingApiKlient = mockk<SaksbehandlingApiKlient>(relaxed = true)
     private val søknadJobbService = SøknadJobbService(søknadRepo, personHttpklient, journalforingService, saksbehandlingApiKlient)
     private val saksnummer = "1234"
@@ -48,7 +48,7 @@ class SøknadJobbServiceTest {
 
     @BeforeEach
     fun setup() {
-        clearMocks(saksbehandlingApiKlient, personHttpklient, pdfService, joarkClient)
+        clearMocks(saksbehandlingApiKlient, personHttpklient, pdfService, dokarkivClient)
         Flyway.configure()
             .dataSource(DataSource.hikariDataSource)
             .loggers("slf4j")
@@ -64,7 +64,7 @@ class SøknadJobbServiceTest {
         coEvery { personHttpklient.hentNavnForFnr(any()) } returns navn
         coEvery { pdfService.lagPdf(any()) } returns "pdf".toByteArray()
         coEvery { pdfService.konverterVedlegg(any()) } returns emptyList()
-        coEvery { joarkClient.opprettJournalpost(any(), any(), any()) } returns journalpostId
+        coEvery { dokarkivClient.opprettJournalpost(any(), any(), any()) } returns journalpostId
     }
 
     @Test
@@ -123,7 +123,7 @@ class SøknadJobbServiceTest {
         oppdatertSoknad?.journalført shouldNotBe null
 
         coVerify {
-            joarkClient.opprettJournalpost(
+            dokarkivClient.opprettJournalpost(
                 match { it.journalfoerendeEnhet == JOURNALFORENDE_ENHET_AUTOMATISK_BEHANDLING && it.sak?.fagsakId == mottattSøknad.saksnummer && it.kanFerdigstilleAutomatisk() },
                 mottattSøknad.id,
                 any(),
@@ -152,7 +152,7 @@ class SøknadJobbServiceTest {
         oppdatertSoknad?.journalført shouldNotBe null
 
         coVerify {
-            joarkClient.opprettJournalpost(
+            dokarkivClient.opprettJournalpost(
                 match { it.journalfoerendeEnhet == null && it.sak == null && !it.kanFerdigstilleAutomatisk() },
                 mottattSøknad.id,
                 any(),

@@ -1,8 +1,8 @@
 package no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforing
 
 import no.nav.tiltakspenger.libs.common.SøknadId
+import no.nav.tiltakspenger.soknad.api.dokarkiv.DokarkivService
 import no.nav.tiltakspenger.soknad.api.domain.Søknad
-import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.log
 import no.nav.tiltakspenger.soknad.api.pdf.PdfService
 import no.nav.tiltakspenger.soknad.api.soknad.SpørsmålsbesvarelserDTO
@@ -11,9 +11,9 @@ import java.time.LocalDateTime
 
 class JournalforingService(
     private val pdfService: PdfService,
-    private val joarkService: JoarkService,
+    private val dokarkivService: DokarkivService,
 ) {
-    suspend fun opprettDokumenterOgArkiverIJoark(
+    suspend fun opprettDokumenterOgArkiverIDokarkiv(
         spørsmålsbesvarelser: SpørsmålsbesvarelserDTO,
         fnr: String,
         fornavn: String,
@@ -40,7 +40,7 @@ class JournalforingService(
         log.info { "Generering av søknadsPDF OK" }
         val vedleggSomPdfer = pdfService.konverterVedlegg(vedlegg)
         log.info { "Vedleggskonvertering OK" }
-        val journalpostId = joarkService.sendPdfTilJoark(
+        val journalpostId = dokarkivService.sendPdfTilDokarkiv(
             pdf = pdf,
             søknad = søknad,
             fnr = fnr,
