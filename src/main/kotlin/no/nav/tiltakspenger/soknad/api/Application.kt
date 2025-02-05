@@ -34,7 +34,6 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.db.flywayMigrate
-import no.nav.tiltakspenger.soknad.api.featuretoggling.setupUnleash
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
 import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.jobber.TaskExecutor
@@ -86,11 +85,6 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     install(RequestValidation) {
         validateSøknad()
     }
-
-    val unleash = setupUnleash(environment = environment)
-    log.info { "Unleash server url er: ${environment.config.property("unleash.unleash_server_api_url").getString()}" }
-    log.info { "Redirect feature er enabled: ${unleash.isEnabled("REDIRECT_TIL_GAMMEL_SOKNAD")}" }
-
     val pdlEndpoint = environment.config.property("endpoints.pdl").getString()
     val pdlScope = environment.config.property("scope.pdl").getString()
     val oauth2CredentialsClient = checkNotNull(ClientConfig(environment.config, httpClientWithRetry()).clients["azure"])

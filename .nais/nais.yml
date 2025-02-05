@@ -60,7 +60,6 @@ spec:
         - host: {{outboundExternalUrls.pdl}}
         - host: {{outboundExternalUrls.dokarkiv}}
         - host: {{outboundExternalUrls.tiltakspengerarena}}
-        - host: "tiltakspenger-unleash-api.nav.cloud.nais.io"
   env:
     - name: PDL_ENDPOINT_URL
       value: {{ endpoints.pdl }}
@@ -90,10 +89,6 @@ spec:
       value: {{ endpoints.tiltakspengertiltak }}
     - name: TILTAKSPENGER_TILTAK_AUDIENCE
       value: {{ audience.tiltakspengertiltak }}
-    - name: UNLEASH_ENVIRONMENT
-      value: {{ unleash.environment }}
-  envFrom:
-    - secret: tiltakspenger-soknad-api-unleash-api-token
   resources:
     limits:
       memory: 2048Mi
