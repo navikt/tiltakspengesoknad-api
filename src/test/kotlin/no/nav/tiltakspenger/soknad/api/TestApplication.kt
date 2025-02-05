@@ -12,13 +12,11 @@ import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.soknad.NySøknadService
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import java.util.UUID.randomUUID
 
 fun ApplicationTestBuilder.configureTestApplication(
     pdlService: PdlService = mockk(),
-    søknadService: SøknadService = mockk(),
     nySøknadService: NySøknadService = mockk(),
     tiltakService: TiltakService = mockk(),
     avService: AvService = mockk(),
@@ -38,7 +36,6 @@ fun ApplicationTestBuilder.configureTestApplication(
         installAuthentication()
         setupRouting(
             pdlService = pdlService,
-            søknadService = søknadService,
             tiltakService = tiltakService,
             avService = avService,
             metricsCollector = metricsCollector,

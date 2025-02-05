@@ -1,10 +1,10 @@
 package no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet
 
+import no.nav.tiltakspenger.soknad.api.log
 import no.nav.tiltakspenger.soknad.api.pdl.AdressebeskyttelseGradering
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet.arbeidsfordeling.ArbeidsfordelingClient
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet.arbeidsfordeling.ArbeidsfordelingRequest
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.Person
-import no.nav.tiltakspenger.soknad.api.soknad.log
 
 class JournalforendeEnhetService(
     private val arbeidsfordelingClient: ArbeidsfordelingClient,

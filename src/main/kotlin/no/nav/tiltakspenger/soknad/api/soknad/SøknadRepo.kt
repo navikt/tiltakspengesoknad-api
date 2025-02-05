@@ -121,6 +121,25 @@ class SøknadRepo {
         }
     }
 
+    fun hentSoknad(soknadId: SøknadId): MottattSøknad? {
+        return sessionOf(DataSource.hikariDataSource).use {
+            it.transaction { transaction ->
+                transaction.run(
+                    queryOf(
+                        """
+                           select * from søknad where id = :id
+                        """.trimIndent(),
+                        mapOf(
+                            "id" to soknadId.toString(),
+                        ),
+                    ).map { row ->
+                        row.toSøknadDbDto()
+                    }.asSingle,
+                )
+            }
+        }
+    }
+
     private fun Row.toSøknadDbDto(): MottattSøknad {
         return MottattSøknad(
             id = SøknadId.fromString(string("id")),

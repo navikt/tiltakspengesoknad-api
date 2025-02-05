@@ -1,4 +1,4 @@
-package no.nav.tiltakspenger.soknad.api.soknad
+package no.nav.tiltakspenger.soknad.api.soknad.routes
 
 import io.ktor.http.ContentDisposition
 import io.ktor.http.HeaderValueParam
@@ -11,7 +11,7 @@ import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.utils.io.core.Input
 import io.ktor.utils.io.core.endOfInput
 import io.ktor.utils.io.jvm.nio.toByteReadChannel
-import io.mockk.coEvery
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
@@ -19,8 +19,12 @@ import io.mockk.mockkStatic
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.Buffer
 import kotlinx.io.asByteChannel
-import no.nav.tiltakspenger.soknad.api.joark.JoarkService
-import no.nav.tiltakspenger.soknad.api.pdf.PdfService
+import no.nav.tiltakspenger.soknad.api.soknad.Barnetillegg
+import no.nav.tiltakspenger.soknad.api.soknad.Introduksjonsprogram
+import no.nav.tiltakspenger.soknad.api.soknad.ManueltRegistrertBarn
+import no.nav.tiltakspenger.soknad.api.soknad.Periode
+import no.nav.tiltakspenger.soknad.api.soknad.RegistrertBarn
+import no.nav.tiltakspenger.soknad.api.soknad.Tiltak
 import no.nav.tiltakspenger.soknad.api.soknad.validering.defaultPeriode
 import no.nav.tiltakspenger.soknad.api.soknad.validering.spørsmålsbesvarelser
 import no.nav.tiltakspenger.soknad.api.soknad.validering.toJsonString
@@ -28,18 +32,12 @@ import no.nav.tiltakspenger.soknad.api.tiltak.Deltakelsesperiode
 import no.nav.tiltakspenger.soknad.api.util.Detect
 import no.nav.tiltakspenger.soknad.api.util.sjekkContentType
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
-internal class MottattSøknadServiceTest {
-    private val mockPdfService = mockk<PdfService>().also { mock ->
-        coEvery { mock.lagPdf(any()) }
-    }
-    private val mockJoarkService = mockk<JoarkService>().also { mock ->
-        coEvery { mock.sendPdfTilJoark(any(), any(), any(), any(), any(), any(), any(), any()) }
-    }
-
+class SoknadRequestMapperTest {
     private val gyldigSpørsmålsbesvarelser = spørsmålsbesvarelser()
 
     class MockMultiPartData(private val partDataList: MutableList<PartData>) : MultiPartData {
@@ -48,10 +46,10 @@ internal class MottattSøknadServiceTest {
         }
     }
 
-    private val søknadService = SøknadServiceImpl(
-        pdfService = mockPdfService,
-        joarkService = mockJoarkService,
-    )
+    @BeforeEach
+    fun setup() {
+        clearAllMocks()
+    }
 
     @Test
     fun `taInnSøknadSomMultipart leser inn MultiPartData med gyldig søknad to vedlegg`() {
@@ -100,7 +98,7 @@ internal class MottattSøknadServiceTest {
         )
 
         runBlocking {
-            val (søknad, vedlegg) = søknadService.taInnSøknadSomMultipart(mockMultiPartData)
+            val (søknad, vedlegg) = taInnSøknadSomMultipart(mockMultiPartData)
             assertEquals(søknad.tiltak.aktivitetId, "123")
             assertEquals(vedlegg.size, 2)
         }
@@ -139,7 +137,7 @@ internal class MottattSøknadServiceTest {
         )
 
         runBlocking {
-            assertThrows<RequestValidationException> { søknadService.taInnSøknadSomMultipart(mockMultiPartData) }
+            assertThrows<RequestValidationException> { taInnSøknadSomMultipart(mockMultiPartData) }
         }
     }
 
@@ -196,7 +194,7 @@ internal class MottattSøknadServiceTest {
         )
 
         runBlocking {
-            val (spørsmålsbesvarelser) = søknadService.taInnSøknadSomMultipart(mockMultiPartData)
+            val (spørsmålsbesvarelser) = taInnSøknadSomMultipart(mockMultiPartData)
             assertEquals(
                 spørsmålsbesvarelser.tiltak.arrangør,
                 """&amp;lt;script&amp;gt;arrangør&amp;lt;\\\/script&amp;gt;""",

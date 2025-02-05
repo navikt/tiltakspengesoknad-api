@@ -3,6 +3,7 @@ package no.nav.tiltakspenger.soknad.api.soknad
 import arrow.core.Either
 import no.nav.tiltakspenger.libs.logging.sikkerlogg
 import no.nav.tiltakspenger.soknad.api.Configuration
+import no.nav.tiltakspenger.soknad.api.log
 
 class NySøknadService(
     private val søknadRepo: SøknadRepo,

@@ -1,4 +1,4 @@
-package no.nav.tiltakspenger.soknad.api.joark
+package no.nav.tiltakspenger.soknad.api.dokarkiv
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -17,7 +17,7 @@ import no.nav.tiltakspenger.soknad.api.vedlegg.Vedlegg
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-internal class JoarkClientTest {
+internal class DokarkivClientTest {
     private val journalpostId = "1"
     private val søknadId = SøknadId.random()
     private val baseurl = "http://dokarkiv"
@@ -26,20 +26,20 @@ internal class JoarkClientTest {
     fun `opprettJournalpost - skal ikke ferdigstille, blir opprettet - returnerer journalpostid`() {
         val mock = MockEngine {
             respond(
-                content = svarIkkeFerdigstiltJoark,
+                content = svarIkkeFerdigstilt,
                 status = HttpStatusCode.Created,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
 
         val client = httpClientGeneric(mock)
-        val joarkClient = JoarkClient(
+        val dokarkivClient = DokarkivClient(
             client = client,
             baseUrl = baseurl,
         ) { getMockToken() }
 
         runTest {
-            val resp = joarkClient.opprettJournalpost(
+            val resp = dokarkivClient.opprettJournalpost(
                 request = journalpostRequest(),
                 søknadId = søknadId,
                 callId = "123",
@@ -53,21 +53,21 @@ internal class JoarkClientTest {
     fun `opprettJournalpost - skal ferdigstille, blir opprettet og ferdigstilt - returnerer journalpostid`() {
         val mock = MockEngine {
             respond(
-                content = svarFerdigstiltJoark,
+                content = svarFerdigstilt,
                 status = HttpStatusCode.Created,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
 
         val client = httpClientGeneric(mock)
-        val joarkClient = JoarkClient(
+        val dokarkivClient = DokarkivClient(
             client = client,
             baseUrl = baseurl,
         ) { getMockToken() }
 
         runTest {
-            val resp = joarkClient.opprettJournalpost(
-                request = journalpostRequest("1234", "saksnummer"),
+            val resp = dokarkivClient.opprettJournalpost(
+                request = journalpostRequest("saksnummer"),
                 søknadId = søknadId,
                 callId = "123",
             )
@@ -80,22 +80,22 @@ internal class JoarkClientTest {
     fun `opprettJournalpost - skal ferdigstille, blir opprettet men ikke ferdigstilt - kaster feil`() {
         val mock = MockEngine {
             respond(
-                content = svarIkkeFerdigstiltJoark,
+                content = svarIkkeFerdigstilt,
                 status = HttpStatusCode.Created,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
 
         val client = httpClientGeneric(mock)
-        val joarkClient = JoarkClient(
+        val dokarkivClient = DokarkivClient(
             client = client,
             baseUrl = baseurl,
         ) { getMockToken() }
 
         runTest {
             shouldThrow<RuntimeException> {
-                joarkClient.opprettJournalpost(
-                    request = journalpostRequest("1234", "saksnummer"),
+                dokarkivClient.opprettJournalpost(
+                    request = journalpostRequest("saksnummer"),
                     søknadId = søknadId,
                     callId = "123",
                 )
@@ -104,23 +104,23 @@ internal class JoarkClientTest {
     }
 
     @Test
-    fun `hvis joark svarer med 409 Conflict returnerer opprettJournalpost en journalpostId hvis vi har fått en`() {
+    fun `hvis dokarkiv svarer med 409 Conflict returnerer opprettJournalpost en journalpostId hvis vi har fått en`() {
         val mock = MockEngine {
             respond(
-                content = svarIkkeFerdigstiltJoark,
+                content = svarIkkeFerdigstilt,
                 status = HttpStatusCode.Conflict,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
         }
 
         val client = httpClientGeneric(mock)
-        val joarkClient = JoarkClient(
+        val dokarkivClient = DokarkivClient(
             client = client,
             baseUrl = baseurl,
         ) { getMockToken() }
 
         runTest {
-            val resp = joarkClient.opprettJournalpost(
+            val resp = dokarkivClient.opprettJournalpost(
                 request = journalpostRequest(),
                 søknadId = søknadId,
                 callId = "123",
@@ -130,7 +130,7 @@ internal class JoarkClientTest {
     }
 
     @Test
-    fun `joark svarer med feil`() {
+    fun `dokarkiv svarer med feil`() {
         val mock = MockEngine {
             respond(
                 content = "",
@@ -140,14 +140,14 @@ internal class JoarkClientTest {
         }
 
         val client = httpClientGeneric(mock)
-        val joarkClient = JoarkClient(
+        val dokarkivClient = DokarkivClient(
             client = client,
             baseUrl = baseurl,
         ) { getMockToken() }
 
         runTest {
             shouldThrow<RuntimeException> {
-                joarkClient.opprettJournalpost(
+                dokarkivClient.opprettJournalpost(
                     request = journalpostRequest(),
                     søknadId = søknadId,
                     callId = "123",
@@ -161,7 +161,6 @@ internal class JoarkClientTest {
     }
 
     private fun journalpostRequest(
-        journalforendeEnhet: String? = null,
         saksnummer: String? = null,
     ) = JournalpostRequest.from(
         fnr = "ident",
@@ -174,18 +173,17 @@ internal class JoarkClientTest {
                 dokument = "vedleggInnhold".toByteArray(),
             ),
         ),
-        journalforendeEnhet = journalforendeEnhet,
         saksnummer = saksnummer,
     )
 
-    private val svarFerdigstiltJoark = """
+    private val svarFerdigstilt = """
         {
           "journalpostId": "$journalpostId",
           "journalpostferdigstilt": true
         }
     """.trimIndent()
 
-    private val svarIkkeFerdigstiltJoark = """
+    private val svarIkkeFerdigstilt = """
         {
           "journalpostId": "$journalpostId",
           "journalpostferdigstilt": false

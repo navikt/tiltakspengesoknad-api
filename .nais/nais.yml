@@ -69,12 +69,12 @@ spec:
       value: {{ audience.pdl }}
     - name: PDL_SCOPE
       value: {{ scope.pdl }}
-    - name: JOARK_ENDPOINT_URL
-      value: {{ endpoints.joark }}
-    - name: JOARK_AUDIENCE
-      value: {{ audience.joark }}
-    - name: JOARK_SCOPE
-      value: {{ scope.joark }}
+    - name: DOKARKIV_ENDPOINT_URL
+      value: {{ endpoints.dokarkiv }}
+    - name: DOKARKIV_AUDIENCE
+      value: {{ audience.dokarkiv }}
+    - name: DOKARKIV_SCOPE
+      value: {{ scope.dokarkiv }}
     - name: VEDTAK_SCOPE
       value: {{ scope.vedtak }}
     - name: PDF_ENDPOINT_URL

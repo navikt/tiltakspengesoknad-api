@@ -33,10 +33,10 @@ import no.nav.tiltakspenger.soknad.api.antivirus.AvServiceImpl
 import no.nav.tiltakspenger.soknad.api.auth.installAuthentication
 import no.nav.tiltakspenger.soknad.api.auth.oauth.ClientConfig
 import no.nav.tiltakspenger.soknad.api.db.flywayMigrate
+import no.nav.tiltakspenger.soknad.api.dokarkiv.DokarkivClient
+import no.nav.tiltakspenger.soknad.api.dokarkiv.DokarkivService
 import no.nav.tiltakspenger.soknad.api.featuretoggling.setupUnleash
 import no.nav.tiltakspenger.soknad.api.health.healthRoutes
-import no.nav.tiltakspenger.soknad.api.joark.JoarkClient
-import no.nav.tiltakspenger.soknad.api.joark.JoarkService
 import no.nav.tiltakspenger.soknad.api.jobber.TaskExecutor
 import no.nav.tiltakspenger.soknad.api.metrics.MetricsCollector
 import no.nav.tiltakspenger.soknad.api.metrics.metricRoutes
@@ -45,24 +45,23 @@ import no.nav.tiltakspenger.soknad.api.pdf.PdfServiceImpl
 import no.nav.tiltakspenger.soknad.api.pdl.PdlService
 import no.nav.tiltakspenger.soknad.api.pdl.pdlRoutes
 import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SaksbehandlingApiKlient
-import no.nav.tiltakspenger.soknad.api.saksbehandlingApi.SendSøknadTilSaksbehandlingApiService
 import no.nav.tiltakspenger.soknad.api.soknad.NySøknadService
 import no.nav.tiltakspenger.soknad.api.soknad.SøknadRepo
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadService
-import no.nav.tiltakspenger.soknad.api.soknad.SøknadServiceImpl
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.SøknadJobbService
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet.JournalforendeEnhetService
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforendeEnhet.arbeidsfordeling.ArbeidsfordelingClient
+import no.nav.tiltakspenger.soknad.api.soknad.jobb.journalforing.JournalforingService
 import no.nav.tiltakspenger.soknad.api.soknad.jobb.person.PersonHttpklient
-import no.nav.tiltakspenger.soknad.api.soknad.søknadRoutes
+import no.nav.tiltakspenger.soknad.api.soknad.routes.søknadRoutes
 import no.nav.tiltakspenger.soknad.api.soknad.validateSøknad
 import no.nav.tiltakspenger.soknad.api.tiltak.TiltakService
 import no.nav.tiltakspenger.soknad.api.tiltak.tiltakRoutes
 import java.util.UUID.randomUUID
 
+val log = KotlinLogging.logger {}
+
 fun main(args: Array<String>) {
     System.setProperty("logback.configurationFile", Configuration.logbackConfigurationFile())
-    val log = KotlinLogging.logger {}
 
     Thread.setDefaultUncaughtExceptionHandler { _, e ->
         log.error { "Uncaught exception logget i securelog" }
@@ -105,32 +104,33 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
     }
     val journalforendeEnhetService = JournalforendeEnhetService(arbeidsfordelingClient)
 
-    val joarkEndpoint = environment.config.property("endpoints.joark").getString()
-    val joarkScope = environment.config.property("scope.joark").getString()
-    val joarkClient = JoarkClient(baseUrl = joarkEndpoint) {
-        oauth2CredentialsClient.clientCredentials(joarkScope)
+    val dokarkivEndpoint = environment.config.property("endpoints.dokarkiv").getString()
+    val dokarkivScope = environment.config.property("scope.dokarkiv").getString()
+    val dokarkivClient = DokarkivClient(baseUrl = dokarkivEndpoint) {
+        oauth2CredentialsClient.clientCredentials(dokarkivScope)
     }
 
-    val søknadRepo = SøknadRepo()
-    val pdlService = PdlService(environment.config)
-    val søknadService: SøknadService = SøknadServiceImpl(
+    val journalforingService = JournalforingService(
         pdfService = PdfServiceImpl(
             PdfClient(
                 config = environment.config,
                 client = httpClientCIO(timeout = 30L),
             ),
         ),
-        joarkService = JoarkService(joarkClient),
+        dokarkivService = DokarkivService(dokarkivClient),
     )
+
+    val søknadRepo = SøknadRepo()
+    val pdlService = PdlService(environment.config)
+
     val nySøknadService = NySøknadService(søknadRepo)
     val saksbehandlingApiEndpoint = if (Configuration.isNais()) environment.config.property("endpoints.tiltakspengervedtak").getString() else "http://host.docker.internal:8080"
     val saksbehandlingApiScope = if (Configuration.isNais()) environment.config.property("scope.vedtak").getString() else "localhost"
     val saksbehandlingApiKlient = SaksbehandlingApiKlient(baseUrl = saksbehandlingApiEndpoint) {
         oauth2CredentialsClient.clientCredentials(saksbehandlingApiScope)
     }
-    val sendSøknadTilSaksbehandlingApiService = SendSøknadTilSaksbehandlingApiService(saksbehandlingApiKlient)
 
-    val søknadJobbService = SøknadJobbService(søknadRepo, personHttpklient, søknadService, sendSøknadTilSaksbehandlingApiService)
+    val søknadJobbService = SøknadJobbService(søknadRepo, personHttpklient, journalforingService, saksbehandlingApiKlient)
     val avService: AvService = AvServiceImpl(
         av = AvClient(
             config = environment.config,
@@ -141,7 +141,6 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
 
     setupRouting(
         pdlService = pdlService,
-        søknadService = søknadService,
         tiltakService = tiltakService,
         avService = avService,
         metricsCollector = metricsCollector,
@@ -188,7 +187,6 @@ fun Application.soknadApi(metricsCollector: MetricsCollector = MetricsCollector(
 
 internal fun Application.setupRouting(
     pdlService: PdlService,
-    søknadService: SøknadService,
     nySøknadService: NySøknadService,
     tiltakService: TiltakService,
     avService: AvService,
@@ -203,7 +201,6 @@ internal fun Application.setupRouting(
                 metricsCollector = metricsCollector,
             )
             søknadRoutes(
-                søknadService = søknadService,
                 avService = avService,
                 metricsCollector = metricsCollector,
                 nySøknadService = nySøknadService,

@@ -1,4 +1,4 @@
-package no.nav.tiltakspenger.soknad.api.soknad
+package no.nav.tiltakspenger.soknad.api.soknad.routes
 
 import java.time.LocalDateTime
 
