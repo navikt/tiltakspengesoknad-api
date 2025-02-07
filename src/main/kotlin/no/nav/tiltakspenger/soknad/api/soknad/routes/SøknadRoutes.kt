@@ -62,8 +62,6 @@ fun Route.søknadRoutes(
                     requestTimer.observeDuration()
 
                     val søknadResponse = SøknadResponse(
-                        // TODO post-mvp jah: Dette kan vi vel ikke returnere?
-                        journalpostId = "ikkeJournalførtEnda",
                         innsendingTidspunkt = innsendingTidspunkt,
                     )
                     call.respond(status = HttpStatusCode.Created, message = søknadResponse)
